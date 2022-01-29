@@ -1,0 +1,499 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+demog_info_data_dir <- here::here("DataBook", "Modules", "DemographicInformation")
+
+# list all files in the directory
+# fs::dir_ls(demog_info_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(demog_info_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Demographic Information Results
+
+**Age group by sex**
+
+Description: Summary information by age group and sex of the respondents.
+
+Instrument questions:
+
+- Sex
+- What is your date of birth?
+
+```{r cagesex_tbls}
+# column names to use with huxtable
+cagesex_col_names <- c("Age Group (years)", "n", "%")
+cagesex_reg_col_names <- c("Region", "n", "%")
+
+# men, women, both sexes
+cagesex_m_w_b <- join_m_w_b(cagesex, 0, cagesex_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cagesex_u_r <- join_u_r(cagesex, 0, cagesex_col_names)
+```
+
+<br>
+
+```{r}
+cbind(cagesex_m_w_b$m, select(cagesex_m_w_b$w, -agerange), select(cagesex_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = "unwt_3", .title = "Age group and sex of respondents", .colspan_val = 7)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(cagesex_u_r$m_u, cagesex_u_r$m_r)
+tbl_w_u_r <- rbind(cagesex_u_r$w_u, cagesex_u_r$w_r)
+tbl_b_u_r <- rbind(cagesex_u_r$b_u, cagesex_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = "unwt_3", .title = "Age group and sex of respondents by type of settlement", .colspan_val = 7)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cagesex$b_reg %>% apply_hux(.col_names = cagesex_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Age group and sex of respondents by region", .colspan_val = 3) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C1, C2, C3
+- R script name: Cagesex
+
+***
+
+**Education**
+
+Description: Mean number of years of education among respondents.
+
+Instrument questions:
+
+- In total, how many years have you spent at school or in full-time study (excluding pre-school)?
+
+```{r ceduyears_tbls}
+# column names to use with huxtable
+ceduyears_col_names <- c("Age Group (years)", "n", "Mean")
+ceduyears_reg_col_names <- c("Region", "n", "Mean")
+
+# men, women, both sexes
+ceduyears_m_w_b <- join_m_w_b(ceduyears, 0, ceduyears_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ceduyears_u_r <- join_u_r(ceduyears, 0, ceduyears_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ceduyears_m_w_b$m, select(ceduyears_m_w_b$w, -agerange), select(ceduyears_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = "unwt_3", .title = "Mean number of years of education", .colspan_val = 7)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ceduyears_u_r$m_u, ceduyears_u_r$m_r)
+tbl_w_u_r <- rbind(ceduyears_u_r$w_u, ceduyears_u_r$w_r)
+tbl_b_u_r <- rbind(ceduyears_u_r$b_u, ceduyears_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = "unwt_3", .title = "Mean number of years of education by type of settlement", .colspan_val = 7)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ceduyears$b_reg %>% apply_hux(.col_names = ceduyears_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of years of education by region", .colspan_val = 3) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C4
+- R script name: Ceduyears
+
+***
+
+
+**Highest level of education**
+
+Description: Highest level of education achieved by the survey respondents.
+
+Instrument questions:
+
+- What is the highest level of education you have completed?
+
+```{r ceduhigh_c_tbls}
+# column names to use with huxtable
+ceduhigh_c_col_names <- 
+  c("Age Group (years)", "n", "% No formal schooling", "% Less than primary school", 
+    "% Primary school completed", "% Secondary school completed", "% High school completed", 
+    "% College/ University completed", "% Post graduate degree completed")
+
+# column names for region to use with huxtable
+ceduhigh_c_reg_col_names <- 
+  c("Region", "n", "% No formal schooling", "% Less than primary school", 
+    "% Primary school completed", "% Secondary school completed", "% High school completed", 
+    "% College/ University completed", "% Post graduate degree completed")
+
+# men, women, both sexes
+ceduhigh_c_m_w_b <- join_m_w_b(ceduhigh_c, 0, ceduhigh_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ceduhigh_c_u_r <- join_u_r(ceduhigh_c, 0, ceduhigh_c_col_names)
+```
+
+<br>
+
+```{r}
+ceduhigh_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Highest level of education", 9)
+```
+
+<br>
+
+```{r}
+ceduhigh_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Highest level of education", 9)
+```
+
+<br>
+
+```{r}
+ceduhigh_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Highest level of education", 9)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ceduhigh_c_u_r$m_u, ceduhigh_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Highest level of education by type of settlement", 9)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ceduhigh_c_u_r$w_u, ceduhigh_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Highest level of education by type of settlement", 9)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ceduhigh_c_u_r$b_u, ceduhigh_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Highest level of education by type of settlement", 9)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+ceduhigh_c$b_reg %>% apply_hux(.col_names = ceduhigh_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Highest level of education by region", 9) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C5
+- R script name: Ceduhigh
+
+***
+
+
+**Martial status**
+
+Description: Marital status of survey respondents.
+
+Instrument questions:
+
+- What is your marital status?
+
+```{r cmaritalstatus_c_tbls}
+# column names to use with huxtable
+cmaritalstatus_c_col_names <- 
+  c("Age Group (years)", "n", "% Never married", "% Currently married", 
+    "% Separated", "% Divorced", "% Widowed", "% Cohabiting")
+
+# column names for region to use with huxtable
+cmaritalstatus_c_reg_col_names <- 
+  c("Region", "n", "% Never married", "% Currently married", 
+    "% Separated", "% Divorced", "% Widowed", "% Cohabiting")
+
+# men, women, both sexes
+cmaritalstatus_c_m_w_b <- join_m_w_b(cmaritalstatus_c, 0, cmaritalstatus_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cmaritalstatus_c_u_r <- join_u_r(cmaritalstatus_c, 0, cmaritalstatus_c_col_names)
+```
+
+<br>
+
+```{r}
+cmaritalstatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Marital status", 8)
+```
+
+<br>
+
+```{r}
+cmaritalstatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Marital status", 8)
+```
+
+<br>
+
+```{r}
+cmaritalstatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Marital status", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cmaritalstatus_c_u_r$m_u, cmaritalstatus_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Marital status by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cmaritalstatus_c_u_r$w_u, cmaritalstatus_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Marital status by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cmaritalstatus_c_u_r$b_u, cmaritalstatus_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Marital status by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+cmaritalstatus_c$b_reg %>% apply_hux(.col_names = cmaritalstatus_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Marital status by region", 8) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C7
+- R script name: Cmaritalstatus
+
+***
+
+
+**Employment  status**
+
+Description: Proportion of respondents in paid employment and those who are unpaid. Unpaid includes persons who are non-paid, students, homemakers, retired, and unemployed.
+
+Instrument questions:
+
+- Which of the following best describes your main work status over the past 12 months?
+
+```{r cworkpaid_c_tbls}
+# column names to use with huxtable
+cworkpaid_c_col_names <- 
+  c("Age Group (years)", "n", "% Government employee", "% Non-government employee", "% Self-employed", "% Unpaid")
+
+# column names for region to use with huxtable
+cworkpaid_c_reg_col_names <- 
+  c("Region", "n", "% Government employee", "% Non-government employee", "% Self-employed", "% Unpaid")
+
+# men, women, both sexes
+cworkpaid_c_m_w_b <- join_m_w_b(cworkpaid_c, 0, cworkpaid_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cworkpaid_c_u_r <- join_u_r(cworkpaid_c, 0, cworkpaid_c_col_names)
+```
+
+<br>
+
+```{r}
+cworkpaid_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Employment status", 6)
+```
+
+<br>
+
+```{r}
+cworkpaid_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Employment status", 6)
+```
+
+<br>
+
+```{r}
+cworkpaid_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Employment status", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworkpaid_c_u_r$m_u, cworkpaid_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Employment status by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworkpaid_c_u_r$w_u, cworkpaid_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Employment status by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworkpaid_c_u_r$b_u, cworkpaid_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Employment status by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+cworkpaid_c$b_reg %>% apply_hux(.col_names = cworkpaid_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Employment status by region", 6) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C8
+- R script name: Cworkpaid
+
+***
+
+
+**Unpaid work and unemployed**
+
+Description: Proportion of respondents in unpaid work.
+
+Instrument questions:
+
+- Which of the following best describes your main work status over the past 12 months?
+
+```{r cworknotpaid_c_tbls}
+# column names to use with huxtable
+cworknotpaid_c_col_names <- 
+  c("Age Group (years)", "n", "% Non-paid", "% Student", "% Home-maker", "% Retired", 
+    "% Unemployed (Able to work)", "% Unemployed (Not able to work)")
+
+# column names for region to use with huxtable
+cworknotpaid_c_reg_col_names <- 
+  c("Region", "n", "% Non-paid", "% Student", "% Home-maker", "% Retired", 
+    "% Unemployed (Able to work)", "% Unemployed (Not able to work)")
+
+# men, women, both sexes
+cworknotpaid_c_m_w_b <- join_m_w_b(cworknotpaid_c, 0, cworknotpaid_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cworknotpaid_c_u_r <- join_u_r(cworknotpaid_c, 0, cworknotpaid_c_col_names)
+```
+
+<br>
+
+```{r}
+cworknotpaid_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Unpaid work and unemployed", 8) #%>% 
+  # insert_row(c("","","","","","","Unemployed",""), after = 2) %>% 
+  # merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(1:6))
+```
+
+<br>
+
+```{r}
+cworknotpaid_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Unpaid work and unemployed", 8)
+```
+
+<br>
+
+```{r}
+cworknotpaid_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Unpaid work and unemployed", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworknotpaid_c_u_r$m_u, cworknotpaid_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Unpaid work and unemployed by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworknotpaid_c_u_r$w_u, cworknotpaid_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Unpaid work and unemployed by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(cworknotpaid_c_u_r$b_u, cworknotpaid_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Unpaid work and unemployed by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+cworknotpaid_c$b_reg %>% apply_hux(.col_names = cworknotpaid_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Unpaid work and unemployed by region", 8) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: C8
+- R script name: Cworknotpaid
+
+***
+
+<br>
+<br>

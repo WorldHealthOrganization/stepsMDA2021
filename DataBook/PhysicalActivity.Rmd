@@ -1,0 +1,1131 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+pa_data_dir <- here::here("DataBook", "Modules", "PhysicalActivity")
+
+# list all files in the directory
+# fs::dir_ls(pa_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(pa_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Physical Activity
+
+**Introduction**
+
+A population's physical activity (or inactivity) can be described in different ways. The two most common ways are 
+
+1. to estimate a population's mean or median physical activity using a continuous indicator such as MET-minutes per week or time spent in physical activity, and 
+2. to classify certain percentages of a population in specific groups by setting up cut-points for a specific amount of physical activity.
+
+When analyzing GPAQ data, both continuous as well as categorical indicators are used.
+
+***
+
+**Metabolic Equivalent (MET)**
+
+METs (Metabolic Equivalents) are commonly used to express the intensity of physical activities, and are also used for the analysis of GPAQ data.
+
+Applying MET values to activity levels allows us to calculate total physical activity. MET is the ratio of a person's working metabolic rate relative to the resting metabolic rate. One MET is defined as the energy cost of sitting quietly, and is equivalent to a caloric consumption of 1 kcal/kg/hour. For the analysis of GPAQ data, existing guidelines have been adopted: It is estimated that, compared to sitting quietly, a person's caloric consumption is four times as high when being moderately active, and eight times as high when being vigorously active.
+
+Therefore, for the calculation of a person's total physical activity using GPAQ data, the following MET values are used:
+
++--------------+-------------------------------------+
+| **Domain**   | **MET value**                       |
++--------------+-------------------------------------+
+| Work         | -   Moderate MET value = 4.0        |
+|              |                                     |
+|              | -   Vigorous MET value = 8.0        |
++--------------+-------------------------------------+
+| Transport    | Cycling and walking MET value = 4.0 |
++--------------+-------------------------------------+
+| Recreation   | -   Moderate MET value = 4.0        |
+|              |                                     |
+|              | -   Vigorous MET value = 8.0        |
++--------------+-------------------------------------+
+
+***
+
+**WHO global recommendations on physical activity for health**
+
+For the calculation of the categorical indicator on the recommended amount of physical activity for health, the total time spent in physical activity during a typical week and the intensity of the physical activity are taken into account.
+
+Throughout a week, including activity for work, during transport and leisure time, adults should do at least
+
+-   150 minutes of moderate-intensity physical activity OR
+-   75 minutes of vigorous-intensity physical activity OR
+-   An equivalent combination of moderate- and vigorous-intensity physical activity achieving at least 600 MET-minutes.
+
+***
+
+**Former recommendations for comparison purposes**
+
+For comparison purposes, tables presenting cut-offs from former recommendations are also included in GPAQ data analysis.
+
+The three levels of physical activity suggested for classifying populations were low, moderate, and high. The criteria for these levels are shown below.
+
+**High** 
+
+A person reaching any of the following criteria is classified in this category:
+
+-   Vigorous-intensity activity on at least 3 days achieving a minimum of at least 1,500 MET-minutes/week OR
+-   7 or more days of any combination of walking, moderate- or vigorous-intensity activities achieving a minimum of at least 3,000 MET-minutes per week.
+
+**Moderate** 
+
+A person not meeting the criteria for the "high" category, but meeting any of the following criteria is classified in this category:
+
+-   3 or more days of vigorous-intensity activity of at least 20 minutes per day OR
+-   5 or more days of moderate-intensity activity or walking of at least 30 minutes per day OR
+-   5 or more days of any combination of walking, moderate- or vigorous-intensity activities achieving a minimum of at least 600 MET-minutes per week.
+
+**Low** 
+
+A person not meeting any of the above mentioned criteria falls in this category.
+
+***
+
+**Not meeting WHO recommendations on physical activity for health ("Insufficient physical activity")**
+
+Description: Percentage of respondents not meeting WHO recommendations on physical activity for health (respondents doing less than 150 minutes of moderate-intensity physical activity per week, or equivalent).
+
+Instrument questions:
+
+-   activity at work
+-   travel to and from places
+-   recreational activities
+
+```{r pnotmeetingrecs_c_tbls}
+# column names to use with huxtable
+pnotmeetingrecs_c_col_names <- c("Age Group (years)", "n", "% not meeting recs", "95% CI")
+pnotmeetingrecs_c_reg_col_names <- c("Region", "n", "% not meeting recs", "95% CI")
+
+# men, women, both sexes
+pnotmeetingrecs_c_m_w_b <- join_m_w_b(pnotmeetingrecs_c, 1, pnotmeetingrecs_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+pnotmeetingrecs_c_u_r <- join_u_r(pnotmeetingrecs_c, 1, pnotmeetingrecs_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(pnotmeetingrecs_c_m_w_b$m, select(pnotmeetingrecs_c_m_w_b$w, -agerange), select(pnotmeetingrecs_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Not meeting WHO recommendations on physical activity for health", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(pnotmeetingrecs_c_u_r$m_u, pnotmeetingrecs_c_u_r$m_r)
+tbl_w_u_r <- rbind(pnotmeetingrecs_c_u_r$w_u, pnotmeetingrecs_c_u_r$w_r)
+tbl_b_u_r <- rbind(pnotmeetingrecs_c_u_r$b_u, pnotmeetingrecs_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Not meeting WHO recommendations on physical activity for health by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+pnotmeetingrecs_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnotmeetingrecs_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Not meeting WHO recommendations on physical activity for health by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Pnotmeetingrecs
+
+***
+
+**Not meeting WHO recommendations on physical activity for health ("Insufficient physical activity")**
+
+Description: Respondents meeting WHO recommendations on physical activity for **additional** health benefits (physical activity ≥ 1200 MET-minutes/week).
+
+Instrument questions:
+
+-   activity at work
+-   travel to and from places
+-   recreational activities
+
+```{r pnotmeetingrecs_mets1200_tbls}
+# column names to use with huxtable
+pnotmeetingrecs_mets1200_col_names <- c("Age Group (years)", "n", "% not meeting recs", "95% CI")
+pnotmeetingrecs_mets1200_reg_col_names <- c("Region", "n", "% not meeting recs", "95% CI")
+
+# men, women, both sexes
+pnotmeetingrecs_mets1200_m_w_b <- join_m_w_b(pnotmeetingrecs_mets1200, 1, pnotmeetingrecs_mets1200_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+pnotmeetingrecs_mets1200_u_r <- join_u_r(pnotmeetingrecs_mets1200, 1, pnotmeetingrecs_mets1200_col_names)
+```
+
+<br>
+
+```{r}
+cbind(pnotmeetingrecs_mets1200_m_w_b$m, select(pnotmeetingrecs_mets1200_m_w_b$w, -agerange), select(pnotmeetingrecs_mets1200_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Meeting WHO recommendations on physical activity for additional health benefits", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(pnotmeetingrecs_mets1200_u_r$m_u, pnotmeetingrecs_mets1200_u_r$m_r)
+tbl_w_u_r <- rbind(pnotmeetingrecs_mets1200_u_r$w_u, pnotmeetingrecs_mets1200_u_r$w_r)
+tbl_b_u_r <- rbind(pnotmeetingrecs_mets1200_u_r$b_u, pnotmeetingrecs_mets1200_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Meeting WHO recommendations on physical activity for additional health benefits by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+pnotmeetingrecs_mets1200$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnotmeetingrecs_mets1200_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Meeting WHO recommendations on physical activity for additional health benefits by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Pnotmeetingrecs
+
+***
+
+**Levels of total physical activity according to former recommendations**
+
+Description: Percentage of respondents classified into three categories of total physical activity according to former recommendations.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r ptotallevels_c_tbls}
+
+# column names to use with huxtable
+ptotallevels_c_col_names <- c("Age Group (years)", "n", "% Low", "95% CI", "% Moderate", "95% CI", "% High", "95% CI")
+ptotallevels_c_reg_col_names <- c("Region", "n", "% Low", "95% CI", "% Moderate", "95% CI", "% High", "95% CI")
+
+# men, women, both sexes
+ptotallevels_c_m_w_b <- join_m_w_b(ptotallevels_c, 3, ptotallevels_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ptotallevels_c_u_r <- join_u_r(ptotallevels_c, 3, ptotallevels_c_col_names)
+```
+
+<br>
+
+```{r}
+ptotallevels_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Level of total physical activity according to former recommendations", 8) 
+```
+
+<br>
+
+```{r}
+ptotallevels_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Level of total physical activity according to former recommendations", 8)
+```
+
+<br>
+
+```{r}
+ptotallevels_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Level of total physical activity according to former recommendations", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ptotallevels_c_u_r$m_u, ptotallevels_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Level of total physical activity according to former recommendations by type of settlement", 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ptotallevels_c_u_r$w_u, ptotallevels_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Level of total physical activity according to former recommendations by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(ptotallevels_c_u_r$b_u, ptotallevels_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Level of total physical activity according to former recommendations by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+ptotallevels_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = ptotallevels_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Level of total physical activity according to former recommendations by region", 8)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Ptotallevels
+
+***
+
+**Total physical activity - mean**
+
+Description: Mean minutes of total physical activity on average per day.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r ptotal_mn_tbls}
+# column names to use with huxtable
+ptotal_mn_col_names <- c("Age Group (years)", "n", "Mean minutes", "95% CI")
+ptotal_mn_reg_col_names <- c("Region", "n", "Mean minutes", "95% CI")
+
+# men, women, both sexes
+ptotal_mn_m_w_b <- join_m_w_b(ptotal_mn, 1, ptotal_mn_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ptotal_mn_u_r <- join_u_r(ptotal_mn, 1, ptotal_mn_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ptotal_mn_m_w_b$m, select(ptotal_mn_m_w_b$w, -agerange), select(ptotal_mn_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean minutes of total physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ptotal_mn_u_r$m_u, ptotal_mn_u_r$m_r)
+tbl_w_u_r <- rbind(ptotal_mn_u_r$w_u, ptotal_mn_u_r$w_r)
+tbl_b_u_r <- rbind(ptotal_mn_u_r$b_u, ptotal_mn_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean minutes of total physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ptotal_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ptotal_mn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean minutes of total physical activity on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Ptotal
+
+***
+
+**Total physical activity - median**
+
+Description: Median minutes of total physical activity on average per day.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r ptotal_md_tbls}
+# column names to use with huxtable
+ptotal_md_col_names <- c("Age Group (years)", "n", "Median minutes", "Inter-quartile range (P25-P75)")
+ptotal_md_reg_col_names <- c("Region", "n", "Median minutes", "Inter-quartile range (P25-P75)")
+
+# men, women, both sexes
+ptotal_md_m_w_b <- join_m_w_b(ptotal_md, "q", ptotal_md_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ptotal_md_u_r <- join_u_r(ptotal_md, "q", ptotal_md_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ptotal_md_m_w_b$m, select(ptotal_md_m_w_b$w, -agerange), select(ptotal_md_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Median minutes of total physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ptotal_md_u_r$m_u, ptotal_md_u_r$m_r)
+tbl_w_u_r <- rbind(ptotal_md_u_r$w_u, ptotal_md_u_r$w_r)
+tbl_b_u_r <- rbind(ptotal_md_u_r$b_u, ptotal_md_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Median minutes of total physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ptotal_md$b_reg %>% unite_ci(.ci_amount = "q") %>% apply_hux(.col_names = ptotal_md_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Median minutes of total physical activity on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Ptotal
+
+***
+
+**Domain-specific physical activity - mean**
+
+Description: Mean minutes spent in work-, transport- and recreation-related physical activity on average per day.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r psetspecific_mn_tbls}
+# column names to use with huxtable
+psetspecific_mn_col_names <- c("Age Group (years)", "n", "Mean minutes", "95% CI")
+psetspecific_mn_reg_col_names <- c("Region", "n", "Mean minutes", "95% CI")
+
+# men, women, both sexes
+# 1 - Mean minutes of work-related physical activity on average per day
+pworkday_mn_m_w_b <- join_m_w_b(psetspecific_pworkday_mn, 1, psetspecific_mn_col_names)
+# 2 - Mean minutes of transport-related physical activity on average per day
+ptravelday_mn_m_w_b <- join_m_w_b(psetspecific_ptravelday_mn, 1, psetspecific_mn_col_names)
+# 3 - Mean minutes of recreation-related physical activity on average per day
+precday_mn_m_w_b <- join_m_w_b(psetspecific_precday_mn, 1, psetspecific_mn_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Mean minutes of work-related physical activity on average per day
+pworkday_mn_u_r <- join_u_r(psetspecific_pworkday_mn, 1, psetspecific_mn_col_names)
+# 2 - Mean minutes of transport-related physical activity on average per day
+ptravelday_mn_u_r <- join_u_r(psetspecific_ptravelday_mn, 1, psetspecific_mn_col_names)
+# 3 - Mean minutes of recreation-related physical activity on average per day
+precday_mn_u_r <- join_u_r(psetspecific_precday_mn, 1, psetspecific_mn_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(pworkday_mn_m_w_b$m, select(pworkday_mn_m_w_b$w, -agerange), select(pworkday_mn_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean minutes of work-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(ptravelday_mn_m_w_b$m, select(ptravelday_mn_m_w_b$w, -agerange), select(ptravelday_mn_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean minutes of transport-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(precday_mn_m_w_b$m, select(precday_mn_m_w_b$w, -agerange), select(precday_mn_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean minutes of recreation-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(pworkday_mn_u_r$m_u, pworkday_mn_u_r$m_r)
+tbl_w_u_r <- rbind(pworkday_mn_u_r$w_u, pworkday_mn_u_r$w_r)
+tbl_b_u_r <- rbind(pworkday_mn_u_r$b_u, pworkday_mn_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean minutes of work-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(ptravelday_mn_u_r$m_u, ptravelday_mn_u_r$m_r)
+tbl_w_u_r <- rbind(ptravelday_mn_u_r$w_u, ptravelday_mn_u_r$w_r)
+tbl_b_u_r <- rbind(ptravelday_mn_u_r$b_u, ptravelday_mn_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean minutes of transport-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(precday_mn_u_r$m_u, precday_mn_u_r$m_r)
+tbl_w_u_r <- rbind(precday_mn_u_r$w_u, precday_mn_u_r$w_r)
+tbl_b_u_r <- rbind(precday_mn_u_r$b_u, precday_mn_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean minutes of recreation-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+psetspecific_pworkday_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = psetspecific_mn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean minutes of work-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+psetspecific_ptravelday_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = psetspecific_mn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean minutes of transport-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+psetspecific_precday_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = psetspecific_mn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean minutes of recreation-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Psetspecific
+
+***
+
+**Domain-specific physical activity - median**
+
+Description: Median minutes spent on average per day in work-, transport- and recreation-related physical activity.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r psetspecific_md_tbls}
+# column names to use with huxtable
+psetspecific_md_col_names <- c("Age Group (years)", "n", "Median minutes", "95% CI")
+psetspecific_md_reg_col_names <- c("Region", "n", "Median minutes", "95% CI")
+
+# men, women, both sexes
+# 1 - Median minutes of work-related physical activity on average per day
+pworkday_md_m_w_b <- join_m_w_b(psetspecific_pworkday_md, "q", psetspecific_md_col_names)
+# 2 - Median minutes of transport-related physical activity on average per day
+ptravelday_md_m_w_b <- join_m_w_b(psetspecific_ptravelday_md, "q", psetspecific_md_col_names)
+# 3 - Median minutes of recreation-related physical activity on average per day
+precday_md_m_w_b <- join_m_w_b(psetspecific_precday_md, "q", psetspecific_md_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Median minutes of work-related physical activity on average per day
+pworkday_md_u_r <- join_u_r(psetspecific_pworkday_md, "q", psetspecific_md_col_names)
+# 2 - Median minutes of transport-related physical activity on average per day
+ptravelday_md_u_r <- join_u_r(psetspecific_ptravelday_md, "q", psetspecific_md_col_names)
+# 3 - Median minutes of recreation-related physical activity on average per day
+precday_md_u_r <- join_u_r(psetspecific_precday_md, "q", psetspecific_md_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(pworkday_md_m_w_b$m, select(pworkday_md_m_w_b$w, -agerange), select(pworkday_md_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Median minutes of work-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(ptravelday_md_m_w_b$m, select(ptravelday_md_m_w_b$w, -agerange), select(ptravelday_md_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Median minutes of transport-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(precday_md_m_w_b$m, select(precday_md_m_w_b$w, -agerange), select(precday_md_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Median minutes of recreation-related physical activity on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(pworkday_md_u_r$m_u, pworkday_md_u_r$m_r)
+tbl_w_u_r <- rbind(pworkday_md_u_r$w_u, pworkday_md_u_r$w_r)
+tbl_b_u_r <- rbind(pworkday_md_u_r$b_u, pworkday_md_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Median minutes of work-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(ptravelday_md_u_r$m_u, ptravelday_md_u_r$m_r)
+tbl_w_u_r <- rbind(ptravelday_md_u_r$w_u, ptravelday_md_u_r$w_r)
+tbl_b_u_r <- rbind(ptravelday_md_u_r$b_u, ptravelday_md_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Median minutes of transport-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(precday_md_u_r$m_u, precday_md_u_r$m_r)
+tbl_w_u_r <- rbind(precday_md_u_r$w_u, precday_md_u_r$w_r)
+tbl_b_u_r <- rbind(precday_md_u_r$b_u, precday_md_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Median minutes of recreation-related physical activity on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+psetspecific_pworkday_md$b_reg %>% unite_ci(.ci_amount = "q") %>% apply_hux(.col_names = psetspecific_md_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Median minutes of work-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+psetspecific_ptravelday_md$b_reg %>% unite_ci(.ci_amount = "q") %>% apply_hux(.col_names = psetspecific_md_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Median minutes of transport-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+psetspecific_precday_md$b_reg %>% unite_ci(.ci_amount = "q") %>% apply_hux(.col_names = psetspecific_md_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Median minutes of recreation-related physical activity on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Psetspecific
+
+***
+
+**No physical activity by domain**
+
+Description: Percentage of respondents classified as doing no work-, transport- or recreational-related physical activity.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r pnoactivitybyset_tbls}
+# column names to use with huxtable
+# 1 - No work-related physical activity
+pnoactivitybyset_work_col_names <- c("Age Group (years)", "n", "% no activity at work", "95% CI")
+pnoactivitybyset_work_reg_col_names <- c("Region", "n", "% no activity at work", "95% CI")
+# 2 - No transport-related physical activity
+pnoactivitybyset_trans_col_names <- c("Age Group (years)", "n", "% no activity for transport", "95% CI")
+pnoactivitybyset_trans_reg_col_names <- c("Region", "n", "% no activity for transport", "95% CI")
+# 3 - No recreation-related physical activity
+pnoactivitybyset_rec_col_names <- c("Age Group (years)", "n", "% no activity at recreation", "95% CI")
+pnoactivitybyset_rec_reg_col_names <- c("Region", "n", "% no activity at recreation", "95% CI")
+
+# men, women, both sexes
+# 1 - No work-related physical activity
+pnoactivitybyset_work_m_w_b <- join_m_w_b(pnoactivitybyset_work, 1, pnoactivitybyset_work_col_names)
+# 2 - No transport-related physical activity
+pnoactivitybyset_trans_m_w_b <- join_m_w_b(pnoactivitybyset_trans, 1, pnoactivitybyset_trans_col_names)
+# 3 - No recreation-related physical activity
+pnoactivitybyset_rec_m_w_b <- join_m_w_b(pnoactivitybyset_rec, 1, pnoactivitybyset_rec_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - No work-related physical activity
+pnoactivitybyset_work_u_r <- join_u_r(pnoactivitybyset_work, 1, pnoactivitybyset_work_col_names)
+# 2 - No transport-related physical activity
+pnoactivitybyset_trans_u_r <- join_u_r(pnoactivitybyset_trans, 1, pnoactivitybyset_trans_col_names)
+# 3 - No recreation-related physical activity
+pnoactivitybyset_rec_u_r <- join_u_r(pnoactivitybyset_rec, 1, pnoactivitybyset_rec_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(pnoactivitybyset_work_m_w_b$m, select(pnoactivitybyset_work_m_w_b$w, -agerange), select(pnoactivitybyset_work_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "No work-related physical activity", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(pnoactivitybyset_trans_m_w_b$m, select(pnoactivitybyset_trans_m_w_b$w, -agerange), select(pnoactivitybyset_trans_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "No transport-related physical activity", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(pnoactivitybyset_rec_m_w_b$m, select(pnoactivitybyset_rec_m_w_b$w, -agerange), select(pnoactivitybyset_rec_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "No recreation-related physical activity", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(pnoactivitybyset_work_u_r$m_u, pnoactivitybyset_work_u_r$m_r)
+tbl_w_u_r <- rbind(pnoactivitybyset_work_u_r$w_u, pnoactivitybyset_work_u_r$w_r)
+tbl_b_u_r <- rbind(pnoactivitybyset_work_u_r$b_u, pnoactivitybyset_work_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "No work-related physical activity by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(pnoactivitybyset_trans_u_r$m_u, pnoactivitybyset_trans_u_r$m_r)
+tbl_w_u_r <- rbind(pnoactivitybyset_trans_u_r$w_u, pnoactivitybyset_trans_u_r$w_r)
+tbl_b_u_r <- rbind(pnoactivitybyset_trans_u_r$b_u, pnoactivitybyset_trans_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "No transport-related physical activity by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(pnoactivitybyset_rec_u_r$m_u, pnoactivitybyset_rec_u_r$m_r)
+tbl_w_u_r <- rbind(pnoactivitybyset_rec_u_r$w_u, pnoactivitybyset_rec_u_r$w_r)
+tbl_b_u_r <- rbind(pnoactivitybyset_rec_u_r$b_u, pnoactivitybyset_rec_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "No recreation-related physical activity by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+pnoactivitybyset_work$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnoactivitybyset_work_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "No work-related physical activity by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+pnoactivitybyset_trans$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnoactivitybyset_trans_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "No transport-related physical activity by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+pnoactivitybyset_rec$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnoactivitybyset_rec_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "No recreation-related physical activity by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Pnoactivitybyset
+
+***
+
+
+**Composition of total physical activity**
+
+Description: Percentage of work, transport and recreational activity contributing to total activity.
+
+Instrument questions:
+
+- activity at work
+- travel to and from places
+- recreational activities
+
+```{r pcomposition_tbls}
+
+# column names to use with huxtable
+pcomposition_col_names <- c("Age Group (years)", "n", "%", "95% CI", "%", "95% CI", "%", "95% CI")
+
+pcomposition_reg_col_names <-
+  c("Region", "n", "% Activity from work", "95% CI",
+    "% Activity for transport", "95% CI", "% Activity during leisure time", "95% CI")
+
+final_tbl_col_names <-
+  c("Age Group (years)", "n", "% Activity from work", "95% CI",
+    "% Activity for transport", "95% CI", "% Activity during leisure time", "95% CI")
+
+# men, women, both sexes
+# 1 - work
+pcomposition_work_m_w_b <- join_m_w_b(pcomposition_work, 1, pcomposition_col_names)
+# 2 - transport
+pcomposition_trans_m_w_b <- join_m_w_b(pcomposition_trans, 1, pcomposition_col_names)
+# 3 - recreation
+pcomposition_rec_m_w_b <- join_m_w_b(pcomposition_rec, 1, pcomposition_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1
+pcomposition_work_u_r <- join_u_r(pcomposition_work, 1, pcomposition_col_names)
+# 2
+pcomposition_trans_u_r <- join_u_r(pcomposition_trans, 1, pcomposition_col_names)
+# 3
+pcomposition_rec_u_r <- join_u_r(pcomposition_rec, 1, pcomposition_col_names)
+```
+
+<br>
+
+```{r}
+# NOTE: SPECIFIC CASE OF JOINING TABLES FOR THIS INDICATOR
+cbind(pcomposition_work_m_w_b$m, 
+      select(pcomposition_trans_m_w_b$m, -c(agerange,n)), 
+      select(pcomposition_rec_m_w_b$m, -c(agerange,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>% 
+  final_m_w_b_tbl(1, "Men", "Composition of total physical activity", 8) 
+```
+
+<br>
+
+```{r}
+cbind(pcomposition_work_m_w_b$w, 
+      select(pcomposition_trans_m_w_b$w, -c(agerange,n)), 
+      select(pcomposition_rec_m_w_b$w, -c(agerange,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>%
+  final_m_w_b_tbl(1, "Women", "Composition of total physical activity", 8) 
+```
+
+<br>
+
+```{r}
+cbind(pcomposition_work_m_w_b$b, 
+      select(pcomposition_trans_m_w_b$b, -c(agerange,n)), 
+      select(pcomposition_rec_m_w_b$b, -c(agerange,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>%
+  final_m_w_b_tbl(1, "Both sexes", "Composition of total physical activity", 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_work_m_u_r <- rbind(pcomposition_work_u_r$m_u, pcomposition_work_u_r$m_r)
+tbl_trans_m_u_r <- rbind(pcomposition_trans_u_r$m_u, pcomposition_trans_u_r$m_r)
+tbl_rec_m_u_r <- rbind(pcomposition_rec_u_r$m_u, pcomposition_rec_u_r$m_r)
+
+cbind(tbl_work_m_u_r, select(tbl_trans_m_u_r, -c(agerange2,n)), select(tbl_rec_m_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Men", "Composition of total physical activity by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_work_w_u_r <- rbind(pcomposition_work_u_r$w_u, pcomposition_work_u_r$w_r)
+tbl_trans_w_u_r <- rbind(pcomposition_trans_u_r$w_u, pcomposition_trans_u_r$w_r)
+tbl_rec_w_u_r <- rbind(pcomposition_rec_u_r$w_u, pcomposition_rec_u_r$w_r)
+
+cbind(tbl_work_w_u_r, select(tbl_trans_w_u_r, -c(agerange2,n)), select(tbl_rec_w_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Women", "Composition of total physical activity by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_work_b_u_r <- rbind(pcomposition_work_u_r$b_u, pcomposition_work_u_r$b_r)
+tbl_trans_b_u_r <- rbind(pcomposition_trans_u_r$b_u, pcomposition_trans_u_r$b_r)
+tbl_rec_b_u_r <- rbind(pcomposition_rec_u_r$b_u, pcomposition_rec_u_r$b_r)
+
+cbind(tbl_work_b_u_r, select(tbl_trans_b_u_r, -c(agerange2,n)), select(tbl_rec_b_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Both sexes", "Composition of total physical activity by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+# 1 + 2 + 3
+cbind(pcomposition_work$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pcomposition_reg_col_names),
+      select(pcomposition_trans$b_reg %>% 
+               unite_ci(.ci_amount = 1) %>% 
+               apply_hux(.col_names = pcomposition_reg_col_names), -c(region,n)),
+      select(pcomposition_rec$b_reg %>% 
+               unite_ci(.ci_amount = 1) %>% 
+               apply_hux(.col_names = pcomposition_reg_col_names), -c(region,n))) %>% 
+  set_right_border(everywhere, c(4,6), 0) %>% set_contents(1, value = pcomposition_reg_col_names) %>%
+  final_m_w_b_tbl(1, "Both sexes", "Composition of total physical activity", 8)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Pcomposition
+
+***
+
+
+**No vigorous physical activity**
+
+Description: Percentage of respondents not engaging in vigorous physical activity.
+
+Instrument questions:
+
+- activity at work
+- recreational activities
+
+```{r pnovigorous_c_tbls}
+# column names to use with huxtable
+pnovigorous_c_col_names <- c("Age Group (years)", "n", "% no vigorous activity", "95% CI")
+pnovigorous_c_reg_col_names <- c("Region", "n", "% no vigorous activity", "95% CI")
+
+# men, women, both sexes
+pnovigorous_c_m_w_b <- join_m_w_b(pnovigorous_c, 1, pnovigorous_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+pnovigorous_c_u_r <- join_u_r(pnovigorous_c, 1, pnovigorous_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(pnovigorous_c_m_w_b$m, select(pnovigorous_c_m_w_b$w, -agerange), select(pnovigorous_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "No vigorous physical activity", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(pnovigorous_c_u_r$m_u, pnovigorous_c_u_r$m_r)
+tbl_w_u_r <- rbind(pnovigorous_c_u_r$w_u, pnovigorous_c_u_r$w_r)
+tbl_b_u_r <- rbind(pnovigorous_c_u_r$b_u, pnovigorous_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "No vigorous physical activity by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+pnovigorous_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = pnovigorous_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "No vigorous physical activity by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P1-P15b
+-   R script name: Pnovigorous
+
+***
+
+**Sedentary**
+
+Description: Minutes spent in sedentary activities on a typical day.
+
+Instrument questions:
+
+- sedentary behaviour
+
+```{r psedentary_tbls}
+# column names to use with huxtable
+psedentary_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+
+psedentary_reg_col_names <- 
+  c("Region", "n", "Mean minutes", "95% CI", "Median minutes", "Inter-quartile range (P25-P75)")
+
+final_tbl_col_names <- 
+  c("Age Group (years)", "n", "Mean minutes", "95% CI", "Median minutes", "Inter-quartile range (P25-P75)")
+
+# men, women, both sexes
+# 1 - mean
+psedentary_mn_m_w_b <- join_m_w_b(psedentary_mn, 1, psedentary_col_names)
+# 2 - median
+psedentary_md_m_w_b <- join_m_w_b(psedentary_md, "q", psedentary_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1
+psedentary_mn_u_r <- join_u_r(psedentary_mn, 1, psedentary_col_names)
+# 2
+psedentary_md_u_r <- join_u_r(psedentary_md, "q", psedentary_col_names)
+```
+
+<br>
+
+```{r}
+# NOTE: SPECIFIC CASE OF JOINING TABLES FOR THIS INDICATOR
+cbind(psedentary_mn_m_w_b$m, 
+      select(psedentary_md_m_w_b$m, -c(agerange,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>% 
+  final_m_w_b_tbl(1, "Men", "Minutes spent in sedentary activities on average per day", 6) 
+```
+
+<br>
+
+```{r}
+cbind(psedentary_mn_m_w_b$w, 
+      select(psedentary_md_m_w_b$w, -c(agerange,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>% 
+  final_m_w_b_tbl(1, "Women", "Minutes spent in sedentary activities on average per day", 6) 
+```
+
+<br>
+
+```{r}
+cbind(psedentary_mn_m_w_b$b, 
+      select(psedentary_md_m_w_b$b, -c(agerange,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% 
+  set_contents(1, value = final_tbl_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Minutes spent in sedentary activities on average per day", 6) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_mn_m_u_r <- rbind(psedentary_mn_u_r$m_u, psedentary_mn_u_r$m_r)
+tbl_md_m_u_r <- rbind(psedentary_md_u_r$m_u, psedentary_md_u_r$m_r)
+
+cbind(tbl_mn_m_u_r, select(tbl_md_m_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Men", "Minutes spent in sedentary activities on average per day by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_mn_w_u_r <- rbind(psedentary_mn_u_r$w_u, psedentary_mn_u_r$w_r)
+tbl_md_w_u_r <- rbind(psedentary_md_u_r$w_u, psedentary_md_u_r$w_r)
+
+cbind(tbl_mn_w_u_r, select(tbl_md_w_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Women", "Minutes spent in sedentary activities on average per day by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_mn_b_u_r <- rbind(psedentary_mn_u_r$b_u, psedentary_mn_u_r$b_r)
+tbl_md_b_u_r <- rbind(psedentary_md_u_r$b_u, psedentary_md_u_r$b_r)
+
+cbind(tbl_mn_b_u_r, select(tbl_md_b_u_r, -c(agerange2,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% set_contents(1, value = final_tbl_col_names) %>%
+  final_u_r_tbl(1, "Both sexes", "Minutes spent in sedentary activities on average per day by type of settlement", 6)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+# mean + median
+cbind(psedentary_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = psedentary_col_names),
+      select(psedentary_md$b_reg %>% 
+               unite_ci(.ci_amount = "q") %>% 
+               apply_hux(.col_names = psedentary_col_names), -c(region,n))) %>% 
+  set_right_border(everywhere, 4, 0) %>% set_contents(1, value = psedentary_reg_col_names) %>%
+  final_m_w_b_tbl(1, "Both sexes", "Minutes spent in sedentary activities on average per day", 6)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: P16a-b
+-   R script name: Psedentary
+
+***
+
+
+<br> 
+
+<br>

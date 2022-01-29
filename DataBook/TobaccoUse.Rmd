@@ -1,0 +1,2684 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+# Forestplot
+library(ggforestplot) # this requires m_se variable in the dataframe and m as numbers
+library(ggforce)
+```
+
+```{r source, include=FALSE}
+tobacco_use_data_dir <- here::here("DataBook", "Modules", "TobaccoUse")
+
+# list all files in the directory
+# fs::dir_ls(tobacco_use_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(tobacco_use_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+title_u_r <- "by type of settlement"
+title_reg <- "by region"
+```
+
+# Tobacco Use
+
+**Current smoking**
+
+Description: Current smokers among all respondents.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+
+```{r tsmokestatus_d_tbls}
+# prep the title
+tsmokestatus_d_title <- "Percentage of current smokers"
+
+# column names to use with huxtable
+tsmokestatus_d_col_names <- c("Age Group (years)", "n", "% Current smoker", "95% CI")
+tsmokestatus_d_reg_col_names <- c("Region", "n", "% Current smoker", "95% CI")
+
+# men, women, both sexes
+tsmokestatus_d_m_w_b <- join_m_w_b(tsmokestatus_d, 1, tsmokestatus_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokestatus_d_u_r <- join_u_r(tsmokestatus_d, 1, tsmokestatus_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokestatus_d_m_w_b$m, select(tsmokestatus_d_m_w_b$w, -agerange), select(tsmokestatus_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of current smokers", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# forestplot_steps(.data = tsmokestatus_d_list_long$m_w_b, .var = d, .var_val = "1) daily and non-daily smokers", .title = tsmokestatus_d_title, .xlab = "%")
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokestatus_d_u_r$m_u, tsmokestatus_d_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokestatus_d_u_r$w_u, tsmokestatus_d_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokestatus_d_u_r$b_u, tsmokestatus_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of current smokers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokestatus_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokestatus_d_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of current smokers by region", .colspan_val = 4) 
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T8
+- R script name:  Tsmokestatus
+
+***
+
+**Smoking status**
+
+Description: Smoking status of all respondents.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- In the past, did you ever smoke any tobacco products?
+
+```{r tsmokestatus_c_tbls}
+# prep the title
+tsmokestatus_c_title <- "Smoking status"
+
+# column names to use with huxtable
+tsmokestatus_c_col_names <- c("Age Group (years)", "n", "% Daily", "95% CI", "% Non-daily", "95% CI", 
+                            "% Former smoker", "95% CI", "% Never smoker", "95% CI")
+
+# column names for region to use with huxtable
+tsmokestatus_c_reg_col_names <- c("Region", "n", "% Daily", "95% CI", "% Non-daily", "95% CI", 
+                                "% Former smoker", "95% CI", "% Never smoker", "95% CI")
+
+# men, women, both sexes
+tsmokestatus_c_m_w_b <- join_m_w_b(tsmokestatus_c, 4, tsmokestatus_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokestatus_c_u_r <- join_u_r(tsmokestatus_c, 4, tsmokestatus_c_col_names)
+```
+
+<br>
+
+```{r}
+tsmokestatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Smoking status", 10)
+```
+
+<br>
+
+```{r}
+tsmokestatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Smoking status", 10)
+```
+
+<br>
+
+```{r}
+tsmokestatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Smoking status", 10)
+```
+
+<br>
+
+```{r}
+# forestplot_steps(.data = tsmokestatus_c_list_long$m_w_b, .var = c, 
+#                  .title = tsmokestatus_c_title, .xlab = "%", .many_vals = TRUE)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokestatus_c_u_r$m_u, tsmokestatus_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Smoking status by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokestatus_c_u_r$w_u, tsmokestatus_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Smoking status by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokestatus_c_u_r$b_u, tsmokestatus_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Smoking status by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+tsmokestatus_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = tsmokestatus_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Smoking status by region", 10) 
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T8
+- R script name:  Tsmokestatus
+
+***
+
+**Daily smoking**
+
+Description: Percentage of current daily smokers among smokers.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+
+```{r tsmokefreq_c_tbls}
+
+# column names to use with huxtable
+tsmokefreq_c_col_names <- c("Age Group (years)", "n", "% Daily smokers", "95% CI")
+tsmokefreq_c_reg_col_names <- c("Region", "n", "% Daily smokers", "95% CI")
+
+# men, women, both sexes
+tsmokefreq_c_m_w_b <- join_m_w_b(tsmokefreq_c, 1, tsmokefreq_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokefreq_c_u_r <- join_u_r(tsmokefreq_c, 1, tsmokefreq_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokefreq_c_m_w_b$m, select(tsmokefreq_c_m_w_b$w, -agerange), select(tsmokefreq_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current daily smokers among smokers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokefreq_c_u_r$m_u, tsmokefreq_c_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokefreq_c_u_r$w_u, tsmokefreq_c_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokefreq_c_u_r$b_u, tsmokefreq_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current daily smokers among smokers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokefreq_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokefreq_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current daily smokers among smokers by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T8
+- R script name:  Tsmokefreq
+
+***
+
+
+**Initiation and duration  of smoking**
+
+Description: Mean age of initiation and mean duration of smoking, in years, among daily smokers (no total age group for mean duration of smoking as age influences these values).
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- How old were you when you first started smoking?
+- Do you remember how long ago it was?
+
+```{r tsmokeagetime_initiation_duration_tbls}
+
+# column names to use with huxtable
+tsmokeagetime_initiation_col_names <- c("Age Group (years)", "n", "Mean age", "95% CI")
+tsmokeagetime_initiation_reg_col_names <- c("Region", "n", "Mean age", "95% CI")
+tsmokeagetime_duration_col_names <- c("Age Group (years)", "n", "Mean duration", "95% CI")
+tsmokeagetime_duration_reg_col_names <- c("Region", "n", "Mean duration", "95% CI")
+
+# INITIATION PART
+# men, women, both sexes
+tsmokeagetime_initiation_m_w_b <- join_m_w_b(tsmokeagetime_initiation, 1, tsmokeagetime_initiation_col_names)
+
+# DURATION PART
+# men, women, both sexes
+tsmokeagetime_duration_m_w_b <- join_m_w_b(tsmokeagetime_duration, 1, tsmokeagetime_duration_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokeagetime_initiation_u_r <- join_u_r(tsmokeagetime_initiation, 1, tsmokeagetime_initiation_col_names)
+# urban, rural
+tsmokeagetime_duration_u_r <- join_u_r(tsmokeagetime_duration, 1, tsmokeagetime_duration_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeagetime_initiation_m_w_b$m, select(tsmokeagetime_initiation_m_w_b$w, -agerange), select(tsmokeagetime_initiation_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean age started smoking", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeagetime_duration_m_w_b$m, select(tsmokeagetime_duration_m_w_b$w, -agerange), select(tsmokeagetime_duration_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean duration of smoking", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeagetime_initiation_u_r$m_u, tsmokeagetime_initiation_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeagetime_initiation_u_r$w_u, tsmokeagetime_initiation_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeagetime_initiation_u_r$b_u, tsmokeagetime_initiation_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean age started smoking by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeagetime_duration_u_r$m_u, tsmokeagetime_duration_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeagetime_duration_u_r$w_u, tsmokeagetime_duration_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeagetime_duration_u_r$b_u, tsmokeagetime_duration_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean duration of smoking by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeagetime_initiation$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeagetime_initiation_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean age started smoking by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeagetime_duration$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeagetime_duration_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean duration of smoking by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T3, T4a-c
+- R script name:  Tsmokeagetime
+
+***
+
+**Manufactured cigarette smokers**
+
+Description: Percentage of smokers who use manufactured cigarettes among daily smokers and among current smokers.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- On average, how many of the following products do you smoke each day?
+
+```{r tsmokeman_daily_nondaily_tbls}
+
+# column names to use with huxtable
+tsmokeman_daily_col_names <- c("Age Group (years)", "n", "Manufactured cigarette smoker", "95% CI")
+tsmokeman_daily_reg_col_names <- c("Region", "n", "Manufactured cigarette smoker", "95% CI")
+tsmokeman_nondaily_col_names <- c("Age Group (years)", "n", "Manufactured cigarette smoker", "95% CI")
+tsmokeman_nondaily_reg_col_names <- c("Region", "n", "Manufactured cigarette smoker", "95% CI")
+
+# DAILY PART
+# men, women, both sexes
+tsmokeman_daily_m_w_b <- join_m_w_b(tsmokeman_daily, 1, tsmokeman_daily_col_names)
+
+# NONDAILY PART
+# men, women, both sexes
+tsmokeman_nondaily_m_w_b <- join_m_w_b(tsmokeman_nondaily, 1, tsmokeman_nondaily_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokeman_daily_u_r <- join_u_r(tsmokeman_daily, 1, tsmokeman_daily_col_names)
+# urban, rural
+tsmokeman_nondaily_u_r <- join_u_r(tsmokeman_nondaily, 1, tsmokeman_nondaily_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeman_daily_m_w_b$m, select(tsmokeman_daily_m_w_b$w, -agerange), select(tsmokeman_daily_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Manufactured cigarette smokers among daily smokers", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeman_nondaily_m_w_b$m, select(tsmokeman_nondaily_m_w_b$w, -agerange), select(tsmokeman_nondaily_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Manufactured cigarette smokers among current smokers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeman_daily_u_r$m_u, tsmokeman_daily_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeman_daily_u_r$w_u, tsmokeman_daily_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeman_daily_u_r$b_u, tsmokeman_daily_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Manufactured cigarette smokers among daily smokers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeman_nondaily_u_r$m_u, tsmokeman_nondaily_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeman_nondaily_u_r$w_u, tsmokeman_nondaily_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeman_nondaily_u_r$b_u, tsmokeman_nondaily_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Manufactured cigarette smokers among current smokers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeman_daily$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeman_daily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Manufactured cigarette smokers among daily smokers by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeman_nondaily$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeman_nondaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Manufactured cigarette smokers among current smokers by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T5a, T5aw
+- R script name:  Tsmokeman
+
+***
+
+**Amount of tobacco used among daily smokers by type**
+
+Description: Mean amount of tobacco used by daily smokers per day, by type.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- On average, how many of the following products do you smoke each day?
+
+```{r tsmoketype_tbls}
+
+# column names to use with huxtable
+tsmoketype_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+tsmoketype_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# 1 - Mean # of manufactured cig.
+# men, women, both sexes
+tsmoketype_t5a_m_w_b <- join_m_w_b(tsmoketype_t5a, 1, tsmoketype_col_names)
+
+# 2 - Mean # of hand-rolled cig.
+# men, women, both sexes
+tsmoketype_t5b_m_w_b <- join_m_w_b(tsmoketype_t5b, 1, tsmoketype_col_names)
+
+# 3 - Mean # of pipes of tobacco
+# men, women, both sexes
+tsmoketype_t5c_m_w_b <- join_m_w_b(tsmoketype_t5c, 1, tsmoketype_col_names)
+
+# 4 - Mean # of cigars, cheerots, cigarillos
+# men, women, both sexes
+tsmoketype_t5d_m_w_b <- join_m_w_b(tsmoketype_t5d, 1, tsmoketype_col_names)
+
+# 5 - Mean # of shisha sessions
+# men, women, both sexes
+tsmoketype_t5e_m_w_b <- join_m_w_b(tsmoketype_t5e, 1, tsmoketype_col_names)
+
+# 6 - Mean # of heated tobacco products
+# men, women, both sexes
+tsmoketype_t5f_m_w_b <- join_m_w_b(tsmoketype_t5f, 1, tsmoketype_col_names)
+
+# 7 - Mean # of other type of tobacco
+# men, women, both sexes
+tsmoketype_t5g_m_w_b <- join_m_w_b(tsmoketype_t5g, 1, tsmoketype_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tsmoketype_t5a_u_r <- join_u_r(tsmoketype_t5a, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5a_b_reg <- unite_ci(tsmoketype_t5a$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 2.
+# urban, rural
+tsmoketype_t5b_u_r <- join_u_r(tsmoketype_t5b, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5b_b_reg <- unite_ci(tsmoketype_t5b$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 3.
+# urban, rural
+tsmoketype_t5c_u_r <- join_u_r(tsmoketype_t5c, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5c_b_reg <- unite_ci(tsmoketype_t5c$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 4.
+# urban, rural
+tsmoketype_t5d_u_r <- join_u_r(tsmoketype_t5d, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5d_b_reg <- unite_ci(tsmoketype_t5d$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 5.
+# urban, rural
+tsmoketype_t5e_u_r <- join_u_r(tsmoketype_t5e, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5e_b_reg <- unite_ci(tsmoketype_t5e$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 6.
+# urban, rural
+tsmoketype_t5f_u_r <- join_u_r(tsmoketype_t5f, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5f_b_reg <- unite_ci(tsmoketype_t5f$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+# 7.
+# urban, rural
+tsmoketype_t5g_u_r <- join_u_r(tsmoketype_t5g, 1, tsmoketype_col_names)
+# region
+tsmoketype_t5g_b_reg <- unite_ci(tsmoketype_t5g$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketype_reg_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5a_m_w_b$m, select(tsmoketype_t5b_m_w_b$m, -c(agerange,n)), select(tsmoketype_t5c_m_w_b$m, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Mean amount of tobacco used by daily smokers by type", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5d_m_w_b$m, select(tsmoketype_t5e_m_w_b$m, -c(agerange,n)), 
+      select(tsmoketype_t5f_m_w_b$m, -c(agerange,n)), select(tsmoketype_t5g_m_w_b$m, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Mean amount of tobacco used by daily smokers by type", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5a_m_w_b$w, select(tsmoketype_t5b_m_w_b$w, -c(agerange,n)), select(tsmoketype_t5c_m_w_b$w, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Mean amount of tobacco used by daily smokers by type", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5d_m_w_b$w, select(tsmoketype_t5e_m_w_b$w, -c(agerange,n)), 
+      select(tsmoketype_t5f_m_w_b$w, -c(agerange,n)), select(tsmoketype_t5g_m_w_b$w, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Mean amount of tobacco used by daily smokers by type", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5a_m_w_b$b, select(tsmoketype_t5b_m_w_b$b, -c(agerange,n)), select(tsmoketype_t5c_m_w_b$b, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketype_t5d_m_w_b$b, select(tsmoketype_t5e_m_w_b$b, -c(agerange,n)), 
+      select(tsmoketype_t5f_m_w_b$b, -c(agerange,n)), select(tsmoketype_t5g_m_w_b$b, -c(agerange,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5a_u_r$m_u, tsmoketype_t5a_u_r$m_r), 
+      select(rbind(tsmoketype_t5b_u_r$m_u, tsmoketype_t5b_u_r$m_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5c_u_r$m_u, tsmoketype_t5c_u_r$m_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5d_u_r$m_u, tsmoketype_t5d_u_r$m_r), 
+      select(rbind(tsmoketype_t5e_u_r$m_u, tsmoketype_t5e_u_r$m_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5f_u_r$m_u, tsmoketype_t5f_u_r$m_r), -c(agerange2,n)),
+      select(rbind(tsmoketype_t5g_u_r$m_u, tsmoketype_t5g_u_r$m_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5a_u_r$w_u, tsmoketype_t5a_u_r$w_r), 
+      select(rbind(tsmoketype_t5b_u_r$w_u, tsmoketype_t5b_u_r$w_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5c_u_r$w_u, tsmoketype_t5c_u_r$w_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5d_u_r$w_u, tsmoketype_t5d_u_r$w_r), 
+      select(rbind(tsmoketype_t5e_u_r$w_u, tsmoketype_t5e_u_r$w_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5f_u_r$w_u, tsmoketype_t5f_u_r$w_r), -c(agerange2,n)),
+      select(rbind(tsmoketype_t5g_u_r$w_u, tsmoketype_t5g_u_r$w_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5a_u_r$b_u, tsmoketype_t5a_u_r$b_r), 
+      select(rbind(tsmoketype_t5b_u_r$b_u, tsmoketype_t5b_u_r$b_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5c_u_r$b_u, tsmoketype_t5c_u_r$b_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketype_t5d_u_r$b_u, tsmoketype_t5d_u_r$b_r), 
+      select(rbind(tsmoketype_t5e_u_r$b_u, tsmoketype_t5e_u_r$b_r), -c(agerange2,n)), 
+      select(rbind(tsmoketype_t5f_u_r$b_u, tsmoketype_t5f_u_r$b_r), -c(agerange2,n)),
+      select(rbind(tsmoketype_t5g_u_r$b_u, tsmoketype_t5g_u_r$b_r), -c(agerange2,n))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type (and by type of settlement)", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketype_t5a_b_reg, 
+      select(tsmoketype_t5b_b_reg, -c(region,n)), 
+      select(tsmoketype_t5c_b_reg, -c(region,n))) %>%
+  set_contents(1, everywhere, c("Region", "n", "Mean # of manufactured cig.", "95% CI", 
+                                "Mean # of hand-rolled cig.", "95% CI", 
+                                "Mean # of pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type (and by region)", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketype_t5d_b_reg, 
+      select(tsmoketype_t5e_b_reg, -c(region,n)), 
+      select(tsmoketype_t5f_b_reg, -c(region,n)),
+      select(tsmoketype_t5g_b_reg, -c(region,n))) %>% 
+  set_contents(1, everywhere, c("Region", "n", "Mean # of cigars, cheerots, cigarillos", "95% CI", 
+                                "Mean # of shisha sessions", "95% CI", 
+                                "Mean # of heated tobacco products", "95% CI",
+                                "Mean # of other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean amount of tobacco used by daily smokers by type (and by region)", 10)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T5a-T5f
+- R script name:  Tsmoketype
+
+***
+
+**Smoked tobacco consumption**
+
+Description: Percentage of current smokers who smoke each of the following products.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- On average, how many of the following products do you smoke each day/week?
+
+```{r tsmoketypeprev_nondaily_tbls}
+
+# column names to use with huxtable
+tsmoketypeprev_nondaily_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tsmoketypeprev_nondaily_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# 1 - Mean # of manufactured cig.
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5a_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5a, 1, tsmoketypeprev_nondaily_col_names)
+
+# 2 - Mean # of hand-rolled cig.
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5b_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5b, 1, tsmoketypeprev_nondaily_col_names)
+
+# 3 - Mean # of pipes of tobacco
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5c_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5c, 1, tsmoketypeprev_nondaily_col_names)
+
+# 4 - Mean # of cigars, cheerots, cigarillos
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5d_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5d, 1, tsmoketypeprev_nondaily_col_names)
+
+# 5 - Mean # of shisha sessions
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5e_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5e, 1, tsmoketypeprev_nondaily_col_names)
+
+# 6 - Mean # of heated tobacco products
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5f_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5f, 1, tsmoketypeprev_nondaily_col_names)
+
+# 7 - Mean # of other type of tobacco
+# men, women, both sexes
+tsmoketypeprev_nondaily_t5g_m_w_b <- join_m_w_b(tsmoketypeprev_nondaily_t5g, 1, tsmoketypeprev_nondaily_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tsmoketypeprev_nondaily_t5a_u_r <- join_u_r(tsmoketypeprev_nondaily_t5a, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5a_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5a$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 2.
+# urban, rural
+tsmoketypeprev_nondaily_t5b_u_r <- join_u_r(tsmoketypeprev_nondaily_t5b, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5b_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5b$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 3.
+# urban, rural
+tsmoketypeprev_nondaily_t5c_u_r <- join_u_r(tsmoketypeprev_nondaily_t5c, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5c_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5c$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 4.
+# urban, rural
+tsmoketypeprev_nondaily_t5d_u_r <- join_u_r(tsmoketypeprev_nondaily_t5d, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5d_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5d$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 5.
+# urban, rural
+tsmoketypeprev_nondaily_t5e_u_r <- join_u_r(tsmoketypeprev_nondaily_t5e, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5e_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5e$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 6.
+# urban, rural
+tsmoketypeprev_nondaily_t5f_u_r <- join_u_r(tsmoketypeprev_nondaily_t5f, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5f_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5f$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+# 7.
+# urban, rural
+tsmoketypeprev_nondaily_t5g_u_r <- join_u_r(tsmoketypeprev_nondaily_t5g, 1, tsmoketypeprev_nondaily_col_names)
+# region
+tsmoketypeprev_nondaily_t5g_b_reg <- unite_ci(tsmoketypeprev_nondaily_t5g$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_nondaily_reg_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5a_m_w_b$m, 
+      select(tsmoketypeprev_nondaily_t5b_m_w_b$m, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5c_m_w_b$m, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Percentage of current smokers smoking each of the following products", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5d_m_w_b$m, 
+      select(tsmoketypeprev_nondaily_t5e_m_w_b$m, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5f_m_w_b$m, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5g_m_w_b$m, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Percentage of current smokers smoking each of the following products", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5a_m_w_b$w, select(tsmoketypeprev_nondaily_t5b_m_w_b$w, -c(agerange,n_sum)), select(tsmoketypeprev_nondaily_t5c_m_w_b$w, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Percentage of current smokers smoking each of the following products", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5d_m_w_b$w, 
+      select(tsmoketypeprev_nondaily_t5e_m_w_b$w, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5f_m_w_b$w, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5g_m_w_b$w, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Percentage of current smokers smoking each of the following products", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5a_m_w_b$b, 
+      select(tsmoketypeprev_nondaily_t5b_m_w_b$b, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5c_m_w_b$b, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_nondaily_t5d_m_w_b$b, 
+      select(tsmoketypeprev_nondaily_t5e_m_w_b$b, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5f_m_w_b$b, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5g_m_w_b$b, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5a_u_r$m_u, tsmoketypeprev_nondaily_t5a_u_r$m_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5b_u_r$m_u, tsmoketypeprev_nondaily_t5b_u_r$m_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5c_u_r$m_u, tsmoketypeprev_nondaily_t5c_u_r$m_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Percentage of current smokers smoking each of the following products by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5d_u_r$m_u, tsmoketypeprev_nondaily_t5d_u_r$m_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5e_u_r$m_u, tsmoketypeprev_nondaily_t5e_u_r$m_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5f_u_r$m_u, tsmoketypeprev_nondaily_t5f_u_r$m_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_nondaily_t5g_u_r$m_u, tsmoketypeprev_nondaily_t5g_u_r$m_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Percentage of current smokers smoking each of the following products by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5a_u_r$w_u, tsmoketypeprev_nondaily_t5a_u_r$w_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5b_u_r$w_u, tsmoketypeprev_nondaily_t5b_u_r$w_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5c_u_r$w_u, tsmoketypeprev_nondaily_t5c_u_r$w_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Percentage of current smokers smoking each of the following products by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5d_u_r$w_u, tsmoketypeprev_nondaily_t5d_u_r$w_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5e_u_r$w_u, tsmoketypeprev_nondaily_t5e_u_r$w_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5f_u_r$w_u, tsmoketypeprev_nondaily_t5f_u_r$w_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_nondaily_t5g_u_r$w_u, tsmoketypeprev_nondaily_t5g_u_r$w_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Percentage of current smokers smoking each of the following products by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5a_u_r$b_u, tsmoketypeprev_nondaily_t5a_u_r$b_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5b_u_r$b_u, tsmoketypeprev_nondaily_t5b_u_r$b_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5c_u_r$b_u, tsmoketypeprev_nondaily_t5c_u_r$b_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_nondaily_t5d_u_r$b_u, tsmoketypeprev_nondaily_t5d_u_r$b_r), 
+      select(rbind(tsmoketypeprev_nondaily_t5e_u_r$b_u, tsmoketypeprev_nondaily_t5e_u_r$b_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_nondaily_t5f_u_r$b_u, tsmoketypeprev_nondaily_t5f_u_r$b_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_nondaily_t5g_u_r$b_u, tsmoketypeprev_nondaily_t5g_u_r$b_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketypeprev_nondaily_t5a_b_reg, 
+      select(tsmoketypeprev_nondaily_t5b_b_reg, -c(region,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5c_b_reg, -c(region,n_sum))) %>%
+  set_contents(1, everywhere, c("Region", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products by region", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketypeprev_nondaily_t5d_b_reg, 
+      select(tsmoketypeprev_nondaily_t5e_b_reg, -c(region,n_sum)), 
+      select(tsmoketypeprev_nondaily_t5f_b_reg, -c(region,n_sum)),
+      select(tsmoketypeprev_nondaily_t5g_b_reg, -c(region,n_sum))) %>% 
+  set_contents(1, everywhere, c("Region", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current smokers smoking each of the following products by region", 10)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T5a-T5fw
+- R script name:  Tsmoketypeprev
+
+***
+
+**Daily smoked tobacco consumption**
+
+Description: Proportion of population who smoke each of the following products **daily**.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- On average, how many of the following products do you smoke each day?
+
+```{r tsmoketypeprev_daily_tbls}
+
+# column names to use with huxtable
+tsmoketypeprev_daily_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tsmoketypeprev_daily_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# 1 - Mean # of manufactured cig.
+# men, women, both sexes
+tsmoketypeprev_daily_t5a_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5a, 1, tsmoketypeprev_daily_col_names)
+
+# 2 - Mean # of hand-rolled cig.
+# men, women, both sexes
+tsmoketypeprev_daily_t5b_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5b, 1, tsmoketypeprev_daily_col_names)
+
+# 3 - Mean # of pipes of tobacco
+# men, women, both sexes
+tsmoketypeprev_daily_t5c_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5c, 1, tsmoketypeprev_daily_col_names)
+
+# 4 - Mean # of cigars, cheerots, cigarillos
+# men, women, both sexes
+tsmoketypeprev_daily_t5d_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5d, 1, tsmoketypeprev_daily_col_names)
+
+# 5 - Mean # of shisha sessions
+# men, women, both sexes
+tsmoketypeprev_daily_t5e_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5e, 1, tsmoketypeprev_daily_col_names)
+
+# 6 - Mean # of heated tobacco products
+# men, women, both sexes
+tsmoketypeprev_daily_t5f_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5f, 1, tsmoketypeprev_daily_col_names)
+
+# 7 - Mean # of other type of tobacco
+# men, women, both sexes
+tsmoketypeprev_daily_t5g_m_w_b <- join_m_w_b(tsmoketypeprev_daily_t5g, 1, tsmoketypeprev_daily_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tsmoketypeprev_daily_t5a_u_r <- join_u_r(tsmoketypeprev_daily_t5a, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5a_b_reg <- unite_ci(tsmoketypeprev_daily_t5a$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 2.
+# urban, rural
+tsmoketypeprev_daily_t5b_u_r <- join_u_r(tsmoketypeprev_daily_t5b, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5b_b_reg <- unite_ci(tsmoketypeprev_daily_t5b$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 3.
+# urban, rural
+tsmoketypeprev_daily_t5c_u_r <- join_u_r(tsmoketypeprev_daily_t5c, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5c_b_reg <- unite_ci(tsmoketypeprev_daily_t5c$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 4.
+# urban, rural
+tsmoketypeprev_daily_t5d_u_r <- join_u_r(tsmoketypeprev_daily_t5d, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5d_b_reg <- unite_ci(tsmoketypeprev_daily_t5d$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 5 .
+# urban, rural
+tsmoketypeprev_daily_t5e_u_r <- join_u_r(tsmoketypeprev_daily_t5e, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5e_b_reg <- unite_ci(tsmoketypeprev_daily_t5e$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 6.
+# urban, rural
+tsmoketypeprev_daily_t5f_u_r <- join_u_r(tsmoketypeprev_daily_t5f, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5f_b_reg <- unite_ci(tsmoketypeprev_daily_t5f$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+# 7.
+# urban, rural
+tsmoketypeprev_daily_t5g_u_r <- join_u_r(tsmoketypeprev_daily_t5g, 1, tsmoketypeprev_daily_col_names)
+# region
+tsmoketypeprev_daily_t5g_b_reg <- unite_ci(tsmoketypeprev_daily_t5g$b_reg, .ci_amount = 1) %>% apply_hux(.col_names = tsmoketypeprev_daily_reg_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5a_m_w_b$m, select(tsmoketypeprev_daily_t5b_m_w_b$m, -c(agerange,n_sum)), select(tsmoketypeprev_daily_t5c_m_w_b$m, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Proportion of population who smoke each of the following products daily", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5d_m_w_b$m, select(tsmoketypeprev_daily_t5e_m_w_b$m, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5f_m_w_b$m, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5g_m_w_b$m, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Men", "Proportion of population who smoke each of the following products daily", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5a_m_w_b$w, select(tsmoketypeprev_daily_t5b_m_w_b$w, -c(agerange,n_sum)), select(tsmoketypeprev_daily_t5c_m_w_b$w, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Proportion of population who smoke each of the following products daily", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5d_m_w_b$w, select(tsmoketypeprev_daily_t5e_m_w_b$w, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5f_m_w_b$w, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5g_m_w_b$w, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Women", "Proportion of population who smoke each of the following products daily", 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5a_m_w_b$b, select(tsmoketypeprev_daily_t5b_m_w_b$b, -c(agerange,n_sum)), select(tsmoketypeprev_daily_t5c_m_w_b$b, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily", 8)
+```
+
+<br>
+
+```{r}
+cbind(tsmoketypeprev_daily_t5d_m_w_b$b, select(tsmoketypeprev_daily_t5e_m_w_b$b, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5f_m_w_b$b, -c(agerange,n_sum)), 
+      select(tsmoketypeprev_daily_t5g_m_w_b$b, -c(agerange,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5a_u_r$m_u, tsmoketypeprev_daily_t5a_u_r$m_r), 
+      select(rbind(tsmoketypeprev_daily_t5b_u_r$m_u, tsmoketypeprev_daily_t5b_u_r$m_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5c_u_r$m_u, tsmoketypeprev_daily_t5c_u_r$m_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Proportion of population who smoke each of the following products daily by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5d_u_r$m_u, tsmoketypeprev_daily_t5d_u_r$m_r), 
+      select(rbind(tsmoketypeprev_daily_t5e_u_r$m_u, tsmoketypeprev_daily_t5e_u_r$m_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5f_u_r$m_u, tsmoketypeprev_daily_t5f_u_r$m_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_daily_t5g_u_r$m_u, tsmoketypeprev_daily_t5g_u_r$m_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Men", "Proportion of population who smoke each of the following products daily by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5a_u_r$w_u, tsmoketypeprev_daily_t5a_u_r$w_r), 
+      select(rbind(tsmoketypeprev_daily_t5b_u_r$w_u, tsmoketypeprev_daily_t5b_u_r$w_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5c_u_r$w_u, tsmoketypeprev_daily_t5c_u_r$w_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Proportion of population who smoke each of the following products daily by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5d_u_r$w_u, tsmoketypeprev_daily_t5d_u_r$w_r), 
+      select(rbind(tsmoketypeprev_daily_t5e_u_r$w_u, tsmoketypeprev_daily_t5e_u_r$w_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5f_u_r$w_u, tsmoketypeprev_daily_t5f_u_r$w_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_daily_t5g_u_r$w_u, tsmoketypeprev_daily_t5g_u_r$w_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Women", "Proportion of population who smoke each of the following products daily by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5a_u_r$b_u, tsmoketypeprev_daily_t5a_u_r$b_r), 
+      select(rbind(tsmoketypeprev_daily_t5b_u_r$b_u, tsmoketypeprev_daily_t5b_u_r$b_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5c_u_r$b_u, tsmoketypeprev_daily_t5c_u_r$b_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(rbind(tsmoketypeprev_daily_t5d_u_r$b_u, tsmoketypeprev_daily_t5d_u_r$b_r), 
+      select(rbind(tsmoketypeprev_daily_t5e_u_r$b_u, tsmoketypeprev_daily_t5e_u_r$b_r), -c(agerange2,n_sum)), 
+      select(rbind(tsmoketypeprev_daily_t5f_u_r$b_u, tsmoketypeprev_daily_t5f_u_r$b_r), -c(agerange2,n_sum)),
+      select(rbind(tsmoketypeprev_daily_t5g_u_r$b_u, tsmoketypeprev_daily_t5g_u_r$b_r), -c(agerange2,n_sum))) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_u_r_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketypeprev_daily_t5a_b_reg, 
+      select(tsmoketypeprev_daily_t5b_b_reg, -c(region,n_sum)), 
+      select(tsmoketypeprev_daily_t5c_b_reg, -c(region,n_sum))) %>%
+  set_contents(1, everywhere, c("Region", "n", "% manufactured cig.", "95% CI", 
+                                "% hand-rolled cig.", "95% CI", 
+                                "% pipes of tobacco", "95% CI")) %>% 
+  set_right_border(row = everywhere, col = c(4,6), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily by region", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cbind(tsmoketypeprev_daily_t5d_b_reg, 
+      select(tsmoketypeprev_daily_t5e_b_reg, -c(region,n_sum)), 
+      select(tsmoketypeprev_daily_t5f_b_reg, -c(region,n_sum)),
+      select(tsmoketypeprev_daily_t5g_b_reg, -c(region,n_sum))) %>% 
+  set_contents(1, everywhere, c("Region", "n", "% cigars, cheerots, cigarillos", "95% CI", 
+                                "% shisha sessions", "95% CI", 
+                                "% heated tobacco products", "95% CI",
+                                "% other type of tobacco", "95% CI")) %>%
+  set_right_border(row = everywhere, col = c(4,6,8), value = 0) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Proportion of population who smoke each of the following products daily by region", 10)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T5a-T5fw
+- R script name:  Tsmoketypeprev
+
+***
+
+**Frequency of daily cigarette smoking**
+
+Description: Percentage of daily cigarette smokers smoking given quantities of manufactured or hand-rolled cigarettes per day.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- On average, how many of the following products do you smoke each day?
+
+```{r tcig_tbls, echo=FALSE}
+
+# column names to use with huxtable
+tcig_col_names <- c("Age Group (years)", "n", "% <5 cigs.", "95% CI", "% 5-9 cigs.", "95% CI", 
+                    "% 10-14 cigs.", "95% CI", "% 15-24 cigs.", "95% CI", "% ≥ 25 cigs.", "95% CI")
+
+# column names for region to use with huxtable
+tcig_reg_col_names <- c("Region", "n", "% <5 cigs.", "95% CI", "% 5-9 cigs.", "95% CI", 
+                        "% 10-14 cigs.", "95% CI", "% 15-24 cigs.", "95% CI", "% ≥ 25 cigs.", "95% CI")
+
+# men, women, both sexes
+tcig_c_m_w_b <- join_m_w_b(tcig_c, 5, tcig_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tcig_c_u_r <- join_u_r(tcig_c, 5, tcig_col_names)
+```
+
+<br>
+
+```{r}
+tcig_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+tcig_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+tcig_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tcig_c_u_r$m_u, tcig_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day by type of settlement", .colspan_val = 12)
+
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tcig_c_u_r$w_u, tcig_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tcig_c_u_r$b_u, tcig_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+tcig_c$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = tcig_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day by region", .colspan_val = 12)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T5a, T5b
+- R script name:  Tcig
+
+***
+
+**Former daily smokers and former smokers**
+
+Description: Percentage of former daily smokers among all respondents and among ever daily smokers, and the mean duration, in years, since former smokers quit smoking.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- In the past did you ever smoke any tobacco products?
+- In the past, did you ever smoke daily?
+- How old were you when you stopped smoking?
+
+```{r tsmokeexdaily_tbls}
+
+# column names to use with huxtable
+# 1. Former daily smokers (who don’t smoke currently) among all respondents
+# 2. Former daily smokers (who don’t smoke currently) among ever daily smokers
+tsmokeexdaily_col_names <- c("Age Group (years)", "n", "% Former daily smokers", "95% CI")
+tsmokeexdaily_reg_col_names <- c("Region", "n", "% Former daily smokers", "95% CI")
+# 3. Mean years since cessation
+tsmokeexdaily_stop_col_names <- c("Age Group (years)", "n", "Mean years", "95% CI")
+tsmokeexdaily_stop_reg_col_names <- c("Region", "n", "Mean years", "95% CI")
+
+# 1.
+# men, women, both sexes
+tsmokeexdaily_c_m_w_b <- join_m_w_b(tsmokeexdaily_c, 1, tsmokeexdaily_col_names)
+# 2.
+# men, women, both sexes
+tsmokeexdaily_everdaily_c_m_w_b <- join_m_w_b(tsmokeexdaily_everdaily_c, 1, tsmokeexdaily_col_names)
+# 3. 
+# men, women, both sexes
+tsmokeexdaily_stop_m_w_b <- join_m_w_b(tsmokeexdaily_stop, 1, tsmokeexdaily_stop_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tsmokeexdaily_c_u_r <- join_u_r(tsmokeexdaily_c, 1, tsmokeexdaily_col_names)
+# 2.
+# urban, rural
+tsmokeexdaily_everdaily_c_u_r <- join_u_r(tsmokeexdaily_everdaily_c, 1, tsmokeexdaily_col_names)
+# 3. 
+# urban, rural
+tsmokeexdaily_stop_u_r <- join_u_r(tsmokeexdaily_stop, 1, tsmokeexdaily_stop_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeexdaily_c_m_w_b$m, select(tsmokeexdaily_c_m_w_b$w, -agerange), select(tsmokeexdaily_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Former daily smokers (who don’t smoke currently) among all respondents", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeexdaily_everdaily_c_m_w_b$m, select(tsmokeexdaily_everdaily_c_m_w_b$w, -agerange), select(tsmokeexdaily_everdaily_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Former daily smokers (who don’t smoke currently) among ever daily smokers", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmokeexdaily_stop_m_w_b$m, select(tsmokeexdaily_stop_m_w_b$w, -agerange), select(tsmokeexdaily_stop_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean years since cessation", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeexdaily_c_u_r$m_u, tsmokeexdaily_c_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeexdaily_c_u_r$w_u, tsmokeexdaily_c_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeexdaily_c_u_r$b_u, tsmokeexdaily_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Former daily smokers (who don’t smoke currently) among all respondents by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeexdaily_everdaily_c_u_r$m_u, tsmokeexdaily_everdaily_c_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeexdaily_everdaily_c_u_r$w_u, tsmokeexdaily_everdaily_c_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeexdaily_everdaily_c_u_r$b_u, tsmokeexdaily_everdaily_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Former daily smokers (who don’t smoke currently) among ever daily smokers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokeexdaily_stop_u_r$m_u, tsmokeexdaily_stop_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokeexdaily_stop_u_r$w_u, tsmokeexdaily_stop_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokeexdaily_stop_u_r$b_u, tsmokeexdaily_stop_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean years since cessation by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeexdaily_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeexdaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Former daily smokers (who don’t smoke currently) among all respondents by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeexdaily_everdaily_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeexdaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Former daily smokers (who don’t smoke currently) among ever daily smokers by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokeexdaily_stop$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokeexdaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean years since cessation by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T8, T9, T10, T11a-c
+- R script name:  Tsmokeexdaily
+
+***
+
+**Cessation**
+
+Description: Percentage of current smokers who have tried to stop smoking during the past 12 months.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- During the past 12 months, have you tried to stop smoking?
+
+```{r tcessation_c_tbls}
+
+# column names to use with huxtable
+tcessation_c_col_names <- c("Age Group (years)", "n", "% Tried to stop smoking", "95% CI")
+tcessation_c_reg_col_names <- c("Region", "n", "% Tried to stop smoking", "95% CI")
+
+# men, women, both sexes
+tcessation_c_m_w_b <- join_m_w_b(tcessation_c, 1, tcessation_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tcessation_c_u_r <- join_u_r(tcessation_c, 1, tcessation_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tcessation_c_m_w_b$m, select(tcessation_c_m_w_b$w, -agerange), select(tcessation_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current smokers who have tried to stop smoking", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tcessation_c_u_r$m_u, tcessation_c_u_r$m_r)
+tbl_w_u_r <- rbind(tcessation_c_u_r$w_u, tcessation_c_u_r$w_r)
+tbl_b_u_r <- rbind(tcessation_c_u_r$b_u, tcessation_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current smokers who have tried to stop smoking by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tcessation_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tcessation_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current smokers who have tried to stop smoking by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T6
+- R script name:  Tcessation
+
+***
+
+**Advice to stop smoking**
+
+Description: Percentage of current smokers who have been advised by a doctor or other health worker to stop smoking, among those smokers who have had a visit to a doctor or other health worker in the past 12 months.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- During any visit to a doctor or other health worker in the past 12 months, were you advised to quit smoking tobacco?
+
+```{r tcessation_d_tbls}
+
+# column names to use with huxtable
+tcessation_d_col_names <- c("Age Group (years)", "n", "% Advised to stop smoking", "95% CI")
+tcessation_d_reg_col_names <- c("Region", "n", "% Advised to stop smoking", "95% CI")
+
+# men, women, both sexes
+tcessation_d_m_w_b <- join_m_w_b(tcessation_d, 1, tcessation_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tcessation_d_u_r <- join_u_r(tcessation_d, 1, tcessation_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tcessation_d_m_w_b$m, select(tcessation_d_m_w_b$w, -agerange), select(tcessation_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current smokers who have been advised by doctor to stop smoking", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tcessation_d_u_r$m_u, tcessation_d_u_r$m_r)
+tbl_w_u_r <- rbind(tcessation_d_u_r$w_u, tcessation_d_u_r$w_r)
+tbl_b_u_r <- rbind(tcessation_d_u_r$b_u, tcessation_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current smokers who have been advised by doctor to stop smoking by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tcessation_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tcessation_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current smokers who have been advised by doctor to stop smoking by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T7
+- R script name:  Tcessation
+
+***
+
+**Current users of smokeless tobacco**
+
+Description: Percentage of current users of smokeless tobacco among all respondents.
+
+Instrument questions:
+
+- Do you currently use any smokeless tobacco such as [snuff, chewing tobacco, betel]?
+
+```{r tsmokelessstatus_d_tbls}
+
+# column names to use with huxtable
+tsmokelessstatus_d_col_names <- c("Age Group (years)", "n", "% Current users", "95% CI")
+tsmokelessstatus_d_reg_col_names <- c("Region", "n", "% Current users", "95% CI")
+
+# men, women, both sexes
+tsmokelessstatus_d_m_w_b <- join_m_w_b(tsmokelessstatus_d, 1, tsmokelessstatus_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokelessstatus_d_u_r <- join_u_r(tsmokelessstatus_d, 1, tsmokelessstatus_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokelessstatus_d_m_w_b$m, select(tsmokelessstatus_d_m_w_b$w, -agerange), select(tsmokelessstatus_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current users of smokeless tobacco", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokelessstatus_d_u_r$m_u, tsmokelessstatus_d_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokelessstatus_d_u_r$w_u, tsmokelessstatus_d_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokelessstatus_d_u_r$b_u, tsmokelessstatus_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current users of smokeless tobacco by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokelessstatus_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokelessstatus_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current users of smokeless tobacco by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T12, T13, T15
+- R script name:  Tsmokelessstatus
+
+***
+
+**Status of smokeless tobacco use**
+
+Description: Status of using smokeless tobacco among all respondents.
+
+Instrument questions:
+
+- Do you currently use any smokeless tobacco such as [snuff, chewing tobacco, betel]?
+- Do you currently use smokeless tobacco products daily?
+- In the past, did you ever use smokeless tobacco such as [snuff, chewing tobacco, betel]?
+
+```{r tsmokelessstatus_c_tbls}
+
+# column names to use with huxtable
+tsmokelessstatus_c_col_names <- c("Age Group (years)", "n", "% Daily", "95% CI",
+                                  "% Non-daily", "95% CI", "% Past user", "95% CI", "% Never used", "95% CI")
+tsmokelessstatus_c_reg_col_names <- c("Region", "n", "% Daily", "95% CI",
+                                      "% Non-daily", "95% CI", "% Past user", "95% CI", "% Never used", "95% CI")
+
+# men, women, both sexes
+tsmokelessstatus_c_m_w_b <- join_m_w_b(tsmokelessstatus_c, 4, tsmokelessstatus_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tsmokelessstatus_c_u_r <- join_u_r(tsmokelessstatus_c, 4, tsmokelessstatus_c_col_names)
+```
+
+<br>
+
+```{r}
+tsmokelessstatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Smokeless tobacco use", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+tsmokelessstatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Smokeless tobacco use", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+tsmokelessstatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Smokeless tobacco use", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokelessstatus_c_u_r$m_u, tsmokelessstatus_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Smokeless tobacco use by type of settlement", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokelessstatus_c_u_r$w_u, tsmokelessstatus_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Smokeless tobacco use by type of settlement", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(tsmokelessstatus_c_u_r$b_u, tsmokelessstatus_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Smokeless tobacco use by type of settlement", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+tsmokelessstatus_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = tsmokelessstatus_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Smokeless tobacco use by region", 10) %>% 
+  insert_row(c("","","Current user","","","","Non user","","",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:10)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T12, T13, T15
+- R script name:  Tsmokelessstatus
+
+***
+
+**Former daily users of smokeless tobacco**
+
+Description: Percentage of former daily users of smokeless tobacco among all respondents and among ever daily users.
+
+Instrument questions:
+
+- Do you currently use any smokeless tobacco such as [snuff, chewing tobacco, betel]?
+- Do you currently use smokeless tobacco products daily?
+- In the past, did you ever use smokeless tobacco such as [snuff, chewing tobacco, betel]?
+- In the past, did you ever use smokeless tobacco such as [snuff, chewing tobacco, betel] daily?
+
+```{r tsmokelessexdaily_tbls}
+
+# column names to use with huxtable
+# 1. Former daily smokeless tobacco users (who don't use tobacco currently) among all respondents
+# 2. Former daily smokeless tobacco users (who don’t use tobacco currently) among ever daily users
+tsmokelessexdaily_col_names <- c("Age Group (years)", "n", "% Former daily users", "95% CI")
+tsmokelessexdaily_reg_col_names <- c("Region", "n", "% Former daily users", "95% CI")
+
+# 1.
+# men, women, both sexes
+tsmokelessexdaily_c_m_w_b <- join_m_w_b(tsmokelessexdaily_c, 1, tsmokelessexdaily_col_names)
+
+# 2.
+# men, women, both sexes
+tsmokelessexdaily_everdaily_c_m_w_b <- join_m_w_b(tsmokelessexdaily_everdaily_c, 1, tsmokelessexdaily_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tsmokelessexdaily_c_u_r <- join_u_r(tsmokelessexdaily_c, 1, tsmokelessexdaily_col_names)
+# 2.
+# urban, rural
+tsmokelessexdaily_everdaily_c_u_r <- join_u_r(tsmokelessexdaily_everdaily_c, 1, tsmokelessexdaily_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tsmokelessexdaily_c_m_w_b$m, select(tsmokelessexdaily_c_m_w_b$w, -agerange), select(tsmokelessexdaily_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Former daily smokeless tobacco users (who don't use tobacco currently) among all respondents", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tsmokelessexdaily_everdaily_c_m_w_b$m, select(tsmokelessexdaily_everdaily_c_m_w_b$w, -agerange), select(tsmokelessexdaily_everdaily_c_m_w_b$b, -agerange)) %>%
+  final_m_w_b_tbl(.s_amount = 3, .title = "Former daily smokeless tobacco users (who don’t use tobacco currently) among ever daily users", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokelessexdaily_c_u_r$m_u, tsmokelessexdaily_c_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokelessexdaily_c_u_r$w_u, tsmokelessexdaily_c_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokelessexdaily_c_u_r$b_u, tsmokelessexdaily_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Former daily smokeless tobacco users (who don't use tobacco currently) among all respondents by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tsmokelessexdaily_everdaily_c_u_r$m_u, tsmokelessexdaily_everdaily_c_u_r$m_r)
+tbl_w_u_r <- rbind(tsmokelessexdaily_everdaily_c_u_r$w_u, tsmokelessexdaily_everdaily_c_u_r$w_r)
+tbl_b_u_r <- rbind(tsmokelessexdaily_everdaily_c_u_r$b_u, tsmokelessexdaily_everdaily_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Former daily smokeless tobacco users (who don’t use tobacco currently) among ever daily users by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokelessexdaily_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokelessexdaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Former daily smokeless tobacco users (who don't use tobacco currently) among all respondents by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tsmokelessexdaily_everdaily_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tsmokelessexdaily_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Former daily smokeless tobacco users (who don’t use tobacco currently) among ever daily users by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T12, T13, T15, T16
+- R script name:  Tsmokelessexdaily
+
+***
+
+**Current tobacco users**
+
+Description: Percentage of daily and current (daily plus non-daily) tobacco users, includes smoking and smokeless, among all respondents.
+
+Instrument questions:
+
+- Do you currently smoke any tobacco products, such as cigarettes, cigars, or pipes?
+- Do you currently smoke tobacco products daily?
+- Do you currently use any smokeless tobacco such as [snuff, chewing tobacco, betel]?
+- Do you currently use smokeless tobacco products daily?
+
+```{r tdailyuser_tbls}
+
+# column names to use with huxtable
+# 1. Current tobacco users
+tdailyuser_c_col_names <- c("Age Group (years)", "n", "% Current users", "95% CI")
+tdailyuser_c_reg_col_names <- c("Region", "n", "% Current users", "95% CI")
+# 2. Daily tobacco users
+tdailyuser_d_col_names <- c("Age Group (years)", "n", "% Daily users", "95% CI")
+tdailyuser_d_reg_col_names <- c("Region", "n", "% Daily users", "95% CI")
+
+# 1.
+# men, women, both sexes
+tdailyuser_c_m_w_b <- join_m_w_b(tdailyuser_c, 1, tdailyuser_c_col_names)
+# 2.
+# men, women, both sexes
+tdailyuser_d_c_m_w_b <- join_m_w_b(tdailyuser_d, 1, tdailyuser_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1.
+# urban, rural
+tdailyuser_c_u_r <- join_u_r(tdailyuser_c, 1, tdailyuser_c_col_names)
+# 2.
+# urban, rural
+tdailyuser_d_c_u_r <- join_u_r(tdailyuser_d, 1, tdailyuser_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tdailyuser_c_m_w_b$m, select(tdailyuser_c_m_w_b$w, -agerange), select(tdailyuser_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current tobacco users", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(tdailyuser_d_c_m_w_b$m, select(tdailyuser_d_c_m_w_b$w, -agerange), select(tdailyuser_d_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Daily tobacco users", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tdailyuser_c_u_r$m_u, tdailyuser_c_u_r$m_r)
+tbl_w_u_r <- rbind(tdailyuser_c_u_r$w_u, tdailyuser_c_u_r$w_r)
+tbl_b_u_r <- rbind(tdailyuser_c_u_r$b_u, tdailyuser_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current tobacco users by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tdailyuser_d_c_u_r$m_u, tdailyuser_d_c_u_r$m_r)
+tbl_w_u_r <- rbind(tdailyuser_d_c_u_r$w_u, tdailyuser_d_c_u_r$w_r)
+tbl_b_u_r <- rbind(tdailyuser_d_c_u_r$b_u, tdailyuser_d_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Daily tobacco users by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tdailyuser_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tdailyuser_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current tobacco users by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tdailyuser_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tdailyuser_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Daily tobacco users by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T1, T2, T12, T13
+- R script name:  Tdailyuser
+
+***
+
+
+**Exposure to second-hand smoke in home in past 30 days**
+
+Description: Percentage of respondents exposed second-hand smoke in the home in the past 30 days.
+
+Instrument questions:
+
+- In the past 30 days, did someone smoke in your home?
+
+```{r tetshome_tbls}
+
+# column names to use with huxtable
+tetshome_c_col_names <- c("Age Group (years)", "n", "% Exposed", "95% CI")
+tetshome_c_reg_col_names <- c("Region", "n", "% Exposed", "95% CI")
+
+# men, women, both sexes
+tetshome_c_m_w_b <- join_m_w_b(tetshome_c, 1, tetshome_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tetshome_c_u_r <- join_u_r(tetshome_c, 1, tetshome_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tetshome_c_m_w_b$m, select(tetshome_c_m_w_b$w, -agerange), select(tetshome_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Exposed to second-hand smoke in home during the past 30 days", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tetshome_c_u_r$m_u, tetshome_c_u_r$m_r)
+tbl_w_u_r <- rbind(tetshome_c_u_r$w_u, tetshome_c_u_r$w_r)
+tbl_b_u_r <- rbind(tetshome_c_u_r$b_u, tetshome_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Exposed to second-hand smoke in home during the past 30 days by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tetshome_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tetshome_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Exposed to second-hand smoke in home during the past 30 days by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T17
+- R script name:  Tetshome
+
+***
+
+
+**Exposure to second-hand smoke in the workplace in past 30 days**
+
+Description: Percentage of respondents exposed to second-hand smoke in the workplace in the past 30 days.
+
+Instrument questions:
+
+- During the past 30 days, did someone smoke in closed areas in your workplace (in the building, in a work area or a specific office)?
+
+```{r tetswork_tbls}
+
+# column names to use with huxtable
+tetswork_c_col_names <- c("Age Group (years)", "n", "% Exposed", "95% CI")
+tetswork_c_reg_col_names <- c("Region", "n", "% Exposed", "95% CI")
+
+# men, women, both sexes
+tetswork_c_m_w_b <- join_m_w_b(tetswork_c, 1, tetswork_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tetswork_c_u_r <- join_u_r(tetswork_c, 1, tetswork_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tetswork_c_m_w_b$m, select(tetswork_c_m_w_b$w, -agerange), select(tetswork_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Exposed to second-hand smoke in the workplace during the past 30 days", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tetswork_c_u_r$m_u, tetswork_c_u_r$m_r)
+tbl_w_u_r <- rbind(tetswork_c_u_r$w_u, tetswork_c_u_r$w_r)
+tbl_b_u_r <- rbind(tetswork_c_u_r$b_u, tetswork_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Exposed to second-hand smoke in the workplace during the past 30 days by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tetswork_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tetswork_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Exposed to second-hand smoke in the workplace during the past 30 days by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: T18
+- R script name:  Tetswork
+
+***
+
+**Current e-cigarettes usage**
+
+Description: Percentage of current users of electronic cigarettes among all respondents.
+
+Instrument questions:
+
+- Do you currently use electronic cigarettes?
+
+```{r etstatus_d_tbls}
+
+# column names to use with huxtable
+etstatus_d_col_names <- c("Age Group (years)", "n", "% Current users", "95% CI")
+etstatus_d_reg_col_names <- c("Region", "n", "% Current users", "95% CI")
+
+# men, women, both sexes
+etstatus_d_m_w_b <- join_m_w_b(etstatus_d, 1, etstatus_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+etstatus_d_u_r <- join_u_r(etstatus_d, 1, etstatus_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(etstatus_d_m_w_b$m, select(etstatus_d_m_w_b$w, -agerange), select(etstatus_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of current users of e-cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(etstatus_d_u_r$m_u, etstatus_d_u_r$m_r)
+tbl_w_u_r <- rbind(etstatus_d_u_r$w_u, etstatus_d_u_r$w_r)
+tbl_b_u_r <- rbind(etstatus_d_u_r$b_u, etstatus_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of current users of e-cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+etstatus_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = etstatus_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current users of e-cigarettes by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: ET1
+- R script name: ETStatus
+
+***
+
+**E-cigarettes usage status**
+
+Description: E-cigarettes smoking status of all respondents.
+
+Instrument questions:
+
+- Do you currently use electronic cigarettes?
+- Do you currently use electronic cigarettes daily?
+
+```{r etstatus_c_tbls}
+
+# column names to use with huxtable
+etstatus_c_col_names <- c("Age Group (years)", "n", "% Daily", "95% CI",
+                          "% Non-daily", "95% CI", "% Former user or never used", "95% CI")
+etstatus_c_reg_col_names <- c("Region", "n", "% Daily", "95% CI",
+                              "% Non-daily", "95% CI", "% Former user or never used", "95% CI")
+
+# men, women, both sexes
+etstatus_c_m_w_b <- join_m_w_b(etstatus_c, 3, etstatus_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+etstatus_c_u_r <- join_u_r(etstatus_c, 3, etstatus_c_col_names)
+```
+
+<br>
+
+```{r}
+etstatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "E-cigarettes usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+etstatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "E-cigarettes usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+etstatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "E-cigarettes usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(etstatus_c_u_r$m_u, etstatus_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "E-cigarettes usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(etstatus_c_u_r$w_u, etstatus_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "E-cigarettes usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(etstatus_c_u_r$b_u, etstatus_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "E-cigarettes usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+etstatus_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = etstatus_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "E-cigarettes usage status by region", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: ET1, ET2
+- R script name: ETStatus
+
+***
+
+**Daily e-cigarettes usage**
+
+Description: Percentage of current daily users among users.
+
+Instrument questions:
+
+- Do you currently use electronic cigarettes?
+- Do you currently use electronic cigarettes daily?
+
+```{r etsmokefreq_c_tbls}
+
+# column names to use with huxtable
+etsmokefreq_c_col_names <- c("Age Group (years)", "n", "% Daily users", "95% CI")
+etsmokefreq_c_reg_col_names <- c("Region", "n", "% Daily users", "95% CI")
+
+# men, women, both sexes
+etsmokefreq_c_m_w_b <- join_m_w_b(etsmokefreq_c, 1, etsmokefreq_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+etsmokefreq_c_u_r <- join_u_r(etsmokefreq_c, 1, etsmokefreq_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(etsmokefreq_c_m_w_b$m, select(etsmokefreq_c_m_w_b$w, -agerange), select(etsmokefreq_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current daily users among e-cigarettes users", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(etsmokefreq_c_u_r$m_u, etsmokefreq_c_u_r$m_r)
+tbl_w_u_r <- rbind(etsmokefreq_c_u_r$w_u, etsmokefreq_c_u_r$w_r)
+tbl_b_u_r <- rbind(etsmokefreq_c_u_r$b_u, etsmokefreq_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current daily users among e-cigarettes users by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+etsmokefreq_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = etsmokefreq_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current daily users among e-cigarettes users by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: ET1, ET2
+- R script name: ETSmokefreq
+
+***
+
+**Initiation and duration of using e-cigarettes**
+
+Description: Mean age of initiation and mean duration of using, in years, among daily users (no total age group for mean duration of using as age influences these values).
+
+Instrument questions:
+
+- Do you currently use electronic cigarettes?
+- Do you currently use electronic cigarettes daily?
+- How old were you when you first started using electronic cigarettes?
+- Do you remember how long ago it was?
+
+```{r etsmokeagetime_initiation_duration_tbls}
+
+# column names to use with huxtable
+etsmokeagetime_initiation_col_names <- c("Age Group (years)", "n", "Mean age", "95% CI")
+etsmokeagetime_initiation_reg_col_names <- c("Region", "n", "Mean age", "95% CI")
+etsmokeagetime_duration_col_names <- c("Age Group (years)", "n", "Mean duration", "95% CI")
+etsmokeagetime_duration_reg_col_names <- c("Region", "n", "Mean duration", "95% CI")
+
+# INITIATION PART
+# men, women, both sexes
+etsmokeagetime_initiation_m_w_b <- join_m_w_b(etsmokeagetime_initiation, 1, etsmokeagetime_initiation_col_names)
+
+# DURATION PART
+# men, women, both sexes
+etsmokeagetime_duration_m_w_b <- join_m_w_b(etsmokeagetime_duration, 1, etsmokeagetime_duration_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+etsmokeagetime_initiation_u_r <- join_u_r(etsmokeagetime_initiation, 1, etsmokeagetime_initiation_col_names)
+# urban, rural
+etsmokeagetime_duration_u_r <- join_u_r(etsmokeagetime_duration, 1, etsmokeagetime_duration_col_names)
+```
+
+<br>
+
+```{r}
+cbind(etsmokeagetime_initiation_m_w_b$m, select(etsmokeagetime_initiation_m_w_b$w, -agerange), select(etsmokeagetime_initiation_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean age started using e-cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(etsmokeagetime_duration_m_w_b$m, select(etsmokeagetime_duration_m_w_b$w, -agerange), select(etsmokeagetime_duration_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean duration of using e-cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(etsmokeagetime_initiation_u_r$m_u, etsmokeagetime_initiation_u_r$m_r)
+tbl_w_u_r <- rbind(etsmokeagetime_initiation_u_r$w_u, etsmokeagetime_initiation_u_r$w_r)
+tbl_b_u_r <- rbind(etsmokeagetime_initiation_u_r$b_u, etsmokeagetime_initiation_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean age started using e-cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(etsmokeagetime_duration_u_r$m_u, etsmokeagetime_duration_u_r$m_r)
+tbl_w_u_r <- rbind(etsmokeagetime_duration_u_r$w_u, etsmokeagetime_duration_u_r$w_r)
+tbl_b_u_r <- rbind(etsmokeagetime_duration_u_r$b_u, etsmokeagetime_duration_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean duration of using e-cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+etsmokeagetime_initiation$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = etsmokeagetime_initiation_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean age started using e-cigarettes by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+etsmokeagetime_duration$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = etsmokeagetime_duration_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean duration of using e-cigarettes by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: ET1, ET2, ET3, ET4
+- R script name: ETSmokeagetime
+
+***
+
+
+**Current heated tobacco products usage**
+
+Description: Percentage of current users of heated tobacco products among all respondents.
+
+Instrument questions:
+
+- Do you currently use heated tobacco products?
+
+```{r htstatus_d_tbls}
+
+# column names to use with huxtable
+htstatus_d_col_names <- c("Age Group (years)", "n", "% Current users", "95% CI")
+htstatus_d_reg_col_names <- c("Region", "n", "% Current users", "95% CI")
+
+# men, women, both sexes
+htstatus_d_m_w_b <- join_m_w_b(htstatus_d, 1, htstatus_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+htstatus_d_u_r <- join_u_r(htstatus_d, 1, htstatus_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(htstatus_d_m_w_b$m, select(htstatus_d_m_w_b$w, -agerange), select(htstatus_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of current users of heated tobacco products", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(htstatus_d_u_r$m_u, htstatus_d_u_r$m_r)
+tbl_w_u_r <- rbind(htstatus_d_u_r$w_u, htstatus_d_u_r$w_r)
+tbl_b_u_r <- rbind(htstatus_d_u_r$b_u, htstatus_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of current users of heated tobacco products by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+htstatus_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = htstatus_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of current users of heated tobacco products by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: HTP1
+- R script name: HTStatus
+
+***
+
+**Heated tobacco products usage status**
+
+Description: Heated tobacco products smoking status of all respondents.
+
+Instrument questions:
+
+- Do you currently use heated tobacco products?
+- Do you currently use heated tobacco products daily?
+
+```{r htstatus_c_tbls}
+
+# column names to use with huxtable
+htstatus_c_col_names <- c("Age Group (years)", "n", "% Daily", "95% CI",
+                          "% Non-daily", "95% CI", "% Former user or never used", "95% CI")
+htstatus_c_reg_col_names <- c("Region", "n", "% Daily", "95% CI",
+                              "% Non-daily", "95% CI", "% Former user or never used", "95% CI")
+
+# men, women, both sexes
+htstatus_c_m_w_b <- join_m_w_b(htstatus_c, 3, htstatus_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+htstatus_c_u_r <- join_u_r(htstatus_c, 3, htstatus_c_col_names)
+```
+
+<br>
+
+```{r}
+htstatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Heated tobacco products usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+htstatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Heated tobacco products usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r}
+htstatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Heated tobacco products usage status", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htstatus_c_u_r$m_u, htstatus_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Heated tobacco products usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htstatus_c_u_r$w_u, htstatus_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Heated tobacco products usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htstatus_c_u_r$b_u, htstatus_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Heated tobacco products usage status by type of settlement", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+htstatus_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = htstatus_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Heated tobacco products usage status by region", 8) %>% 
+  insert_row(c("","","Current user","","","","Non user",""), after = 2) %>% 
+  merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(3:6)) %>% 
+  set_right_border(row = 3, col = c(1:6), value = 0)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: HTP1, HTP2
+- R script name: HTStatus
+
+***
+
+**Daily heated tobacco products usage**
+
+Description: Percentage of current daily users among users.
+
+Instrument questions:
+
+- Do you currently use heated tobacco products?
+- Do you currently use heated tobacco products daily?
+
+```{r htsmokefreq_c_tbls}
+
+# column names to use with huxtable
+htsmokefreq_c_col_names <- c("Age Group (years)", "n", "% Daily users", "95% CI")
+htsmokefreq_c_reg_col_names <- c("Region", "n", "% Daily users", "95% CI")
+
+# men, women, both sexes
+htsmokefreq_c_m_w_b <- join_m_w_b(htsmokefreq_c, 1, htsmokefreq_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+htsmokefreq_c_u_r <- join_u_r(htsmokefreq_c, 1, htsmokefreq_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(htsmokefreq_c_m_w_b$m, select(htsmokefreq_c_m_w_b$w, -agerange), select(htsmokefreq_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current daily users among heated tobacco products users", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(htsmokefreq_c_u_r$m_u, htsmokefreq_c_u_r$m_r)
+tbl_w_u_r <- rbind(htsmokefreq_c_u_r$w_u, htsmokefreq_c_u_r$w_r)
+tbl_b_u_r <- rbind(htsmokefreq_c_u_r$b_u, htsmokefreq_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current daily users among heated tobacco products users by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+htsmokefreq_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = htsmokefreq_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current daily users among heated tobacco products users by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: HTP1, HTP2
+- R script name: HTSmokefreq
+
+***
+
+**Initiation and duration of using heated tobacco products**
+
+Description: Mean age of initiation and mean duration of using, in years, among daily users (no total age group for mean duration of using as age influences these values).
+
+Instrument questions:
+
+- Do you currently use heated tobacco products?
+- Do you currently use heated tobacco products daily?
+- How old were you when you first started using heated tobacco products?
+- Do you remember how long ago it was?
+
+```{r htsmokeagetime_initiation_duration_tbls}
+
+# column names to use with huxtable
+htsmokeagetime_initiation_col_names <- c("Age Group (years)", "n", "Mean age", "95% CI")
+htsmokeagetime_initiation_reg_col_names <- c("Region", "n", "Mean age", "95% CI")
+htsmokeagetime_duration_col_names <- c("Age Group (years)", "n", "Mean duration", "95% CI")
+htsmokeagetime_duration_reg_col_names <- c("Region", "n", "Mean duration", "95% CI")
+
+# INITIATION PART
+# men, women, both sexes
+htsmokeagetime_initiation_m_w_b <- join_m_w_b(htsmokeagetime_initiation, 1, htsmokeagetime_initiation_col_names)
+
+# DURATION PART
+# men, women, both sexes
+htsmokeagetime_duration_m_w_b <- join_m_w_b(htsmokeagetime_duration, 1, htsmokeagetime_duration_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+htsmokeagetime_initiation_u_r <- join_u_r(htsmokeagetime_initiation, 1, htsmokeagetime_initiation_col_names)
+# urban, rural
+htsmokeagetime_duration_u_r <- join_u_r(htsmokeagetime_duration, 1, htsmokeagetime_duration_col_names)
+```
+
+<br>
+
+```{r}
+cbind(htsmokeagetime_initiation_m_w_b$m, select(htsmokeagetime_initiation_m_w_b$w, -agerange), select(htsmokeagetime_initiation_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean age started using heated tobacco products", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(htsmokeagetime_duration_m_w_b$m, select(htsmokeagetime_duration_m_w_b$w, -agerange), select(htsmokeagetime_duration_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean duration of using heated tobacco products", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(htsmokeagetime_initiation_u_r$m_u, htsmokeagetime_initiation_u_r$m_r)
+tbl_w_u_r <- rbind(htsmokeagetime_initiation_u_r$w_u, htsmokeagetime_initiation_u_r$w_r)
+tbl_b_u_r <- rbind(htsmokeagetime_initiation_u_r$b_u, htsmokeagetime_initiation_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean age started using heated tobacco products by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(htsmokeagetime_duration_u_r$m_u, htsmokeagetime_duration_u_r$m_r)
+tbl_w_u_r <- rbind(htsmokeagetime_duration_u_r$w_u, htsmokeagetime_duration_u_r$w_r)
+tbl_b_u_r <- rbind(htsmokeagetime_duration_u_r$b_u, htsmokeagetime_duration_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean duration of using heated tobacco products by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+htsmokeagetime_initiation$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = htsmokeagetime_initiation_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean age started using heated tobacco products by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+htsmokeagetime_duration$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = htsmokeagetime_duration_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean duration of using heated tobacco products by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: HTP1, HTP2, HTP3, HTP4
+- R script name: HTSmokeagetime
+
+***
+
+
+<br>
+<br>

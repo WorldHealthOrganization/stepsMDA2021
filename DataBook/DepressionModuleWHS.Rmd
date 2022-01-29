@@ -1,0 +1,340 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+whs_depr_data_dir <- here::here("DataBook", "Modules", "DepressionModuleWHS")
+
+# list all files in the directory
+# fs::dir_ls(whs_depr_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(whs_depr_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Depression
+
+**WHS algorithm**
+
+Description: Percentage of respondents who have depressive symptoms based on the World Health Survey (WHS) algorithm/cascade.
+
+Instrument questions:
+
+- Have you ever been told by a doctor or other health worker that you have depression?
+- When were you diagnosed?
+- How many years passed since your doctor or health care provider told you for the first time that you have depression?
+- Have you been taking any medications or other treatment, like counseling or psychotherapy, either alone or in group, for depression in the last 12 months?
+- Have you been taking any medications or other treatment, like counseling or psychotherapy, either alone or in group, for depression in the last 2 weeks?
+- During the last 12 months, have you had a period lasting several days when you felt sad, empty or depressed?
+- During the last 12 months, have you had a period lasting several days when you lost interest in most things you usually enjoy such as personal relationships, work or hobbies/recreation?
+- During the last 12 months, have you had a period lasting several days when you have been feeling your energy decreased or that you are tired all the time?
+- Was this period of sadness, loss of interest or low energy for more than 2 weeks?
+- Was this period of sadness, loss of interest or low energy most of the day, nearly every day?
+
+During this period:
+
+- Did you lose your appetite?
+- Did you notice any slowing down in your thinking?
+- Did you notice any problems falling asleep?
+- Did you notice any problems waking up too early?
+- Did you have any difficulties concentrating; for example, listening to others, working, watching TV, listening to the radio?
+- Did you notice any slowing down in your moving around?
+- Did you feel anxious and worried most days?
+- Were you so restless or jittery nearly every day that you paced up and down and couldn’t sit still?
+- Did you feel negative about yourself or like you had lost confidence?
+- Did you frequently feel hopeless – that there was no way to improve things?
+- Did your interest in sex decrease?
+- Did you think of death, or wish you were dead?
+- During this period, did you ever try to end your life?
+
+```{r whs_depression_c_tbls}
+# column names to use with huxtable
+whs_depression_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+whs_depression_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+whs_depression_c_m_w_b <- join_m_w_b(whs_depression_c, 1, whs_depression_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+whs_depression_c_u_r <- join_u_r(whs_depression_c, 1, whs_depression_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(whs_depression_c_m_w_b$m, select(whs_depression_c_m_w_b$w, -agerange), select(whs_depression_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(whs_depression_c_u_r$m_u, whs_depression_c_u_r$m_r)
+tbl_w_u_r <- rbind(whs_depression_c_u_r$w_u, whs_depression_c_u_r$w_r)
+tbl_b_u_r <- rbind(whs_depression_c_u_r$b_u, whs_depression_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+whs_depression_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = whs_depression_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Prevalence of depressive symptoms using established WHS algorithm by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DA1-DA23
+- R script name: WHSdepression 
+
+***
+
+
+**History of depression based on WHS algorithm**
+
+Description: Percentage of population who have been diagnosed with depression by a physician or health care professional among those that are depressed based on the WHS algorithm.
+
+Instrument questions:
+
+- Have you ever been told by a doctor or health care professional that you have depression?
+- Various depressive symptoms
+
+```{r da1_d_whs_tbls}
+# column names to use with huxtable
+da1_d_whs_col_names <- c("Age Group (years)", "n", "% Told", "95% CI")
+da1_d_whs_reg_col_names <- c("Region", "n", "% Told", "95% CI")
+
+# men, women, both sexes
+da1_d_whs_m_w_b <- join_m_w_b(da1_d_whs, 1, da1_d_whs_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+da1_d_whs_u_r <- join_u_r(da1_d_whs, 1, da1_d_whs_col_names)
+```
+
+<br>
+
+```{r}
+cbind(da1_d_whs_m_w_b$m, select(da1_d_whs_m_w_b$w, -agerange), select(da1_d_whs_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(da1_d_whs_u_r$m_u, da1_d_whs_u_r$m_r)
+tbl_w_u_r <- rbind(da1_d_whs_u_r$w_u, da1_d_whs_u_r$w_r)
+tbl_b_u_r <- rbind(da1_d_whs_u_r$b_u, da1_d_whs_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+da1_d_whs$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da1_d_whs_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DA1-DA23
+- R script name: WHSdepression 
+
+***
+
+
+**History of depression**
+
+Description: Percentage of the general population who have been diagnosed with depression by a physician or health care professional.
+
+Instrument questions:
+
+- Have you ever been told by a doctor or health care professional that you have depression?
+
+```{r da1_d_all_tbls}
+# column names to use with huxtable
+da1_d_all_col_names <- c("Age Group (years)", "n", "% Told", "95% CI")
+da1_d_all_reg_col_names <- c("Region", "n", "% Told", "95% CI")
+
+# men, women, both sexes
+da1_d_all_m_w_b <- join_m_w_b(da1_d_all, 1, da1_d_all_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+da1_d_all_u_r <- join_u_r(da1_d_all, 1, da1_d_all_col_names)
+```
+
+<br>
+
+```{r}
+cbind(da1_d_all_m_w_b$m, select(da1_d_all_m_w_b$w, -agerange), select(da1_d_all_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(da1_d_all_u_r$m_u, da1_d_all_u_r$m_r)
+tbl_w_u_r <- rbind(da1_d_all_u_r$w_u, da1_d_all_u_r$w_r)
+tbl_b_u_r <- rbind(da1_d_all_u_r$b_u, da1_d_all_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+da1_d_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da1_d_all_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DA1
+- R script name: WHSdepression
+
+***
+
+
+**Treatment of depression**
+
+Description: Percentage of population who have been treated for depression among those with depression diagnosed by a health care worker.
+
+Instrument questions:
+
+- Have you been taking any medications or other treatment, like counseling or psychotherapy, either alone or in group, for depression in the last **12 months**?
+- Have you been taking any medications or other treatment, like counseling or psychotherapy, either alone or in group, for depression in the last **2 weeks**?
+
+```{r da4_e_da5_f_all_tbls}
+# column names to use with huxtable
+da4_e_da5_f_all_col_names <- c("Age Group (years)", "n", "% On medication", "95% CI")
+da4_e_da5_f_all_reg_col_names <- c("Region", "n", "% On medication", "95% CI")
+
+# men, women, both sexes
+# 1 - Have been taking medications or other treatment for depression in the last 12 months
+da4_e_all_m_w_b <- join_m_w_b(da4_e_all, 1, da4_e_da5_f_all_col_names)
+# 2 - Have been taking medications or other treatment for depression in the last 2 weeks
+da5_f_all_m_w_b <- join_m_w_b(da5_f_all, 1, da4_e_da5_f_all_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1
+da4_e_all_u_r <- join_u_r(da4_e_all, 1, da4_e_da5_f_all_col_names)
+# 2
+da5_f_all_u_r <- join_u_r(da5_f_all, 1, da4_e_da5_f_all_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(da4_e_all_m_w_b$m, select(da4_e_all_m_w_b$w, -agerange), select(da4_e_all_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(da5_f_all_m_w_b$m, select(da5_f_all_m_w_b$w, -agerange), select(da5_f_all_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(da4_e_all_u_r$m_u, da4_e_all_u_r$m_r)
+tbl_w_u_r <- rbind(da4_e_all_u_r$w_u, da4_e_all_u_r$w_r)
+tbl_b_u_r <- rbind(da4_e_all_u_r$b_u, da4_e_all_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(da5_f_all_u_r$m_u, da5_f_all_u_r$m_r)
+tbl_w_u_r <- rbind(da5_f_all_u_r$w_u, da5_f_all_u_r$w_r)
+tbl_b_u_r <- rbind(da5_f_all_u_r$b_u, da5_f_all_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+da4_e_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da5_f_all_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+da5_f_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da5_f_all_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 2 weeks by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DA4, DA5
+- R script name: WHSdepression
+
+***
+
+
+
+
+<br>
+<br>

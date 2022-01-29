@@ -1,0 +1,607 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+tobacco_policy_data_dir <- here::here("DataBook", "Modules", "TobaccoPolicy")
+
+# list all files in the directory
+# fs::dir_ls(tobacco_policy_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(tobacco_policy_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+title_u_r <- "by type of settlement"
+title_reg <- "by region"
+```
+
+# Tobacco Policy
+
+**Anti-cigarette information**
+
+Description: Percentage of all respondents who noticed information in newspapers or magazines, television or radio about the dangers of smoking or that encourages quitting during the past 30 days.
+
+Instrument questions:
+
+- During the past 30 days, have you noticed information about the dangers of smoking cigarettes or that encourages quitting through the following media?
+- Newspapers or magazines
+- Television
+- Radio
+
+```{r tpdanger_c_d_e_tbls}
+# column names to use with huxtable
+tpdanger_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpdanger_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 - Noticed information in newspapers or magazines about dangers of smoking or that encourages quitting
+tpdanger_c_m_w_b <- join_m_w_b(tpdanger_c, 1, tpdanger_col_names)
+# 2 - Noticed information on television about dangers of smoking or that encourages quitting
+tpdanger_d_m_w_b <- join_m_w_b(tpdanger_d, 1, tpdanger_col_names)
+# 3 - Noticed information on the radio about dangers of smoking or that encourages quitting
+tpdanger_e_m_w_b <- join_m_w_b(tpdanger_e, 1, tpdanger_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpdanger_c_u_r <- join_u_r(tpdanger_c, 1, tpdanger_col_names) # 1
+tpdanger_d_u_r <- join_u_r(tpdanger_d, 1, tpdanger_col_names) # 2
+tpdanger_e_u_r <- join_u_r(tpdanger_e, 1, tpdanger_col_names) # 3
+```
+
+<br>
+
+```{r}
+# 1
+cbind(tpdanger_c_m_w_b$m, select(tpdanger_c_m_w_b$w, -agerange), select(tpdanger_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed information in newspapers or magazines about dangers of smoking or that encourages quitting", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(tpdanger_d_m_w_b$m, select(tpdanger_d_m_w_b$w, -agerange), select(tpdanger_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed information on television about dangers of smoking or that encourages quitting", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(tpdanger_e_m_w_b$m, select(tpdanger_e_m_w_b$w, -agerange), select(tpdanger_e_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed information on the radio about dangers of smoking or that encourages quitting", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(tpdanger_c_u_r$m_u, tpdanger_c_u_r$m_r)
+tbl_w_u_r <- rbind(tpdanger_c_u_r$w_u, tpdanger_c_u_r$w_r)
+tbl_b_u_r <- rbind(tpdanger_c_u_r$b_u, tpdanger_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed information in newspapers or magazines about dangers of smoking or that encourages quitting by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(tpdanger_d_u_r$m_u, tpdanger_d_u_r$m_r)
+tbl_w_u_r <- rbind(tpdanger_d_u_r$w_u, tpdanger_d_u_r$w_r)
+tbl_b_u_r <- rbind(tpdanger_d_u_r$b_u, tpdanger_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed information on television about dangers of smoking or that encourages quitting by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(tpdanger_e_u_r$m_u, tpdanger_e_u_r$m_r)
+tbl_w_u_r <- rbind(tpdanger_e_u_r$w_u, tpdanger_e_u_r$w_r)
+tbl_b_u_r <- rbind(tpdanger_e_u_r$b_u, tpdanger_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed information on the radio about dangers of smoking or that encourages quitting by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tpdanger_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed information in newspapers or magazines about dangers of smoking or that encourages quitting by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tpdanger_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed information on television about dangers of smoking or that encourages quitting by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tpdanger_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed information on the radio about dangers of smoking or that encourages quitting by region", .colspan_val = 4) 
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP1a-c
+- R script name: TPdanger
+
+***
+
+**Cigarette advertising**
+
+Description: Percentage of all respondents who noticed advertisements or signs promoting cigarettes in stores where cigarettes are sold during the past 30 days.
+
+Instrument questions:
+
+- During the past 30 days, have you noticed any advertisements or signs promoting cigarettes in stores where cigarettes are sold?
+
+```{r tpcigads_c_tbls}
+# column names to use with huxtable
+tpcigads_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpcigads_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+tpcigads_c_m_w_b <- join_m_w_b(tpcigads_c, 1, tpcigads_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpcigads_c_u_r <- join_u_r(tpcigads_c, 1, tpcigads_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tpcigads_c_m_w_b$m, select(tpcigads_c_m_w_b$w, -agerange), select(tpcigads_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed advertisements or signs promoting cigarettes in stores", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tpcigads_c_u_r$m_u, tpcigads_c_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigads_c_u_r$w_u, tpcigads_c_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigads_c_u_r$b_u, tpcigads_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed advertisements or signs promoting cigarettes in stores by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tpcigads_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigads_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Noticed advertisements or signs promoting cigarettes in stores by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP2
+- R script name: TPcigads
+
+***
+
+**Cigarette promotion**
+
+Description: Percentage of all respondents who noticed cigarette promotions during the past 30 days.
+
+Instrument questions:
+
+- During the past 30 days, have you noticed any of the following types of cigarette promotions?
+
+```{r tpcigpromos_a_b_c_d_e_f_tbls}
+# column names to use with huxtable
+tpcigpromos_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpcigpromos_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 - Noticed free samples of cigarettes
+tpcigpromos_a_m_w_b <- join_m_w_b(tpcigpromos_a, 1, tpcigpromos_col_names)
+# 2 - Noticed sale prices on cigarettes
+tpcigpromos_b_m_w_b <- join_m_w_b(tpcigpromos_b, 1, tpcigpromos_col_names)
+# 3 - Noticed coupons for cigarettes
+tpcigpromos_c_m_w_b <- join_m_w_b(tpcigpromos_c, 1, tpcigpromos_col_names)
+# 4 - Noticed free gifts or special discount offers on other products when buying cigarettes
+tpcigpromos_d_m_w_b <- join_m_w_b(tpcigpromos_d, 1, tpcigpromos_col_names)
+# 5 - Noticed clothing or other items with a cigarette brand name or logo
+tpcigpromos_e_m_w_b <- join_m_w_b(tpcigpromos_e, 1, tpcigpromos_col_names)
+# 6 - Noticed cigarette promotions in the mail
+tpcigpromos_f_m_w_b <- join_m_w_b(tpcigpromos_f, 1, tpcigpromos_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpcigpromos_a_u_r <- join_u_r(tpcigpromos_a, 1, tpcigpromos_col_names) # 1
+tpcigpromos_b_u_r <- join_u_r(tpcigpromos_b, 1, tpcigpromos_col_names) # 2
+tpcigpromos_c_u_r <- join_u_r(tpcigpromos_c, 1, tpcigpromos_col_names) # 3
+tpcigpromos_d_u_r <- join_u_r(tpcigpromos_d, 1, tpcigpromos_col_names) # 4
+tpcigpromos_e_u_r <- join_u_r(tpcigpromos_e, 1, tpcigpromos_col_names) # 5
+tpcigpromos_f_u_r <- join_u_r(tpcigpromos_f, 1, tpcigpromos_col_names) # 6
+```
+
+<br>
+
+```{r}
+# 1
+cbind(tpcigpromos_a_m_w_b$m, select(tpcigpromos_a_m_w_b$w, -agerange), select(tpcigpromos_a_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed free samples of cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(tpcigpromos_b_m_w_b$m, select(tpcigpromos_b_m_w_b$w, -agerange), select(tpcigpromos_b_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed sale prices on cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(tpcigpromos_c_m_w_b$m, select(tpcigpromos_c_m_w_b$w, -agerange), select(tpcigpromos_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed coupons for cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 4
+cbind(tpcigpromos_d_m_w_b$m, select(tpcigpromos_d_m_w_b$w, -agerange), select(tpcigpromos_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed free gifts or special discount offers on other products when buying cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 5
+cbind(tpcigpromos_e_m_w_b$m, select(tpcigpromos_e_m_w_b$w, -agerange), select(tpcigpromos_e_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed clothing or other items with a cigarette brand name or logo", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 6
+cbind(tpcigpromos_f_m_w_b$m, select(tpcigpromos_f_m_w_b$w, -agerange), select(tpcigpromos_f_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Noticed cigarette promotions in the mail", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(tpcigpromos_a_u_r$m_u, tpcigpromos_a_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_a_u_r$w_u, tpcigpromos_a_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_a_u_r$b_u, tpcigpromos_a_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed free samples of cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(tpcigpromos_b_u_r$m_u, tpcigpromos_b_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_b_u_r$w_u, tpcigpromos_b_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_b_u_r$b_u, tpcigpromos_b_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed sale prices on cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(tpcigpromos_c_u_r$m_u, tpcigpromos_c_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_c_u_r$w_u, tpcigpromos_c_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_c_u_r$b_u, tpcigpromos_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed coupons for cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+tbl_m_u_r <- rbind(tpcigpromos_d_u_r$m_u, tpcigpromos_d_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_d_u_r$w_u, tpcigpromos_d_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_d_u_r$b_u, tpcigpromos_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed free gifts or special discount offers on other products when buying cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 5
+tbl_m_u_r <- rbind(tpcigpromos_e_u_r$m_u, tpcigpromos_e_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_e_u_r$w_u, tpcigpromos_e_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_e_u_r$b_u, tpcigpromos_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed clothing or other items with a cigarette brand name or logo by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 6
+tbl_m_u_r <- rbind(tpcigpromos_f_u_r$m_u, tpcigpromos_f_u_r$m_r)
+tbl_w_u_r <- rbind(tpcigpromos_f_u_r$w_u, tpcigpromos_f_u_r$w_r)
+tbl_b_u_r <- rbind(tpcigpromos_f_u_r$b_u, tpcigpromos_f_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Noticed cigarette promotions in the mail by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tpcigpromos_a$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed free samples of cigarettes by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tpcigpromos_b$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed sale prices on cigarettes by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tpcigpromos_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed coupons for cigarettes by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+tpcigpromos_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed free gifts or special discount offers on other products when buying cigarettes by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 5
+tpcigpromos_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed clothing or other items with a cigarette brand name or logo by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 6
+tpcigpromos_f$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcigpromos_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Noticed cigarette promotions in the mail by region", .colspan_val = 4) 
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP3a-TP3f
+- R script name: TPcigpromos
+
+***
+
+
+**Cigarette package health warnings**
+
+Description: Percentage of current smokers who noticed health warnings on cigarette packages during the past 30 days.
+
+Instrument questions:
+
+- During the past 30 days, did you notice any health warnings on cigarette packages?
+
+```{r tpwarnings_c_tbls}
+# column names to use with huxtable
+tpwarnings_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpwarnings_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+tpwarnings_c_m_w_b <- join_m_w_b(tpwarnings_c, 1, tpwarnings_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpwarnings_c_u_r <- join_u_r(tpwarnings_c, 1, tpwarnings_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tpwarnings_c_m_w_b$m, select(tpwarnings_c_m_w_b$w, -agerange), select(tpwarnings_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current smokers who noticed health warnings on cigarette packages", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tpwarnings_c_u_r$m_u, tpwarnings_c_u_r$m_r)
+tbl_w_u_r <- rbind(tpwarnings_c_u_r$w_u, tpwarnings_c_u_r$w_r)
+tbl_b_u_r <- rbind(tpwarnings_c_u_r$b_u, tpwarnings_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current smokers who noticed health warnings on cigarette packages by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tpwarnings_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpwarnings_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current smokers who noticed health warnings on cigarette packages by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP4
+- R script name: TPwarnings
+
+***
+
+**Quitting**
+
+Description: Percentage of current smokers who noticed health warnings on cigarette packages during the past 30 days that thought about quitting due to the health warnings they saw.
+
+Instrument questions:
+
+- During the past 30 days, did you notice any health warnings on cigarette packages?
+- During the past 30 days, have warning labels on cigarette packages led you to think about quitting?
+
+```{r tpquitting_c_tbls}
+# column names to use with huxtable
+tpquitting_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpquitting_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+tpquitting_c_m_w_b <- join_m_w_b(tpquitting_c, 1, tpquitting_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpquitting_c_u_r <- join_u_r(tpquitting_c, 1, tpquitting_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tpquitting_c_m_w_b$m, select(tpquitting_c_m_w_b$w, -agerange), select(tpquitting_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Current smokers who saw health warnings on cigarette packages that thought of quitting", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tpquitting_c_u_r$m_u, tpquitting_c_u_r$m_r)
+tbl_w_u_r <- rbind(tpquitting_c_u_r$w_u, tpquitting_c_u_r$w_r)
+tbl_b_u_r <- rbind(tpquitting_c_u_r$b_u, tpquitting_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Current smokers who saw health warnings on cigarette packages that thought of quitting by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tpquitting_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpquitting_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Current smokers who saw health warnings on cigarette packages that thought of quitting by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP4, TP5
+- R script name: TPquitting
+
+***
+
+**Cigarette costs**
+
+Description: Average price paid for 20 manufactured cigarettes, based on the last manufactured cigarette purchase.
+Instrument questions:
+
+- The last time you bought manufactured cigarettes for yourself, how many cigarettes did you buy in total?
+- In total, how much money did you pay for this purchase?
+
+```{r tpcost_priceper20cigs_tbls}
+# column names to use with huxtable
+tpcost_priceper20cigs_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+tpcost_priceper20cigs_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+tpcost_priceper20cigs_m_w_b <- join_m_w_b(tpcost_priceper20cigs, 1, tpcost_priceper20cigs_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+tpcost_priceper20cigs_u_r <- join_u_r(tpcost_priceper20cigs, 1, tpcost_priceper20cigs_col_names)
+```
+
+<br>
+
+```{r}
+cbind(tpcost_priceper20cigs_m_w_b$m, select(tpcost_priceper20cigs_m_w_b$w, -agerange), select(tpcost_priceper20cigs_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Average price paid for 20 manufactured cigarettes", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(tpcost_priceper20cigs_u_r$m_u, tpcost_priceper20cigs_u_r$m_r)
+tbl_w_u_r <- rbind(tpcost_priceper20cigs_u_r$w_u, tpcost_priceper20cigs_u_r$w_r)
+tbl_b_u_r <- rbind(tpcost_priceper20cigs_u_r$b_u, tpcost_priceper20cigs_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Average price paid for 20 manufactured cigarettes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tpcost_priceper20cigs$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpcost_priceper20cigs_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Average price paid for 20 manufactured cigarettes by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: TP6, TP7
+- R script name: TPcost
+
+***
+
+
+<br>
+<br>

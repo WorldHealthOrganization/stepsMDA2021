@@ -1,0 +1,152 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+cervical_cancer_data_dir <- here::here("DataBook", "Modules", "CervicalCancerScreening")
+
+# list all files in the directory
+# fs::dir_ls(cervical_cancer_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(cervical_cancer_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Cervical Cancer Screening
+
+**Cervical cancer screening**
+
+Description: Percentage of female respondents who have ever had a screening test for cervical cancer among all female respondents.
+
+Instrument questions:
+
+- Have you ever had a screening test for cervical cancer, using any of these methods described above?
+
+```{r hcervcancer_c_duration_tbls}
+# column names to use with huxtable
+hcervcancer_c_col_names <- c("Age Group (years)", "n", "% Ever tested", "95% CI")
+hcervcancer_c_reg_col_names <- c("Region", "n", "% Ever tested", "95% CI")
+
+# women
+hcervcancer_c_w$w %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcervcancer_c_col_names) %>% 
+  final_m_w_b_tbl(1, "Women", "Cervical cancer screening", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(unite_ci(hcervcancer_c_w$w_u, .ci_amount = 1) %>% 
+        apply_hux(.col_names = hcervcancer_c_col_names), 
+      unite_ci(hcervcancer_c_w$w_r, .ci_amount = 1) %>% 
+        apply_hux(.col_names = hcervcancer_c_col_names)) %>% 
+  final_u_r_tbl(1, "Women", "Cervical cancer screening by type of settlement", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+hcervcancer_c_w$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcervcancer_c_col_names) %>% 
+  final_m_w_b_tbl(1, "Women", "Cervical cancer screening by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: CX1
+-   R script name: Hcervcancer
+
+***
+
+
+**Cervical cancer screening among women aged 30-49 years**
+
+Description: Percentage of female respondents aged 30-49 years who have ever had a screening test for cervical cancer among all female respondents aged 30-49 years.
+
+Instrument questions:
+
+- Have you ever had a screening test for cervical cancer, using any of these methods described above?
+
+```{r hcervcancer_c2_duration_tbls}
+# column names to use with huxtable
+hcervcancer_c2_col_names <- c("Age Group (years)", "n", "% Ever tested", "95% CI")
+hcervcancer_c2_reg_col_names <- c("Region", "n", "% Ever tested", "95% CI")
+
+# women
+hcervcancer_c2_w_t %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcervcancer_c2_col_names) %>% 
+  final_m_w_b_tbl(1, "Women", "Cervical cancer screening among women aged 30-49 years", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(unite_ci(hcervcancer_c2_w$w_u %>% filter(agerange2 == "18–69"), .ci_amount = 1) %>% 
+        apply_hux(.col_names = hcervcancer_c2_col_names), 
+      unite_ci(hcervcancer_c2_w$w_r %>% filter(agerange2 == "18–69"), .ci_amount = 1) %>% 
+        apply_hux(.col_names = hcervcancer_c2_col_names)) %>% 
+  final_m_w_b_tbl(1, "Women", "Cervical cancer screening among women aged 30-49 years by type of settlement", 4) %>% 
+  # add urban and rural rows
+  insert_row("Urban", after = 3, fill = "", colspan = 4) %>%
+  set_bottom_border(row = c(4,6), everywhere, value = 0) %>% 
+  set_contents(row = 6, col = 1, value = "Rural") %>% 
+  merge_cells(row = 6, col = c(1:4)) %>% 
+  set_right_border(row = c(4, 6), col = 1) %>%
+  set_left_padding(row = c(4, 6), col = 1, value = 8) %>% 
+  # align left urban and rural
+  set_align(row = 4, value = "left") %>%
+  set_align(row = 6, value = "left") %>%
+  set_bold(row = c(4, 6), everywhere)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+hcervcancer_c2_w$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcervcancer_c2_col_names) %>% 
+  final_m_w_b_tbl(1, "Women", "Cervical cancer screening among women aged 30-49 years by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: CX1
+-   R script name: Hcervcancer
+
+***
+
+
+<br> 
+
+<br>

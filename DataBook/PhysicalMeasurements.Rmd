@@ -1,0 +1,898 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+physical_measurements_data_dir <- here::here("DataBook", "Modules", "PhysicalMeasurements")
+
+# list all files in the directory
+# fs::dir_ls(physical_measurements_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(physical_measurements_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Physical Measurements
+
+**Blood pressure**
+
+Description: Mean blood pressure among all respondents, including those currently on medication for raised blood pressure.
+
+Instrument questions:
+
+- Reading 1-3 systolic and diastolic blood pressure.
+
+```{r mbloodpressure_sbp_d_duration_tbls}
+
+# column names to use with huxtable
+mbloodpressure_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+mbloodpressure_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# 1 - Mean systolic blood pressure (mmHg)
+# men, women, both sexes
+mbloodpressure_sbp_m_w_b <- join_m_w_b(mbloodpressure_sbp, 1, mbloodpressure_col_names)
+
+# 2 - Mean diastolic blood pressure (mmHg)
+# men, women, both sexes
+mbloodpressure_dbp_m_w_b <- join_m_w_b(mbloodpressure_dbp, 1, mbloodpressure_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Mean systolic blood pressure (mmHg)
+mbloodpressure_sbp_u_r <- join_u_r(mbloodpressure_sbp, 1, mbloodpressure_col_names)
+# 2 - Mean diastolic blood pressure (mmHg)
+mbloodpressure_dbp_u_r <- join_u_r(mbloodpressure_dbp, 1, mbloodpressure_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(mbloodpressure_sbp_m_w_b$m, select(mbloodpressure_sbp_m_w_b$w, -agerange), select(mbloodpressure_sbp_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean systolic blood pressure (mmHg)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(mbloodpressure_dbp_m_w_b$m, select(mbloodpressure_dbp_m_w_b$w, -agerange), select(mbloodpressure_dbp_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean diastolic blood pressure (mmHg)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(mbloodpressure_sbp_u_r$m_u, mbloodpressure_sbp_u_r$m_r)
+tbl_w_u_r <- rbind(mbloodpressure_sbp_u_r$w_u, mbloodpressure_sbp_u_r$w_r)
+tbl_b_u_r <- rbind(mbloodpressure_sbp_u_r$b_u, mbloodpressure_sbp_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean systolic blood pressure (mmHg) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(mbloodpressure_dbp_u_r$m_u, mbloodpressure_dbp_u_r$m_r)
+tbl_w_u_r <- rbind(mbloodpressure_dbp_u_r$w_u, mbloodpressure_dbp_u_r$w_r)
+tbl_b_u_r <- rbind(mbloodpressure_dbp_u_r$b_u, mbloodpressure_dbp_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean diastolic blood pressure (mmHg) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+mbloodpressure_sbp$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbloodpressure_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean systolic blood pressure (mmHg) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+mbloodpressure_dbp$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbloodpressure_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean diastolic blood pressure (mmHg) by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M4a, M4b, M5a, M5b, M6a, M6b
+-   R script name: Mbloodpressure
+
+***
+
+**Raised blood pressure**
+
+Description: Percentage of respondents with raised blood pressure.
+
+Instrument questions:
+
+- Reading 1-3 systolic and diastolic blood pressure 
+- During the past two weeks, have you been treated for raised blood pressure with drugs (medication) prescribed by a doctor or other health worker?
+
+```{r mraisedbp_tbls}
+# column names to use with huxtable
+mraisedbp_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+mraisedbp_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 (a) - SBP ≥140 and/or DBP ≥ 90 mmHg
+raisedbp_140_90_m_w_b <- join_m_w_b(raisedbp_140_90, 1, mraisedbp_col_names)
+
+# 2 (b) - SBP ≥160 and/or DBP ≥ 100 mmHg
+raisedbp_160_100_m_w_b <- join_m_w_b(raisedbp_160_100, 1, mraisedbp_col_names)
+
+# 3 (c) - SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure
+raisedbp_140_90_or_meds_m_w_b <- join_m_w_b(raisedbp_140_90_or_meds, 1, mraisedbp_col_names)
+
+# 4 (d) - SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure
+raisedbp_160_100_or_meds_m_w_b <- join_m_w_b(raisedbp_160_100_or_meds, 1, mraisedbp_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - SBP ≥140 and/or DBP ≥ 90 mmHg
+raisedbp_140_90_u_r <- join_u_r(raisedbp_140_90, 1, mraisedbp_col_names)
+# 2 - SBP ≥160 and/or DBP ≥ 100 mmHg
+raisedbp_160_100_u_r <- join_u_r(raisedbp_160_100, 1, mraisedbp_col_names)
+# 3 - SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure
+raisedbp_140_90_or_meds_u_r <- join_u_r(raisedbp_140_90_or_meds, 1, mraisedbp_col_names)
+# 4 - SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure
+raisedbp_160_100_or_meds_u_r <- join_u_r(raisedbp_160_100_or_meds, 1, mraisedbp_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(raisedbp_140_90_m_w_b$m, select(raisedbp_140_90_m_w_b$w, -agerange), select(raisedbp_140_90_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "SBP ≥140 and/or DBP ≥ 90 mmHg", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(raisedbp_160_100_m_w_b$m, select(raisedbp_160_100_m_w_b$w, -agerange), select(raisedbp_160_100_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "SBP ≥160 and/or DBP ≥ 100 mmHg", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(raisedbp_140_90_or_meds_m_w_b$m, select(raisedbp_140_90_or_meds_m_w_b$w, -agerange), select(raisedbp_140_90_or_meds_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 4
+cbind(raisedbp_160_100_or_meds_m_w_b$m, select(raisedbp_160_100_or_meds_m_w_b$w, -agerange), select(raisedbp_160_100_or_meds_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(raisedbp_140_90_u_r$m_u, raisedbp_140_90_u_r$m_r)
+tbl_w_u_r <- rbind(raisedbp_140_90_u_r$w_u, raisedbp_140_90_u_r$w_r)
+tbl_b_u_r <- rbind(raisedbp_140_90_u_r$b_u, raisedbp_140_90_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "SBP ≥140 and/or DBP ≥ 90 mmHg by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(raisedbp_160_100_u_r$m_u, raisedbp_160_100_u_r$m_r)
+tbl_w_u_r <- rbind(raisedbp_160_100_u_r$w_u, raisedbp_160_100_u_r$w_r)
+tbl_b_u_r <- rbind(raisedbp_160_100_u_r$b_u, raisedbp_160_100_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "SBP ≥160 and/or DBP ≥ 100 mmHg by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(raisedbp_140_90_or_meds_u_r$m_u, raisedbp_140_90_or_meds_u_r$m_r)
+tbl_w_u_r <- rbind(raisedbp_140_90_or_meds_u_r$w_u, raisedbp_140_90_or_meds_u_r$w_r)
+tbl_b_u_r <- rbind(raisedbp_140_90_or_meds_u_r$b_u, raisedbp_140_90_or_meds_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+tbl_m_u_r <- rbind(raisedbp_160_100_or_meds_u_r$m_u, raisedbp_160_100_or_meds_u_r$m_r)
+tbl_w_u_r <- rbind(raisedbp_160_100_or_meds_u_r$w_u, raisedbp_160_100_or_meds_u_r$w_r)
+tbl_b_u_r <- rbind(raisedbp_160_100_or_meds_u_r$b_u, raisedbp_160_100_or_meds_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+raisedbp_140_90$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mraisedbp_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "SBP ≥140 and/or DBP ≥ 90 mmHg by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+raisedbp_160_100$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mraisedbp_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "SBP ≥160 and/or DBP ≥ 100 mmHg by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+raisedbp_140_90_or_meds$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mraisedbp_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+raisedbp_160_100_or_meds$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mraisedbp_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H1, H2a, H3, M4a, M4b, M5a, M5b, M6a, M6b, M7
+-   R script name: Mraisedbp
+
+***
+
+**Blood pressure diagnosis, treatment and control**
+
+Description: Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure.
+
+Instrument questions:
+
+- Have you ever had your blood pressure measured by a doctor or other health worker?
+- Have you ever been told by a doctor or other health worker that you have raised blood pressure or hypertension?
+- During the past two weeks, have you been treated for raised blood pressure with drugs (medication) prescribed by a doctor or other health worker?
+- Reading 1-3 systolic and diastolic blood pressure
+
+```{r htn_control_tbls}
+
+# column names to use with huxtable
+htn_control_col_names <- 
+  c("Age Group (years)", "n", "% with raised blood pressure, not previously diagnosed", "95% CI", 
+    "% with previously diagnosed raised blood pressure, not on medication", "95% CI", 
+    "% with previously diagnosed raised blood pressure, on medication but not controlled", "95% CI", 
+    "% with previously diagnosed raised blood pressure, on medication and blood pressure controlled", "95% CI")
+
+# column names for region to use with huxtable
+htn_control_reg_col_names <- 
+  c("Region", "n", "% with raised blood pressure, not previously diagnosed", "95% CI", 
+    "% with previously diagnosed raised blood pressure, not on medication", "95% CI", 
+    "% with previously diagnosed raised blood pressure, on medication but not controlled", "95% CI", 
+    "% with previously diagnosed raised blood pressure, on medication and blood pressure controlled", "95% CI")
+
+# men, women, both sexes
+htn_control_m_w_b <- join_m_w_b(htn_control, 4, htn_control_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+htn_control_u_r <- join_u_r(htn_control, 4, htn_control_col_names)
+```
+
+<br>
+
+```{r}
+htn_control_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 10)
+```
+
+<br>
+
+```{r}
+htn_control_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 10)
+```
+
+<br>
+
+```{r}
+htn_control_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htn_control_u_r$m_u, htn_control_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htn_control_u_r$w_u, htn_control_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(htn_control_u_r$b_u, htn_control_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+htn_control$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = htn_control_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by region", 10) 
+```
+
+**Hypertension control (presented as in previous STEPS with three categories instead of current four)**
+
+```{r bp_control_old_tbls}
+
+# column names to use with huxtable
+bp_control_old_col_names <- 
+  c("Age Group (years)", "n", "% on medication and BP not raised", "95% CI", 
+    "% on medication and BP raised", "95% CI", 
+    "% not on medication and BP raised", "95% CI")
+
+# column names for region to use with huxtable
+bp_control_old_reg_col_names <- 
+  c("Region", "n", "% on medication and BP not raised", "95% CI", 
+    "% on medication and BP raised", "95% CI", 
+    "% not on medication and BP raised", "95% CI")
+
+# men, women, both sexes
+bp_control_old_m_w_b <- join_m_w_b(bp_control_old, 3, bp_control_old_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+bp_control_old_u_r <- join_u_r(bp_control_old, 3, bp_control_old_col_names)
+```
+
+<br>
+
+```{r}
+bp_control_old_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 8)
+```
+
+<br>
+
+```{r}
+bp_control_old_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 8)
+```
+
+<br>
+
+```{r}
+bp_control_old_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bp_control_old_u_r$m_u, bp_control_old_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bp_control_old_u_r$w_u, bp_control_old_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bp_control_old_u_r$b_u, bp_control_old_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+bp_control_old$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = bp_control_old_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Raised blood pressure diagnosis, treatment and control among those with raised blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure by region", 8) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H1, H2a, H3, M4a, M4b, M5a, M5b, M6a, M6b, M7
+-   R script name: Mraisedbp
+
+***
+
+
+**Mean heart rate**
+
+Description: Mean heart rate (beats per minute).
+
+Instrument questions:
+
+- Reading 1-3 heart rate
+
+```{r mheartrate_mn_tbls}
+# column names to use with huxtable
+mheartrate_mn_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+mheartrate_mn_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+mheartrate_mn_m_w_b <- join_m_w_b(mheartrate_mn, 1, mheartrate_mn_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+mheartrate_mn_u_r <- join_u_r(mheartrate_mn, 1, mheartrate_mn_col_names)
+```
+
+<br>
+
+```{r}
+cbind(mheartrate_mn_m_w_b$m, select(mheartrate_mn_m_w_b$w, -agerange), select(mheartrate_mn_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean heart rate (beats per minute)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(mheartrate_mn_u_r$m_u, mheartrate_mn_u_r$m_r)
+tbl_w_u_r <- rbind(mheartrate_mn_u_r$w_u, mheartrate_mn_u_r$w_r)
+tbl_b_u_r <- rbind(mheartrate_mn_u_r$b_u, mheartrate_mn_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean heart rate (beats per minute) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+mheartrate_mn$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mheartrate_mn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean heart rate (beats per minute) by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M16a, M16b, M16c
+-   R script name: Mheartrate
+
+***
+
+**Height, weight and BMI**
+
+Description: Mean height, weight, and body mass index among all respondents (excluding pregnant women).
+
+Instrument questions:
+
+- For women: Are you pregnant?
+- Height
+- Weight
+
+```{r mbmi_tbls}
+# column names to use with huxtable
+mbmi_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+mbmi_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+# 1. Mean height (cm)
+mbmi_m11_m_w_b <- join_m_w_b(mbmi_m11, 1, mbmi_col_names)
+# 2. Mean weight (kg)
+mbmi_m12_m_w_b <- join_m_w_b(mbmi_m12, 1, mbmi_col_names)
+# 3. Mean BMI (kg/m2)
+mbmi_m_w_b <- join_m_w_b(mbmi, 1, mbmi_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1. Mean height (cm)
+mbmi_m11_u_r <- join_u_r(mbmi_m11, 1, mbmi_col_names)
+# 2. Mean weight (kg)
+mbmi_m12_u_r <- join_u_r(mbmi_m12, 1, mbmi_col_names)
+# 3. Mean BMI (kg/m2)
+mbmi_u_r <- join_u_r(mbmi, 1, mbmi_col_names)
+```
+
+<br>
+
+```{r}
+# 1. Mean height (cm)
+# ONLY MEN AND WOMEN INCLUDED
+cbind(mbmi_m11_m_w_b$m, select(mbmi_m11_m_w_b$w, -agerange), select(mbmi_m11_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean height (cm)", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r}
+# 2. Mean weight (kg)
+# ONLY MEN AND WOMEN INCLUDED
+cbind(mbmi_m12_m_w_b$m, select(mbmi_m12_m_w_b$w, -agerange), select(mbmi_m12_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean weight (kg)", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r}
+# 3. Mean BMI (kg/m2)
+cbind(mbmi_m_w_b$m, select(mbmi_m_w_b$w, -agerange), select(mbmi_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean BMI (kg/m2)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1. Mean height (cm)
+tbl_m_u_r <- rbind(mbmi_m11_u_r$m_u, mbmi_m11_u_r$m_r)
+tbl_w_u_r <- rbind(mbmi_m11_u_r$w_u, mbmi_m11_u_r$w_r)
+tbl_b_u_r <- rbind(mbmi_m11_u_r$b_u, mbmi_m11_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean height (cm) by type of settlement", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2. Mean weight (kg)
+tbl_m_u_r <- rbind(mbmi_m12_u_r$m_u, mbmi_m12_u_r$m_r)
+tbl_w_u_r <- rbind(mbmi_m12_u_r$w_u, mbmi_m12_u_r$w_r)
+tbl_b_u_r <- rbind(mbmi_m12_u_r$b_u, mbmi_m12_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean weight (kg) by type of settlement", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3. Mean BMI (kg/m2)
+tbl_m_u_r <- rbind(mbmi_u_r$m_u, mbmi_u_r$m_r)
+tbl_w_u_r <- rbind(mbmi_u_r$w_u, mbmi_u_r$w_r)
+tbl_b_u_r <- rbind(mbmi_u_r$b_u, mbmi_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean BMI (kg/m2) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1. Mean height (cm)
+# mbmi_m11$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbmi_reg_col_names) %>% 
+#   final_m_w_b_tbl(1, "Both sexes", "Mean height (cm) by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2. Mean weight (kg)
+# mbmi_m12$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbmi_reg_col_names) %>% 
+#   final_m_w_b_tbl(1, "Both sexes", "Mean weight (kg) by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3. Mean BMI (kg/m2)
+mbmi$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbmi_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean BMI (kg/m2) by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M8, M11, M12
+-   R script name: Mbmi
+
+***
+
+**BMI categories**
+
+Description: Percentage of respondents (excluding pregnant women) in each BMI category.
+
+Instrument questions:
+
+- For women: Are you pregnant?
+- Height
+- Weight
+
+```{r mbmiclass_c_tbls}
+# column names to use with huxtable
+mbmiclass_c_col_names <- 
+  c("Age Group (years)", "n", "% Under-weight <18.5", "95% CI", "% Normal weight 18.5-24.9", "95% CI", 
+    "% BMI 25.0-29.9", "95% CI", "% Obese ≥30.0", "95% CI")
+
+# column names for region to use with huxtable
+mbmiclass_c_reg_col_names <- 
+  c("Region", "n", "% Under-weight <18.5", "95% CI", "% Normal weight 18.5-24.9", "95% CI", 
+    "% BMI 25.0-29.9", "95% CI", "% Obese ≥30.0", "95% CI")
+
+# men, women, both sexes
+mbmiclass_c_m_w_b <- join_m_w_b(mbmiclass_c, 4, mbmiclass_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+mbmiclass_c_u_r <- join_u_r(mbmiclass_c, 4, mbmiclass_c_col_names)
+```
+
+<br>
+
+```{r}
+mbmiclass_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "BMI classifications", 10)
+```
+
+<br>
+
+```{r}
+mbmiclass_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "BMI classifications", 10)
+```
+
+<br>
+
+```{r}
+mbmiclass_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "BMI classifications", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(mbmiclass_c_u_r$m_u, mbmiclass_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "BMI classifications by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(mbmiclass_c_u_r$w_u, mbmiclass_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "BMI classifications by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(mbmiclass_c_u_r$b_u, mbmiclass_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "BMI classifications by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+mbmiclass_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = mbmiclass_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "BMI classifications by region", 10) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M8, M11, M12
+-   R script name: Mbmiclass
+
+***
+
+**BMI ≥25**
+
+Description: Percentage of respondents (excluding pregnant women) classified as overweight (BMI≥25).
+
+Instrument questions:
+
+- For women: Are you pregnant?
+- Height
+- Weight
+
+```{r mbmiclass_d_tbls}
+# column names to use with huxtable
+mbmiclass_d_col_names <- c("Age Group (years)", "n", "% BMI≥25", "95% CI")
+mbmiclass_d_reg_col_names <- c("Region", "n", "% BMI≥25", "95% CI")
+
+# men, women, both sexes
+mbmiclass_d_m_w_b <- join_m_w_b(mbmiclass_d, 1, mbmiclass_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+mbmiclass_d_u_r <- join_u_r(mbmiclass_d, 1, mbmiclass_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(mbmiclass_d_m_w_b$m, select(mbmiclass_d_m_w_b$w, -agerange), select(mbmiclass_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "BMI≥25", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(mbmiclass_d_u_r$m_u, mbmiclass_d_u_r$m_r)
+tbl_w_u_r <- rbind(mbmiclass_d_u_r$w_u, mbmiclass_d_u_r$w_r)
+tbl_b_u_r <- rbind(mbmiclass_d_u_r$b_u, mbmiclass_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "BMI≥25 by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+mbmiclass_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mbmiclass_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "BMI≥25 by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M8, M11, M12
+-   R script name: Mbmiclass
+
+***
+
+**Waist circumference**
+
+Description: Mean waist circumference among all respondents (excluding pregnant women).
+
+Instrument questions:
+
+- For women: Are you pregnant?
+- Waist circumference measurement
+
+```{r mwaist_tbls}
+# column names to use with huxtable
+mwaist_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+mwaist_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+mwaist_m_w_b <- join_m_w_b(mwaist, 1, mwaist_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+mwaist_u_r <- join_u_r(mwaist, 1, mwaist_col_names)
+```
+
+<br>
+
+```{r}
+# ONLY MEN AND WOMEN INCLUDED
+cbind(mwaist_m_w_b$m, select(mwaist_m_w_b$w, -agerange), select(mwaist_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Waist circumference (cm)", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(mwaist_u_r$m_u, mwaist_u_r$m_r)
+tbl_w_u_r <- rbind(mwaist_u_r$w_u, mwaist_u_r$w_r)
+tbl_b_u_r <- rbind(mwaist_u_r$b_u, mwaist_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Waist circumference (cm) by type of settlement", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# mwaist_m11$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mwaist_reg_col_names) %>% 
+#   final_m_w_b_tbl(1, "Both sexes", "Waist circumference (cm) by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M8, M14
+-   R script name: Mwaist
+
+***
+
+
+**Hip circumference**
+
+Description: Mean hip circumference among all respondents (excluding pregnant women).
+
+Instrument questions:
+
+- For women: Are you pregnant?
+- Hip circumference measurement
+
+```{r mhip_tbls}
+# column names to use with huxtable
+mhip_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+mhip_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+mhip_m_w_b <- join_m_w_b(mhip, 1, mhip_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+mhip_u_r <- join_u_r(mhip, 1, mhip_col_names)
+```
+
+<br>
+
+```{r}
+# ONLY MEN AND WOMEN INCLUDED
+cbind(mhip_m_w_b$m, select(mhip_m_w_b$w, -agerange), select(mhip_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Hip circumference (cm)", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(mhip_u_r$m_u, mhip_u_r$m_r)
+tbl_w_u_r <- rbind(mhip_u_r$w_u, mhip_u_r$w_r)
+tbl_b_u_r <- rbind(mhip_u_r$b_u, mhip_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Hip circumference (cm) by type of settlement", .colspan_val = 7) %>% select(c(1:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# mhip_m11$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = mhip_reg_col_names) %>% 
+#   final_m_w_b_tbl(1, "Both sexes", "Hip circumference (cm) by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: M8, M15
+-   R script name: Mhip
+
+***
+
+
+<br> 
+
+<br>

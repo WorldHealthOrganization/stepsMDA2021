@@ -1,0 +1,504 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+diet_data_dir <- here::here("DataBook", "Modules", "Diet")
+
+# list all files in the directory
+# fs::dir_ls(diet_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(diet_data_dir, regexp = "\\.R$") 
+r_files
+
+# read in just each R file, because in MDA not scripts are used
+source(r_files[1]) # DX1
+source(r_files[4]) # Ddays
+source(r_files[13]) # Dservings
+source(r_files[6]) # Dfiveormore
+
+
+# scale up to all R files with a map function from purrr
+# r_files %>% 
+#   map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Diet
+
+**Mean number of days of fruit and vegetable consumption**
+
+Description: mean number of days fruit and vegetables consumed.
+
+Instrument questions:
+
+- In a typical week, on how many days do you eat fruit?
+- In a typical week, on how many days do you eat vegetables?
+
+```{r ddays_tbls}
+
+# column names to use with huxtable
+ddays_col_names <- c("Age Group (years)", "n", "Mean number of days", "95% CI")
+ddays_reg_col_names <- c("Region", "n", "Mean number of days", "95% CI")
+
+# 1. Fruit
+# men, women, both sexes
+ddays_d1_m_w_b <- join_m_w_b(ddays_d1, 1, ddays_col_names)
+# 2. Vegetables
+# men, women, both sexes
+ddays_d3_m_w_b <- join_m_w_b(ddays_d3, 1, ddays_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1. Fruit
+ddays_d1_u_r <- join_u_r(ddays_d1, 1, ddays_col_names)
+# 2. Vegetable
+ddays_d3_u_r <- join_u_r(ddays_d3, 1, ddays_col_names)
+```
+
+<br>
+
+```{r}
+# 1. Fruit
+cbind(ddays_d1_m_w_b$m, select(ddays_d1_m_w_b$w, -agerange), select(ddays_d1_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean number of days fruit consumed in a typical week", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2. Vegetables
+cbind(ddays_d3_m_w_b$m, select(ddays_d3_m_w_b$w, -agerange), select(ddays_d3_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean number of days vegetables consumed in a typical week", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1. Fruit
+tbl_m_u_r <- rbind(ddays_d1_u_r$m_u, ddays_d1_u_r$m_r)
+tbl_w_u_r <- rbind(ddays_d1_u_r$w_u, ddays_d1_u_r$w_r)
+tbl_b_u_r <- rbind(ddays_d1_u_r$b_u, ddays_d1_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of days fruit consumed in a typical week by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2. Vegetables
+tbl_m_u_r <- rbind(ddays_d3_u_r$m_u, ddays_d3_u_r$m_r)
+tbl_w_u_r <- rbind(ddays_d3_u_r$w_u, ddays_d3_u_r$w_r)
+tbl_b_u_r <- rbind(ddays_d3_u_r$b_u, ddays_d3_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of days vegetables consumed in a typical week by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ddays_d1$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ddays_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of days fruit consumed in a typical week by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ddays_d3$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ddays_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of days vegetables consumed in a typical week by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: D1, D3
+- R script name: Ddays
+
+***
+
+**Mean number of servings of fruit and vegetable consumption**
+
+Description: mean number of fruit, vegetable, and combined fruit and vegetable servings on average per day.
+
+Instrument questions:
+
+- In a typical week, on how many days do you eat fruit?
+- How many servings of fruit do you eat on one of those days?
+- In a typical week, on how many days do you eat vegetables?
+- How many servings of vegetables do you eat on one of those days?
+
+```{r dservings_tbls}
+
+# column names to use with huxtable
+dservings_col_names <- c("Age Group (years)", "n", "Mean number of servings", "95% CI")
+dservings_reg_col_names <- c("Region", "n", "Mean number of servings", "95% CI")
+
+# 1. Fruit
+# men, women, both sexes
+fservings_tbls_m_w_b <- join_m_w_b(fservings_tbls, 1, dservings_col_names)
+# 2. Vegetables
+# men, women, both sexes
+vservings_tbls_m_w_b <- join_m_w_b(vservings_tbls, 1, dservings_col_names)
+# 3. Fruit and/or vegetables
+# men, women, both sexes
+fvservings_tbls_m_w_b <- join_m_w_b(fvservings_tbls, 1, dservings_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1. Fruit
+fservings_tbls_u_r <- join_u_r(fservings_tbls, 1, dservings_col_names)
+# 2. Vegetable
+vservings_tbls_u_r <- join_u_r(vservings_tbls, 1, dservings_col_names)
+# 3. Fruit and/or vegetables
+fvservings_tbls_u_r <- join_u_r(fvservings_tbls, 1, dservings_col_names)
+```
+
+<br>
+
+```{r}
+# 1. Fruit
+cbind(fservings_tbls_m_w_b$m, select(fservings_tbls_m_w_b$w, -agerange), select(fservings_tbls_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean number of servings of fruit on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2. Vegetables
+cbind(vservings_tbls_m_w_b$m, select(vservings_tbls_m_w_b$w, -agerange), select(vservings_tbls_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean number of servings of vegetables on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3. Fruit and/or vegetables
+cbind(fvservings_tbls_m_w_b$m, select(fvservings_tbls_m_w_b$w, -agerange), select(fvservings_tbls_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Mean number of servings of fruit and/or vegetables on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1. Fruit
+tbl_m_u_r <- rbind(fservings_tbls_u_r$m_u, fservings_tbls_u_r$m_r)
+tbl_w_u_r <- rbind(fservings_tbls_u_r$w_u, fservings_tbls_u_r$w_r)
+tbl_b_u_r <- rbind(fservings_tbls_u_r$b_u, fservings_tbls_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of servings of fruit on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2. Vegetables
+tbl_m_u_r <- rbind(vservings_tbls_u_r$m_u, vservings_tbls_u_r$m_r)
+tbl_w_u_r <- rbind(vservings_tbls_u_r$w_u, vservings_tbls_u_r$w_r)
+tbl_b_u_r <- rbind(vservings_tbls_u_r$b_u, vservings_tbls_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of servings of vegetables on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3. Fruit and/or vegetables
+tbl_m_u_r <- rbind(fvservings_tbls_u_r$m_u, fvservings_tbls_u_r$m_r)
+tbl_w_u_r <- rbind(fvservings_tbls_u_r$w_u, fvservings_tbls_u_r$w_r)
+tbl_b_u_r <- rbind(fvservings_tbls_u_r$b_u, fvservings_tbls_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of servings of fruit and/or vegetables on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1. Fruit
+fservings_tbls$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = dservings_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of servings of fruit on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2. Veges
+vservings_tbls$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = dservings_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of servings of vegetables on average per day by region", 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3. Fruit and/or veges
+fvservings_tbls$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = dservings_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of servings of fruit and/or vegetables on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: D1, D2, D3, D4
+- R script name: Dservings
+
+***
+
+**Fruit and vegetable consumption per day**
+
+Description: Frequency of fruit and/or vegetable consumption.
+
+Instrument questions:
+
+- In a typical week, on how many days do you eat fruit?
+- How many servings of fruit do you eat on one of those days?
+- In a typical week, on how many days do you eat vegetables?
+- How many servings of vegetables do you eat on one of those days?
+
+```{r dfiveormore_d_tbls}
+
+# column names to use with huxtable
+dfiveormore_d_col_names <- c("Age Group (years)", "n", "% no fruit and/or vegetables", "95% CI", 
+                             "% 1-2 servings", "95% CI", "% 3-4 servings ", "95% CI", "% ≥5 servings", "95% CI")
+
+# column names for region to use with huxtable
+dfiveormore_d_reg_col_names <- c("Region", "n", "% no fruit and/or vegetables", "95% CI", 
+                                 "% 1-2 servings", "95% CI", "% 3-4 servings ", "95% CI", "% ≥5 servings", "95% CI")
+
+# men, women, both sexes
+dfiveormore_d_m_w_b <- join_m_w_b(dfiveormore_d, 4, dfiveormore_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+dfiveormore_d_u_r <- join_u_r(dfiveormore_d, 4, dfiveormore_d_col_names)
+```
+
+<br>
+
+```{r}
+dfiveormore_d_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Number of servings of fruit and/or vegetables on average per day", 10)
+```
+
+<br>
+
+```{r}
+dfiveormore_d_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Number of servings of fruit and/or vegetables on average per day", 10)
+```
+
+<br>
+
+```{r}
+dfiveormore_d_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Number of servings of fruit and/or vegetables on average per day", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dfiveormore_d_u_r$m_u, dfiveormore_d_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Number of servings of fruit and/or vegetables on average per day by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dfiveormore_d_u_r$w_u, dfiveormore_d_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Number of servings of fruit and/or vegetables on average per day by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dfiveormore_d_u_r$b_u, dfiveormore_d_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Number of servings of fruit and/or vegetables on average per day by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+dfiveormore_d$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = dfiveormore_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Number of servings of fruit and/or vegetables on average per day by region", 10) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: D1, D2, D3, D4
+- R script name: Dfiveormore
+
+***
+
+**Fruit and vegetable consumption per day**
+
+Description: Percentage of those eating less than five servings of fruit and/or vegetables on average per day.
+
+Instrument questions:
+
+- In a typical week, on how many days do you eat fruit?
+- How many servings of fruit do you eat on one of those days?
+- In a typical week, on how many days do you eat vegetables?
+- How many servings of vegetables do you eat on one of those days?
+
+```{r dfiveormore_c_tbls}
+
+# column names to use with huxtable
+dfiveormore_c_col_names <- c("Age Group (years)", "n", "% < five servings per day", "95% CI")
+dfiveormore_c_reg_col_names <- c("Region", "n", "% < five servings per day", "95% CI")
+
+# men, women, both sexes
+dfiveormore_c_m_w_b <- join_m_w_b(dfiveormore_c, 1, dfiveormore_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+dfiveormore_c_u_r <- join_u_r(dfiveormore_c, 1, dfiveormore_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(dfiveormore_c_m_w_b$m, select(dfiveormore_c_m_w_b$w, -agerange), select(dfiveormore_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Less than five servings of fruit and/or vegetables on average per day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(dfiveormore_c_u_r$m_u, dfiveormore_c_u_r$m_r)
+tbl_w_u_r <- rbind(dfiveormore_c_u_r$w_u, dfiveormore_c_u_r$w_r)
+tbl_b_u_r <- rbind(dfiveormore_c_u_r$b_u, dfiveormore_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Less than five servings of fruit and/or vegetables on average per day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+dfiveormore_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = dfiveormore_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Less than five servings of fruit and/or vegetables on average per day by region", 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: D1, D2, D3, D4
+- R script name: Dfiveormore
+
+***
+
+**Drinking sugared soft drinks**
+
+Description: How often people drink sugared beverages, excluding light, diet and non-sugar beverages.
+
+Instrument questions:
+
+- How often do you drink sugared soft drinks (for example, Coca Cola, Pepsi, Fanta, Sprite, Mirinda, Kvas, Baikal, Buratino, Tarkhun etc.), bottled ice tea (for example, Nestea, Lipton Ice Tea, etc.) and sugar sweetened compote, sweet mors? Exclude light, diet and non-sugar drinks.
+
+```{r dx1_tbls, echo=FALSE}
+# column names to use with huxtable
+dx1_col_names <- c("Age Group (years)", "n", "% Once or more a day", "95% CI", "% 4 to 6 times a week", "95% CI", 
+                   "% 1 to 3 times a week", "95% CI", "% Less than once a week", "95% CI", "% Never", "95% CI")
+
+# column names for region to use with huxtable
+dx1_reg_col_names <- c("Region", "n", "% Once or more a day", "95% CI", "% 4 to 6 times a week", "95% CI", 
+                       "% 1 to 3 times a week", "95% CI", "% Less than once a week", "95% CI", "% Never", "95% CI")
+
+# men, women, both sexes
+dx1_c_m_w_b <- join_m_w_b(dx1_c, 5, dx1_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+dx1_c_u_r <- join_u_r(dx1_c, 5, dx1_col_names)
+```
+
+<br>
+
+```{r}
+dx1_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Drinking sugared soft drinks", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+dx1_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Drinking sugared soft drinks", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+dx1_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Drinking sugared soft drinks", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dx1_c_u_r$m_u, dx1_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Drinking sugared soft drinks by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dx1_c_u_r$w_u, dx1_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Drinking sugared soft drinks by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(dx1_c_u_r$b_u, dx1_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Drinking sugared soft drinks by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+dx1_c$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = dx1_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Drinking sugared soft drinks by region", .colspan_val = 12)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DX1
+- R script name: DX1
+
+***
+
+
+
+<br>
+<br>

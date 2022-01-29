@@ -1,0 +1,1568 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+
+alcohol_data_dir <- here::here("DataBook", "Modules", "AlcoholConsumption")
+
+# list all files in the directory
+# fs::dir_ls(alcohol_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(alcohol_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Alcohol Consumption
+
+**Alcohol consumption status**
+
+Description: Alcohol consumption status of all respondents.
+
+Instrument questions:
+
+-   Have you ever consumed any alcohol such as ...?
+-   Have you consumed any alcohol in the past 12 months?
+-   Have you consumed any alcohol in the past 30 days?
+
+```{r aconsumption_tbls, echo=FALSE}
+
+# column names to use with huxtable
+aconsumption_col_names <- c("Age Group (years)", "n", "% Current drinker (past 30 days)", "95% CI",
+                            "% Drank in past 12 months, not current", "95% CI", 
+                            "% Past 12 months abstainer", "95% CI", "% Lifetime abstainer", "95% CI")
+
+# column names for region to use with huxtable
+aconsumption_reg_col_names <- c("Region", "n", "% Current drinker (past 30 days)", "95% CI",
+                              "% Drank in past 12 months, not current", "95% CI", 
+                              "% Past 12 months abstainer", "95% CI", "% Lifetime abstainer", "95% CI")
+
+# men, women, both sexes
+aconsumption_c_m_w_b <- join_m_w_b(aconsumption_c, 4, aconsumption_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aconsumption_c_u_r <- join_u_r(aconsumption_c, 4, aconsumption_col_names)
+```
+
+<br>
+
+```{r}
+aconsumption_c_m_w_b$m %>% 
+  final_m_w_b_tbl(.s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+aconsumption_c_m_w_b$w %>% 
+  final_m_w_b_tbl(.s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+aconsumption_c_m_w_b$b %>% 
+  final_m_w_b_tbl(.s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aconsumption_c_u_r$m_u, aconsumption_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aconsumption_c_u_r$w_u, aconsumption_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aconsumption_c_u_r$b_u, aconsumption_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+aconsumption_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = aconsumption_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Alcohol consumption status by region", .colspan_val = 10)
+```
+<br>
+
+**Analysis information**:
+
+-	Questions used: A1, A2, A5
+-	R script name:  Aconsumption
+
+***
+
+**Stopping drinking due to health reasons**
+
+Description: Percentage of former drinkers (those who did not drink during the past 12 months) who stopped drinking due to health reasons, such as a negative impact of drinking on your health or as per advice of a doctor or other health worker among those respondents who drank in their lifetime, but not in the last 12 months.
+
+Instrument questions:
+
+- Have you consumed any alcohol in the past 12 months?
+- Did you stop drinking due to health reasons, such as a negative impact of drinking on your health or as per advice of your doctor or other health worker?
+
+```{r astopdrink_tbls}
+# column names to use with huxtable
+astopdrink_col_names <- c("Age Group (years)", "n", "% stopping due to health reasons", "95% CI")
+
+# column names for region to use with huxtable
+astopdrink_reg_col_names <- c("Region", "n", "% stopping due to health reasons", "95% CI")
+
+# men, women, both sexes
+astopdrink_c_m_w_b <- join_m_w_b(astopdrink_c, 1, astopdrink_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+astopdrink_c_u_r <- join_u_r(astopdrink_c, 1, astopdrink_col_names)
+```
+
+<br>
+
+```{r}
+cbind(astopdrink_c_m_w_b$m, select(astopdrink_c_m_w_b$w, -agerange), select(astopdrink_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Stopping drinking due to health reasons", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(astopdrink_c_u_r$m_u, astopdrink_c_u_r$m_r)
+tbl_w_u_r <- rbind(astopdrink_c_u_r$w_u, astopdrink_c_u_r$w_r)
+tbl_b_u_r <- rbind(astopdrink_c_u_r$b_u, astopdrink_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Stopping drinking due to health reasons by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+astopdrink_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = astopdrink_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Stopping drinking due to health reasons by region", .colspan_val = 4)
+```
+<br>
+
+**Analysis information**:
+
+-	Questions used: A1, A2, A3
+-	R script name:  Astopdrink
+
+***
+
+
+**Frequency of alcohol consumption**
+
+Description: Frequency of alcohol consumption in the past 12 months among those respondents who drank in the last 12 months.
+
+Instrument questions:
+
+- During the past 12 months, how frequently have you had at least one alcoholic drink?
+
+```{r afrequency_tbls}
+# column names to use with huxtable
+afrequency_col_names <- c(
+  "Age Group (years)", "n",
+  "% Daily", "95% CI",
+  "% 5-6 days/ week", "95% CI",
+  "% 3-4 days/ week", "95% CI",
+  "% 1-2 days/ week", "95% CI",
+  "% 1-3 days/ month", "95% CI",
+  "% < once a month", "95% CI")
+
+# column names for region to use with huxtable
+afrequency_reg_col_names <- c(
+  "Region", "n",
+  "% Daily", "95% CI",
+  "% 5-6 days/ week", "95% CI",
+  "% 3-4 days/ week", "95% CI",
+  "% 1-2 days/ week", "95% CI",
+  "% 1-3 days/ month", "95% CI",
+  "% < once a month", "95% CI")
+
+# men, women, both sexes
+afrequency_c_m_w_b <- join_m_w_b(afrequency_c, 6, afrequency_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+afrequency_c_u_r <- join_u_r(afrequency_c, 6, afrequency_col_names)
+```
+
+<br>
+
+```{r}
+afrequency_c_m_w_b$m %>% 
+  final_m_w_b_tbl(1., "Men", "Frequency of alcohol consumption in the past 12 months", 14)
+```
+
+<br>
+
+```{r}
+afrequency_c_m_w_b$w %>% 
+  final_m_w_b_tbl(1., "Women", "Frequency of alcohol consumption in the past 12 months", 14)
+```
+
+<br>
+
+```{r}
+afrequency_c_m_w_b$b %>% 
+  final_m_w_b_tbl(1., "Both sexes", "Frequency of alcohol consumption in the past 12 months", 14)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afrequency_c_u_r$m_u, afrequency_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afrequency_c_u_r$w_u, afrequency_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afrequency_c_u_r$b_u, afrequency_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+afrequency_c$b_reg %>% unite_ci(.ci_amount = 6) %>% apply_hux(.col_names = afrequency_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", .title = "Frequency of alcohol consumption in the past 12 months by region", 14)
+```
+<br>
+
+**Analysis information**:
+
+-	Questions used: A1, A2, A4
+-	R script name:  Afrequency
+
+***
+
+**Drinking occasions in the past 30 days**
+
+Description: Mean number of occasions with at least one drink in the past 30 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During the past 30 days, on how many occasions did you have at least one alcoholic drink?
+
+```{r aoccasions_a6_tbls}
+
+# column names to use with huxtable
+aoccasions_a6_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+
+# column names for region to use with huxtable
+aoccasions_a6_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+aoccasions_a6_m_w_b <- join_m_w_b(aoccasions_a6, 1, aoccasions_a6_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aoccasions_a6_u_r <- join_u_r(aoccasions_a6, 1, aoccasions_a6_col_names)
+```
+
+<br>
+
+```{r}
+cbind(aoccasions_a6_m_w_b$m, select(aoccasions_a6_m_w_b$w, -agerange), select(aoccasions_a6_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(aoccasions_a6_u_r$m_u, aoccasions_a6_u_r$m_r)
+tbl_w_u_r <- rbind(aoccasions_a6_u_r$w_u, aoccasions_a6_u_r$w_r)
+tbl_b_u_r <- rbind(aoccasions_a6_u_r$b_u, aoccasions_a6_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+aoccasions_a6$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aoccasions_a6_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+-	Questions used: A1, A2, A5, A6
+-	R script name:  Aoccasions
+
+***
+
+**Standard drinks per drinking occasion**
+
+Description: Mean number of standard drinks consumed on a drinking occasion among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During the past 30 days, when you drank alcohol, on average, how many standard alcoholic drinks did you have during one occasion?
+
+```{r anumdrinkperday_a7_tbls}
+
+# column names to use with huxtable
+anumdrinkperday_a7_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+
+# column names for region to use with huxtable
+anumdrinkperday_a7_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# men, women, both sexes
+anumdrinkperday_a7_m_w_b <- join_m_w_b(anumdrinkperday_a7, 1, anumdrinkperday_a7_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+anumdrinkperday_a7_u_r <- join_u_r(anumdrinkperday_a7, 1, anumdrinkperday_a7_col_names)
+```
+
+<br>
+
+```{r}
+cbind(anumdrinkperday_a7_m_w_b$m, select(anumdrinkperday_a7_m_w_b$w, -agerange), select(anumdrinkperday_a7_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(anumdrinkperday_a7_u_r$m_u, anumdrinkperday_a7_u_r$m_r)
+tbl_w_u_r <- rbind(anumdrinkperday_a7_u_r$w_u, anumdrinkperday_a7_u_r$w_r)
+tbl_b_u_r <- rbind(anumdrinkperday_a7_u_r$b_u, anumdrinkperday_a7_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+anumdrinkperday_a7$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = anumdrinkperday_a7_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A7
+- R script name:  Anumdrinkperday
+
+***
+
+**Average volume drinking levels among all respondents**
+
+Description: Percentage of respondents with different drinking levels. A standard drink contains approximately 10g of pure alcohol.
+
+Instrument questions:
+
+- During the past 30 days, when you drank alcohol, on average, how many standard alcoholic drinks did you have during one occasion?
+
+```{r acategories_tbls}
+
+# column names to use with huxtable (specific names will be added later on when producing final tables)
+acategories_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+
+# column names for region to use with huxtable
+# 1
+acategories_high_reg_b_col_names <- c("Region", "n", "% high-end level", "95% CI")
+# 2
+acategories_int_reg_b_col_names <- c("Region", "n", "% intermediate level", "95% CI")
+# 3
+acategories_low_reg_b_col_names <- c("Region", "n", "% lower-end level", "95% CI")
+
+################################################################################
+# men, women, both sexes
+# 1 high
+a_high_m_w_b <- join_m_w_b(acategories_high, 1, acategories_col_names)
+
+# 2 intermediate
+a_int_m_w_b <- join_m_w_b(acategories_int, 1, acategories_col_names)
+
+# 3 low
+a_low_m_w_b <- join_m_w_b(acategories_low, 1, acategories_col_names)
+
+################################################################################
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 high
+a_high_u_r <- join_u_r(acategories_high, 1, acategories_col_names)
+
+# 2 intermediate
+a_int_u_r <- join_u_r(acategories_int, 1, acategories_col_names)
+
+# 3 low
+a_low_u_r <- join_u_r(acategories_low, 1, acategories_col_names)
+```
+
+<br>
+
+```{r}
+cbind(a_high_m_w_b$m, select(a_high_m_w_b$w, -agerange), select(a_high_m_w_b$b, -agerange)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% ≥60g", "95% CI", "n", "% ≥40g", "95% CI", 
+                                "n", "% high-end level", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(a_int_m_w_b$m, select(a_int_m_w_b$w, -agerange), select(a_int_m_w_b$b, -agerange)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% 40–59.9g", "95% CI", "n", "% 20–39.9g", "95% CI", 
+                                "n", "% intermediate level", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+cbind(a_low_m_w_b$m, select(a_low_m_w_b$w, -agerange), select(a_low_m_w_b$b, -agerange)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% <40g", "95% CI", "n", "% <20g", "95% CI", 
+                                "n", "% lower-end level", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+a_high_m_u_r <- rbind(a_high_u_r$m_u, a_high_u_r$m_r)
+a_high_w_u_r <- rbind(a_high_u_r$w_u, a_high_u_r$w_r)
+a_high_b_u_r <- rbind(a_high_u_r$b_u, a_high_u_r$b_r)
+
+cbind(a_high_m_u_r, select(a_high_w_u_r, -agerange2), select(a_high_b_u_r, -agerange2)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% ≥60g", "95% CI", "n", "% ≥40g", "95% CI", 
+                                "n", "% high-end level", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+a_int_m_u_r <- rbind(a_int_u_r$m_u, a_int_u_r$m_r)
+a_int_w_u_r <- rbind(a_int_u_r$w_u, a_int_u_r$w_r)
+a_int_b_u_r <- rbind(a_int_u_r$b_u, a_int_u_r$b_r)
+
+cbind(a_int_m_u_r, select(a_int_w_u_r, -agerange2), select(a_int_b_u_r, -agerange2)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% 40–59.9g", "95% CI", "n", "% 20–39.9g", "95% CI", 
+                                "n", "% intermediate level", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+a_low_m_u_r <- rbind(a_low_u_r$m_u, a_low_u_r$m_r)
+a_low_w_u_r <- rbind(a_low_u_r$w_u, a_low_u_r$w_r)
+a_low_b_u_r <- rbind(a_low_u_r$b_u, a_low_u_r$b_r)
+
+cbind(a_low_m_u_r, select(a_low_w_u_r, -agerange2), select(a_low_b_u_r, -agerange2)) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% <40g", "95% CI", "n", "% <20g", "95% CI", 
+                                "n", "% lower-end level", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region - high
+acategories_high$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_high_reg_b_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region - intermediate
+acategories_int$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_int_reg_b_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region - low
+acategories_low$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_low_reg_b_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by region", 4)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A7
+- R script name:  Acategories
+
+***
+
+**Average volume drinking levels among current (past 30 days) drinkers**
+
+Description: Description: Percentage of current (past 30 days) drinkers with different drinking levels. A standard drink contains approximately 10g of pure alcohol.
+
+Instrument questions:
+
+- During the past 30 days, when you drank alcohol, on average, how many standard alcoholic drinks did you have during one occasion?
+
+```{r acategories_drinker_tbls, echo=FALSE}
+
+# column names to use with huxtable (specific names will be set later on when producing final tables)
+acategories_drinker_col_names <- 
+  c("Age Group (years)", "n", "%", "95% CI", "%", "95% CI", "%", "95% CI")
+
+# column names for region to use with huxtable
+acategories_drinker_reg_col_names <- 
+  c("Region", "n", "% high-end", "95% CI", "% intermediate", "95% CI", "% lower-end", "95% CI")
+
+# men, women, both sexes
+acategories_drinker_m_w_b <- join_m_w_b(acategories_drinker, 3, acategories_drinker_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+acategories_drinker_u_r <- join_u_r(acategories_drinker, 3, acategories_drinker_col_names)
+```
+
+<br>
+
+```{r}
+acategories_drinker_m_w_b$m %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥60g)", "95% CI", 
+                                "% intermediate (40-59.9g)", "95% CI", "% lower-end (<40g)", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+acategories_drinker_m_w_b$w %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥40g)", "95% CI", 
+                                "% intermediate (20-39.9g)", "95% CI", "% lower-end (<20g)", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+acategories_drinker_m_w_b$b %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end", "95% CI", 
+                                "% intermediate", "95% CI", "% lower-end", "95% CI")) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(acategories_drinker_u_r$m_u, acategories_drinker_u_r$m_r) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥60g)", "95% CI", 
+                                "% intermediate (40-59.9g)", "95% CI", "% lower-end (<40g)", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(acategories_drinker_u_r$w_u, acategories_drinker_u_r$w_r) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥40g)", "95% CI", 
+                                "% intermediate (20-39.9g)", "95% CI", "% lower-end (<20g)", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(acategories_drinker_u_r$b_u, acategories_drinker_u_r$b_r) %>% 
+  set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end", "95% CI", 
+                                "% intermediate", "95% CI", "% lower-end", "95% CI")) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# acategories_drinker_e_b_t_reg_j %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = acategories_drinker_reg_col_names) %>% 
+#   final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by region", .colspan_val = 8)
+
+acategories_drinker$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = acategories_drinker_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by region", .colspan_val = 8)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A7
+- R script name:  Acategories
+
+***
+
+**Largest number of drinks in the past 30 days**
+
+Description: Largest number of drinks consumed during a single occasion in the past 30 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During the past 30 days, what was the largest number of standard alcoholic drinks you had on a single occasion, counting all types of alcoholic drinks together?
+
+```{r alargestnum_a8_tbls}
+
+# column names to use with huxtable
+alargestnum_a8_col_names <- c("Age Group (years)", "n", "Mean maximum  number", "95% CI")
+
+# column names for region to use with huxtable
+alargestnum_a8_reg_col_names <- c("Region", "n", "Mean maximum  number", "95% CI")
+
+# men, women, both sexes
+alargestnum_a8_m_w_b <- join_m_w_b(alargestnum_a8, 1, alargestnum_a8_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+alargestnum_a8_u_r <- join_u_r(alargestnum_a8, 1, alargestnum_a8_col_names)
+```
+
+<br>
+
+```{r}
+cbind(alargestnum_a8_m_w_b$m, select(alargestnum_a8_m_w_b$w, -agerange), select(alargestnum_a8_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(alargestnum_a8_u_r$m_u, alargestnum_a8_u_r$m_r)
+tbl_w_u_r <- rbind(alargestnum_a8_u_r$w_u, alargestnum_a8_u_r$w_r)
+tbl_b_u_r <- rbind(alargestnum_a8_u_r$b_u, alargestnum_a8_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+alargestnum_a8$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = alargestnum_a8_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A8
+- R script name:  Alargestnum
+
+***
+
+**Six or more drinks on a single occasion (“heavy episodic drinking”)**
+
+Description: Percentage of respondents who had six or more drinks on any occasion in the past 30 days during a single occasion among the total population.
+
+Instrument questions:
+
+- During the past 30 days, how many times did you have **six or more** standard alcoholic drinks in a single drinking occasion?
+
+```{r aepisodic_c_tbls}
+
+# column names to use with huxtable
+aepisodic_c_col_names <- c("Age Group (years)", "n", "% ≥ 6 drinks", "95% CI")
+
+# column names for region to use with huxtable
+aepisodic_c_reg_col_names <- c("Region", "n", "% ≥ 6 drinks", "95% CI")
+
+# men, women, both sexes
+aepisodic_c_m_w_b <- join_m_w_b(aepisodic_c, 1, aepisodic_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aepisodic_c_u_r <- join_u_r(aepisodic_c, 1, aepisodic_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(aepisodic_c_m_w_b$m, select(aepisodic_c_m_w_b$w, -agerange), select(aepisodic_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(aepisodic_c_u_r$m_u, aepisodic_c_u_r$m_r)
+tbl_w_u_r <- rbind(aepisodic_c_u_r$w_u, aepisodic_c_u_r$w_r)
+tbl_b_u_r <- rbind(aepisodic_c_u_r$b_u, aepisodic_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+aepisodic_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aepisodic_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A9
+- R script name:  Aepisodic
+
+***
+
+**Six or more drinks on a single occasion**
+
+Description: Mean number of times in the past 30 days on which current (past 30 days) drinkers consumed six or more drinks during a single occasion.
+
+Instrument questions:
+
+- During the past 30 days, how many times did you have **six or more** standard alcoholic drinks in a single drinking occasion?
+
+```{r aepisodic_a9_tbls}
+
+# column names to use with huxtable
+aepisodic_a9_col_names <- c("Age Group (years)", "n", "Mean number of times", "95% CI")
+
+# column names for region to use with huxtable
+aepisodic_a9_reg_col_names <- c("Region", "n", "Mean number of times", "95% CI")
+
+# men, women, both sexes
+aepisodic_a9_m_w_b <- join_m_w_b(aepisodic_a9, 1, aepisodic_a9_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aepisodic_a9_u_r <- join_u_r(aepisodic_a9, 1, aepisodic_a9_col_names)
+```
+
+<br>
+
+```{r}
+cbind(aepisodic_a9_m_w_b$m, select(aepisodic_a9_m_w_b$w, -agerange), select(aepisodic_a9_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(aepisodic_a9_u_r$m_u, aepisodic_a9_u_r$m_r)
+tbl_w_u_r <- rbind(aepisodic_a9_u_r$w_u, aepisodic_a9_u_r$w_r)
+tbl_b_u_r <- rbind(aepisodic_a9_u_r$b_u, aepisodic_a9_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+aepisodic_a9$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aepisodic_a9_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A9
+- R script name:  Aepisodic
+
+***
+
+
+**Past 7 days drinking**
+
+Description: Frequency of alcohol consumption in the past 7 days by current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During each of the past 7 days, how many standard drinks of any alcoholic drink did you have each day?
+
+```{r apastweek_tbls, echo=FALSE}
+
+# column names to use with huxtable
+apastweek_col_names <- c("Age Group (years)", "n", "% Daily", "95% CI", "% 5-6 days", "95% CI", 
+                         "% 3-4 days", "95% CI", "% 1-2 days", "95% CI", "% 0 days", "95% CI")
+
+# column names for region to use with huxtable
+apastweek_reg_col_names <- c("Region", "n", "% Daily", "95% CI", "% 5-6 days", "95% CI", 
+                             "% 3-4 days", "95% CI", "% 1-2 days", "95% CI", "% 0 days", "95% CI")
+
+# men, women, both sexes
+apastweek_c_m_w_b <- join_m_w_b(apastweek_c, 5, apastweek_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+apastweek_c_u_r <- join_u_r(apastweek_c, 5, apastweek_col_names)
+```
+
+<br>
+
+```{r}
+apastweek_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+apastweek_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+```
+
+<br>
+
+```{r}
+apastweek_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(apastweek_c_u_r$m_u, apastweek_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(apastweek_c_u_r$w_u, apastweek_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(apastweek_c_u_r$b_u, apastweek_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+apastweek_c$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = apastweek_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by region", .colspan_val = 12)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A10a-g
+- R script name:  Apastweek
+
+***
+
+**Standard  drinks per day in the past 7 days**
+
+Description: Mean number of standard drinks consumed on average per day in the past 7 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During each of the past 7 days, how many standard drinks of any alcoholic drink did you have each day?
+
+```{r apastweek_drinksday_tbls}
+
+# column names to use with huxtable
+apastweek_drinksday_col_names <- c("Age Group (years)", "n", "Mean number", "95% CI")
+
+# column names for region to use with huxtable
+apastweek_drinksday_reg_col_names <- c("Region", "n", "Mean number", "95% CI")
+
+# men, women, both sexes
+apastweek_drinksday_m_w_b <- join_m_w_b(apastweek_drinksday, 1, apastweek_drinksday_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+apastweek_drinksday_u_r <- join_u_r(apastweek_drinksday, 1, apastweek_drinksday_col_names)
+```
+
+<br>
+
+```{r}
+cbind(apastweek_drinksday_m_w_b$m, select(apastweek_drinksday_m_w_b$w, -agerange), 
+      select(apastweek_drinksday_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(apastweek_drinksday_u_r$m_u, apastweek_drinksday_u_r$m_r)
+tbl_w_u_r <- rbind(apastweek_drinksday_u_r$w_u, apastweek_drinksday_u_r$w_r)
+tbl_b_u_r <- rbind(apastweek_drinksday_u_r$b_u, apastweek_drinksday_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+apastweek_drinksday$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = apastweek_drinksday_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A10a-g
+- R script name:  Apastweek
+
+***
+
+**Consumption of unrecorded alcohol**
+
+Description: Percentage of respondents that consumed unrecorded alcohol (homebrewed alcohol, alcohol brought over the border, not intended for drinking or other untaxed alcohol) during the past 7 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- Have you consumed any alcohol within the past 30 days?
+-	During the past 7 days, did you consume any homebrewed alcohol, any alcohol brought over the border, not intended for drinking or other untaxed alcohol?
+
+```{r aunrecorded_c_tbls}
+
+# column names to use with huxtable
+aunrecorded_c_col_names <- c("Age Group (years)", "n", "% consuming unrecorded alcohol", "95% CI")
+
+# column names for region to use with huxtable
+aunrecorded_c_reg_col_names <- c("Region", "n", "% consuming unrecorded alcohol", "95% CI")
+
+# men, women, both sexes
+aunrecorded_c_m_w_b <- join_m_w_b(aunrecorded_c, 1, aunrecorded_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aunrecorded_c_u_r <- join_u_r(aunrecorded_c, 1, aunrecorded_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(aunrecorded_c_m_w_b$m, select(aunrecorded_c_m_w_b$w, -agerange), select(aunrecorded_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Consumption of unrecorded alcohol", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(aunrecorded_c_u_r$m_u, aunrecorded_c_u_r$m_r)
+tbl_w_u_r <- rbind(aunrecorded_c_u_r$w_u, aunrecorded_c_u_r$w_r)
+tbl_b_u_r <- rbind(aunrecorded_c_u_r$b_u, aunrecorded_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Consumption of unrecorded alcohol by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+aunrecorded_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aunrecorded_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Consumption of unrecorded alcohol by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A10a-g, A11
+- R script name:  Aunrecorded
+
+***
+
+**Standard  drinks of unrecorded alcohol per day in the past 7 days**
+
+Description: Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- On average, how many standard drinks of the following did you consume during the past 7 days?
+
+```{r ameanunrecorded_tbls}
+
+# column names to use with huxtable
+ameanunrecorded_col_names <- c("Age Group (years)", "n", "Mean number", "95% CI")
+ameanunrecorded_reg_col_names <- c("Region", "n", "Mean number", "95% CI")
+
+# men, women, both sexes
+ameanunrecorded_m_w_b <- join_m_w_b(ameanunrecorded, 1, ameanunrecorded_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ameanunrecorded_u_r <- join_u_r(ameanunrecorded, 1, ameanunrecorded_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ameanunrecorded_m_w_b$m, select(ameanunrecorded_m_w_b$w, -agerange), select(ameanunrecorded_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ameanunrecorded_u_r$m_u, ameanunrecorded_u_r$m_r)
+tbl_w_u_r <- rbind(ameanunrecorded_u_r$w_u, ameanunrecorded_u_r$w_r)
+tbl_b_u_r <- rbind(ameanunrecorded_u_r$b_u, ameanunrecorded_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ameanunrecorded$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ameanunrecorded_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A10a-g, A11, A12a-e
+- R script name:  Ameanunrecorded
+
+***
+
+**Percent of unrecorded alcohol from all alcohol consumed**
+
+Description: Percentage of unrecorded alcohol from all alcohol consumed during the past 7 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During each of the past 7 days, how many standard drinks did you have each day?
+- During the past 7 days, did you consume any homebrewed alcohol, any alcohol brought over the border, not intended for drinking or other untaxed alcohol?
+- On average, how many standard drinks of the following did you consume during the past 7 days?
+
+```{r aunrecordedpastweek_tbls}
+
+# # column names to use with huxtable
+aunrecordedpastweek_col_names <- c("Age Group (years)", "n", "% unrecorded alcohol of all alcohol", "95% CI")
+aunrecordedpastweek_reg_col_names <- c("Region", "n", "% unrecorded alcohol of all alcohol", "95% CI")
+
+# STATA OUTPUT STYLE (without CIs)
+
+# men, women, both sexes
+aunrecordedpastweek_m_w_b <- aunrecordedpastweek %>% 
+  map(~ mutate(., ci = "–") %>% apply_hux(.col_names = aunrecordedpastweek_col_names))
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aunrecordedpastweek_u_r <- aunrecordedpastweek %>% 
+  map(~ mutate(., ci = "–") %>% apply_hux(.col_names = aunrecordedpastweek_col_names))
+```
+
+<br>
+
+```{r}
+cbind(aunrecordedpastweek_m_w_b$m, select(aunrecordedpastweek_m_w_b$w, -agerange), 
+      select(aunrecordedpastweek_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(aunrecordedpastweek_u_r$m_u, aunrecordedpastweek_u_r$m_r)
+tbl_w_u_r <- rbind(aunrecordedpastweek_u_r$w_u, aunrecordedpastweek_u_r$w_r)
+tbl_b_u_r <- rbind(aunrecordedpastweek_u_r$b_u, aunrecordedpastweek_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+aunrecordedpastweek$b_reg %>% mutate(., ci = "–") %>% 
+  apply_hux(.col_names = aunrecordedpastweek_reg_col_names) %>%
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A10a-g, A11, A12a-e
+- R script name:  Aunrecordedpastweek
+
+***
+
+**Types of unrecorded alcohol**
+
+Description: Percentage of each type of unrecorded alcohol of all unrecorded alcohol consumed in the past 7 days among current (past 30 days) drinkers.
+
+Instrument questions:
+
+- During the past 7 days, did you consume any homebrewed alcohol, any alcohol brought over the border, not intended for drinking or other untaxed alcohol?
+- On average, how many standard drinks of the following did you consume during the past 7 days?
+
+```{r aunrecpastweektype_tbls, echo=FALSE}
+
+# column names to use with huxtable
+aunrecpastweektype_col_names <- c("Age Group (years)", "n", "% home-brewed spirits",  
+                                  "% home-brewed beer/wine", "% brought over border", 
+                                  "% surrogate alcohol", "% other")
+
+# column names for region to use with huxtable
+aunrecpastweektype_reg_col_names <- c("Region", "n", "% home-brewed spirits",  
+                                  "% home-brewed beer/wine", "% brought over border", 
+                                  "% surrogate alcohol", "% other")
+
+# men, women, both sexes
+aunrecpastweektype_m_w_b <- aunrecpastweektype %>% 
+  map(~ apply_hux(., .col_names = aunrecpastweektype_col_names)) 
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+aunrecpastweektype_u_r <- aunrecpastweektype %>% 
+  map(~ apply_hux(., .col_names = aunrecpastweektype_col_names)) 
+```
+
+<br>
+
+```{r}
+aunrecpastweektype_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+```
+
+<br>
+
+```{r}
+aunrecpastweektype_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+```
+
+<br>
+
+```{r}
+aunrecpastweektype_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aunrecpastweektype_u_r$m_u, aunrecpastweektype_u_r$m_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aunrecpastweektype_u_r$w_u, aunrecpastweektype_u_r$w_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(aunrecpastweektype_u_r$b_u, aunrecpastweektype_u_r$b_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+aunrecpastweektype$b_reg %>% apply_hux(., .col_names = aunrecpastweektype_reg_col_names) %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by region)", .colspan_val = 7)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A5, A11, A12a-e
+- R script name:  Aunrecpastweektype
+
+***
+
+
+**Frequency of impaired control over drinking**
+
+Description: Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers.
+
+Instrument questions:
+
+- Have you consumed any alcohol within the past 12 months?
+- How often during the past 12 months have you found that you were not able to stop drinking once you had started?
+
+```{r anotabletostop_tbls, echo=FALSE}
+
+# column names to use with huxtable
+anotabletostop_col_names <- c("Age Group (years)", "n", "% monthly or more frequently", "95% CI",
+                              "% less than monthly", "95% CI", "% never", "95% CI")
+
+# column names for region to use with huxtable
+anotabletostop_reg_col_names <- c("Region", "n", "% monthly or more frequently", "95% CI",
+                                  "% less than monthly", "95% CI", "% never", "95% CI")
+
+# men, women, both sexes
+anotabletostop_c_m_w_b <- join_m_w_b(anotabletostop_c, 3, anotabletostop_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+anotabletostop_c_u_r <- join_u_r(anotabletostop_c, 3, anotabletostop_col_names)
+```
+
+<br>
+
+```{r}
+anotabletostop_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+anotabletostop_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+anotabletostop_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(anotabletostop_c_u_r$m_u, anotabletostop_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(anotabletostop_c_u_r$w_u, anotabletostop_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(anotabletostop_c_u_r$b_u, anotabletostop_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+anotabletostop_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = anotabletostop_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+```
+<br>
+
+**Analysis information**:
+
+-	Questions used: A1, A2, A13
+-	R script name:  Anotabletostop
+
+***
+
+
+**Frequency of failing to do what was normally expected because of drinking**
+
+Description: Frequency of failing to do what was normally expected from you because of drinking during the past 12 months among past 12 month drinkers.
+
+Instrument questions:
+
+- Have you consumed any alcohol within the past 12 months?
+- How often during the past 12 months have you failed to do what was normally expected from you because of drinking?
+
+```{r afailexpected_tbls, echo=FALSE}
+
+# column names to use with huxtable
+afailexpected_col_names <- c("Age Group (years)", "n", "% monthly or more frequently", "95% CI",
+                              "% less than monthly", "95% CI", "% never", "95% CI")
+
+# column names for region to use with huxtable
+afailexpected_reg_col_names <- c("Region", "n", "% monthly or more frequently", "95% CI",
+                                  "% less than monthly", "95% CI", "% never", "95% CI")
+
+# men, women, both sexes
+afailexpected_c_m_w_b <- join_m_w_b(afailexpected_c, 3, afailexpected_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+afailexpected_c_u_r <- join_u_r(afailexpected_c, 3, afailexpected_col_names)
+```
+
+<br>
+
+```{r}
+afailexpected_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+afailexpected_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+afailexpected_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afailexpected_c_u_r$m_u, afailexpected_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afailexpected_c_u_r$w_u, afailexpected_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afailexpected_c_u_r$b_u, afailexpected_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+afailexpected_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = afailexpected_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A14
+- R script name:  Afailexpected
+
+***
+
+**Frequency of morning drinking**
+
+Description: Frequency of needing a first drink in the morning to get going after a heavy drinking session during the past 12 months among past 12 month drinkers.
+
+Instrument questions:
+
+- Have you consumed any alcohol within the past 12 months?
+- How often during the past 12 months have you needed a first drink in the morning to get yourself going after a heavy drinking session?
+
+```{r amorningdrink_tbls, echo=FALSE}
+
+# column names to use with huxtable
+amorningdrink_col_names <- c("Age Group (years)", "n", "% monthly or more frequently", "95% CI",
+                             "% less than monthly", "95% CI", "% never", "95% CI")
+
+# column names for region to use with huxtable
+amorningdrink_reg_col_names <- c("Region", "n", "% monthly or more frequently", "95% CI",
+                                 "% less than monthly", "95% CI", "% never", "95% CI")
+
+# men, women, both sexes
+amorningdrink_c_m_w_b <- join_m_w_b(amorningdrink_c, 3, amorningdrink_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+amorningdrink_c_u_r <- join_u_r(amorningdrink_c, 3, amorningdrink_col_names)
+```
+
+<br>
+
+```{r}
+amorningdrink_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+amorningdrink_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+amorningdrink_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(amorningdrink_c_u_r$m_u, amorningdrink_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(amorningdrink_c_u_r$w_u, amorningdrink_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(amorningdrink_c_u_r$b_u, amorningdrink_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+amorningdrink_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = amorningdrink_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: A1, A2, A15
+- R script name:  Amorningdrink
+
+***
+
+
+**Frequency of problems with family/ partner due to someone else’s drinking**
+
+Description: Frequency of having had problems with family or partner due to someone else’s drinking in the past 12 months among all respondents.
+
+Instrument questions:
+
+- Have you had family problems or problems with your partner due to someone else’s drinking within the past 12 months?
+
+```{r afamproblem_tbls, echo=FALSE}
+
+# column names to use with huxtable
+afamproblem_col_names <- c("Age Group (years)", "n", "% monthly or more frequently", "95% CI",
+                           "% less than monthly", "95% CI", "% never", "95% CI")
+
+# column names for region to use with huxtable
+afamproblem_reg_col_names <- c("Region", "n", "% monthly or more frequently", "95% CI",
+                               "% less than monthly", "95% CI", "% never", "95% CI")
+
+# men, women, both sexes
+afamproblem_c_m_w_b <- join_m_w_b(afamproblem_c, 3, afamproblem_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+afamproblem_c_u_r <- join_u_r(afamproblem_c, 3, afamproblem_col_names)
+```
+
+<br>
+
+```{r}
+afamproblem_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+afamproblem_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+```
+
+<br>
+
+```{r}
+afamproblem_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afamproblem_c_u_r$m_u, afamproblem_c_u_r$m_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afamproblem_c_u_r$w_u, afamproblem_c_u_r$w_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(afamproblem_c_u_r$b_u, afamproblem_c_u_r$b_r) %>% 
+  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+afamproblem_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = afamproblem_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by region", .colspan_val = 8)
+```
+<br>
+
+**Analysis information**:
+
+- Questions used: A16
+- R script name:  Afamproblem
+
+***
+
+
+
+
+
+
+
+
+<br>
+<br>

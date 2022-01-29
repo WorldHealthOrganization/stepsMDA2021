@@ -1,0 +1,291 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+cholesterol_data_dir <- here::here("DataBook", "Modules", "HistoryofRaisedTotalCholesterol")
+
+# list all files in the directory
+# fs::dir_ls(cholesterol_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(cholesterol_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# History of Raised Total Cholesterol
+
+**Cholesterol measurement and diagnosis**
+
+Description: Total cholesterol measurement and diagnosis among all respondents.
+
+Instrument questions:
+
+- Have you ever had your cholesterol (fat levels in your blood) measured by a doctor or other health worker?
+- Have you ever been told by a doctor or other health worker that you have raised cholesterol?
+- Have you been told in the past 12 months?
+
+```{r hchol_c_tbls}
+
+# column names to use with huxtable
+hchol_c_col_names <- 
+  c("Age Group (years)", "n", "% Never measured", "95% CI", "% Measured, not diagnosed", "95% CI", 
+    "% Diagnosed, but not within past 12 months", "95% CI", "% Diagnosed within past 12 months", "95% CI")
+
+# column names for region to use with huxtable
+hchol_c_reg_col_names <- 
+  c("Region", "n", "% Never measured", "95% CI", "% Measured, not diagnosed", "95% CI", 
+    "% Diagnosed, but not within past 12 months", "95% CI", "% Diagnosed within past 12 months", "95% CI")
+
+# men, women, both sexes
+hchol_c_m_w_b <- join_m_w_b(hchol_c, 4, hchol_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+hchol_c_u_r <- join_u_r(hchol_c, 4, hchol_c_col_names)
+```
+
+<br>
+
+```{r}
+hchol_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Total cholesterol measurement and diagnosis", 10)
+```
+
+<br>
+
+```{r}
+hchol_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Total cholesterol measurement and diagnosis", 10)
+```
+
+<br>
+
+```{r}
+hchol_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Total cholesterol measurement and diagnosis", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(hchol_c_u_r$m_u, hchol_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Total cholesterol measurement and diagnosis by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(hchol_c_u_r$w_u, hchol_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Total cholesterol measurement and diagnosis by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(hchol_c_u_r$b_u, hchol_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Total cholesterol measurement and diagnosis by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+hchol_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = hchol_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Total cholesterol measurement and diagnosis by region", 10) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H12, H13a, H13b
+-   R script name: Hchol
+
+***
+
+**Cholesterol treatment among those diagnosed**
+
+Description: Cholesterol treatment results among those previously diagnosed with raised cholesterol.
+
+Instrument questions:
+
+- Have you ever had your cholesterol (fat levels in your blood) measured by a doctor or other health worker?
+- Have you ever been told by a doctor or other health worker that you have raised cholesterol?
+- In the past two weeks, have you taken oral treatment (medication) for raised total cholesterol prescribed by a doctor or other health worker?
+
+```{r hchol_d_tbls}
+
+# column names to use with huxtable
+hchol_d_col_names <- c("Age Group (years)", "n", "% Taking meds", "95% CI")
+hchol_d_reg_col_names <- c("Region", "n", "% Taking meds", "95% CI")
+
+# men, women, both sexes
+hchol_d_m_w_b <- join_m_w_b(hchol_d, 1, hchol_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+hchol_d_u_r <- join_u_r(hchol_d, 1, hchol_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(hchol_d_m_w_b$m, select(hchol_d_m_w_b$w, -agerange), select(hchol_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking oral treatment (medication) prescribed for raised total cholesterol among those previously diagnosed", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(hchol_d_u_r$m_u, hchol_d_u_r$m_r)
+tbl_w_u_r <- rbind(hchol_d_u_r$w_u, hchol_d_u_r$w_r)
+tbl_b_u_r <- rbind(hchol_d_u_r$b_u, hchol_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Currently taking oral treatment (medication) prescribed for raised total cholesterol among those previously diagnosed by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+hchol_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hchol_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Currently taking oral treatment (medication) prescribed for raised total cholesterol among those previously diagnosed by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H12, H13a, H14
+-   R script name: Hchol
+
+***
+
+**Cholesterol advice by traditional healer**
+
+Description: Percentage of respondents who are have sought advice or treatment from a traditional healer for raised cholesterol among those previously diagnosed.
+
+Instrument questions:
+
+- Have you ever had your cholesterol (fat levels in your blood) measured by a doctor or other health worker?
+- Have you ever been told by a doctor or other health worker that you have raised cholesterol?
+- Have you ever seen a traditional healer for raised cholesterol?
+- Are you currently taking any herbal or traditional remedy for your raised cholesterol?
+
+```{r hcholtrad_c_d_duration_tbls}
+
+# column names to use with huxtable
+hcholtrad_c_col_names <- c("Age Group (years)", "n", "% Seen trad. healer", "95% CI")
+hcholtrad_c_reg_col_names <- c("Region", "n", "% Seen trad. healer", "95% CI")
+hcholtrad_d_col_names <- c("Age Group (years)", "n", "% Taking trad. meds", "95% CI")
+hcholtrad_d_reg_col_names <- c("Region", "n", "% Taking trad. meds", "95% CI")
+
+# 1 - Seen a traditional healer for raised cholesterol among those previously diagnosed
+# men, women, both sexes
+hcholtrad_c_m_w_b <- join_m_w_b(hcholtrad_c, 1, hcholtrad_c_col_names)
+
+# 2 - Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed
+# men, women, both sexes
+hcholtrad_d_m_w_b <- join_m_w_b(hcholtrad_d, 1, hcholtrad_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Seen a traditional healer for raised cholesterol among those previously diagnosed
+hcholtrad_c_u_r <- join_u_r(hcholtrad_c, 1, hcholtrad_c_col_names)
+# 2 - Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed
+hcholtrad_d_u_r <- join_u_r(hcholtrad_d, 1, hcholtrad_d_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(hcholtrad_c_m_w_b$m, select(hcholtrad_c_m_w_b$w, -agerange), select(hcholtrad_c_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Seen a traditional healer for raised cholesterol among those previously diagnosed", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(hcholtrad_d_m_w_b$m, select(hcholtrad_d_m_w_b$w, -agerange), select(hcholtrad_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(hcholtrad_c_u_r$m_u, hcholtrad_c_u_r$m_r)
+tbl_w_u_r <- rbind(hcholtrad_c_u_r$w_u, hcholtrad_c_u_r$w_r)
+tbl_b_u_r <- rbind(hcholtrad_c_u_r$b_u, hcholtrad_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Seen a traditional healer for raised cholesterol among those previously diagnosed by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(hcholtrad_d_u_r$m_u, hcholtrad_d_u_r$m_r)
+tbl_w_u_r <- rbind(hcholtrad_d_u_r$w_u, hcholtrad_d_u_r$w_r)
+tbl_b_u_r <- rbind(hcholtrad_d_u_r$b_u, hcholtrad_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+hcholtrad_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcholtrad_c_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Seen a traditional healer for raised cholesterol among those previously diagnosed by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+hcholtrad_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcholtrad_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H12, H13a, H15, H16
+-   R script name: Hcholtrad
+
+***
+
+<br> 
+
+<br>

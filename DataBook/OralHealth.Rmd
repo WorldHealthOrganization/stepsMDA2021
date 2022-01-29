@@ -1,0 +1,1865 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+oral_health_data_dir <- here::here("DataBook", "Modules", "OralHealth")
+
+# list all files in the directory
+# fs::dir_ls(oral_health_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(oral_health_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Oral Health
+
+**Percentage of respondents having natural teeth**
+
+Description: Percentage of respondents who have no natural teeth, 1–9 natural teeth, 10–19 natural teeth, or 20 or more natural teeth.
+
+Instrument questions:
+
+- How many natural teeth do you have?
+
+```{r onatural_c_tbls}
+# column names to use with huxtable
+onatural_c_col_names <- 
+  c("Age Group (years)", "n", "% No natural teeth", "95% CI", "% 1–9 natural teeth", "95% CI", 
+    "% 10–19 natural teeth", "95% CI", "% ≥ 20 natural teeth", "95% CI")
+
+# column names for region to use with huxtable
+onatural_c_reg_col_names <- 
+  c("Region", "n", "% No natural teeth", "95% CI", "% 1–9 natural teeth", "95% CI", 
+    "% 10–19 natural teeth", "95% CI", "% ≥ 20 natural teeth", "95% CI")
+
+# men, women, both sexes
+onatural_c_m_w_b <- join_m_w_b(onatural_c, 4, onatural_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+onatural_c_u_r <- join_u_r(onatural_c, 4, onatural_c_col_names)
+```
+
+<br>
+
+```{r}
+onatural_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Percentage of respondents with natural teeth", 10)
+```
+
+<br>
+
+```{r}
+onatural_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Percentage of respondents with natural teeth", 10)
+```
+
+<br>
+
+```{r}
+onatural_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Percentage of respondents with natural teeth", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(onatural_c_u_r$m_u, onatural_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Percentage of respondents with natural teeth by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(onatural_c_u_r$w_u, onatural_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Percentage of respondents with natural teeth by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(onatural_c_u_r$b_u, onatural_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Percentage of respondents with natural teeth by type of settlement", 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+onatural_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = onatural_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of respondents with natural teeth by region", 10) 
+```
+<br>
+
+
+**Analysis information**:
+
+- Questions used: O1
+- R script name: Onatural 
+
+***
+
+
+**Percentage of respondents having poor or very poor state of teeth**
+
+Description: Percentage of respondents having a poor or very poor state of teeth among those having natural teeth.
+
+Instrument questions:
+
+- How would you describe the state of your teeth?
+
+```{r ohealthteeth_c_tbls}
+# column names to use with huxtable
+ohealthteeth_c_col_names <- c("Age Group (years)", "n", "% Having poor or very poor state of teeth", "95% CI")
+ohealthteeth_c_reg_col_names <- c("Region", "n", "% Having poor or very poor state of teeth", "95% CI")
+
+# men, women, both sexes
+ohealthteeth_c_m_w_b <- join_m_w_b(ohealthteeth_c, 1, ohealthteeth_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ohealthteeth_c_u_r <- join_u_r(ohealthteeth_c, 1, ohealthteeth_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ohealthteeth_c_m_w_b$m, select(ohealthteeth_c_m_w_b$w, -agerange), select(ohealthteeth_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of teeth among those having natural teeth", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ohealthteeth_c_u_r$m_u, ohealthteeth_c_u_r$m_r)
+tbl_w_u_r <- rbind(ohealthteeth_c_u_r$w_u, ohealthteeth_c_u_r$w_r)
+tbl_b_u_r <- rbind(ohealthteeth_c_u_r$b_u, ohealthteeth_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of teeth among those having natural teeth by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ohealthteeth_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ohealthteeth_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having poor or very poor state of teeth among those having natural teeth by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O2
+- R script name: Ohealthteeth 
+
+***
+
+
+**Percentage of respondents having poor or very poor state of gums**
+
+Description: Percentage of respondents having a poor or very poor state of gums among those having natural teeth.
+
+Instrument questions:
+
+- How would you describe the state of your gums?
+
+```{r ohealthgums_c_tbls}
+# column names to use with huxtable
+ohealthgums_c_col_names <- c("Age Group (years)", "n", "% Having poor or very poor state of gums", "95% CI")
+ohealthgums_c_reg_col_names <- c("Region", "n", "% Having poor or very poor state of gums", "95% CI")
+
+# men, women, both sexes
+ohealthgums_c_m_w_b <- join_m_w_b(ohealthgums_c, 1, ohealthgums_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ohealthgums_c_u_r <- join_u_r(ohealthgums_c, 1, ohealthgums_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ohealthgums_c_m_w_b$m, select(ohealthgums_c_m_w_b$w, -agerange), select(ohealthgums_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of gums among those having natural teeth", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ohealthgums_c_u_r$m_u, ohealthgums_c_u_r$m_r)
+tbl_w_u_r <- rbind(ohealthgums_c_u_r$w_u, ohealthgums_c_u_r$w_r)
+tbl_b_u_r <- rbind(ohealthgums_c_u_r$b_u, ohealthgums_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of gums among those having natural teeth by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ohealthgums_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ohealthgums_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having poor or very poor state of gums among those having natural teeth by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O3
+- R script name: Ohealthgums
+
+***
+
+**Percentage of respondents having poor or very poor state of mouth (mucosa)**
+
+Description: Percentage of respondents having a poor or very poor state of mouth (mucosa) among those having natural teeth.
+
+Instrument questions:
+
+- How would you describe the state of your mouth (mucosa)?
+
+```{r ohealthmucosa_c_tbls}
+# column names to use with huxtable
+ohealthmucosa_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+ohealthmucosa_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+ohealthmucosa_c_m_w_b <- join_m_w_b(ohealthmucosa_c, 1, ohealthmucosa_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ohealthmucosa_c_u_r <- join_u_r(ohealthmucosa_c, 1, ohealthmucosa_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ohealthmucosa_c_m_w_b$m, select(ohealthmucosa_c_m_w_b$w, -agerange), select(ohealthmucosa_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of the mouth (mucosa)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ohealthmucosa_c_u_r$m_u, ohealthmucosa_c_u_r$m_r)
+tbl_w_u_r <- rbind(ohealthmucosa_c_u_r$w_u, ohealthmucosa_c_u_r$w_r)
+tbl_b_u_r <- rbind(ohealthmucosa_c_u_r$b_u, ohealthmucosa_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having poor or very poor state of the mouth (mucosa) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ohealthmucosa_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ohealthmucosa_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having poor or very poor state of the mouth (mucosa) by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O4
+- R script name: Ohealthmucosa
+
+***
+
+
+**Percentage of respondents having removable dentures**
+
+Description: Percentage of respondents having removable dentures.
+
+Instrument questions:
+
+- Do you have any removable dentures?
+
+```{r odentures_c_tbls}
+# column names to use with huxtable
+odentures_c_col_names <- c("Age Group (years)", "n", "% Having removable dentures", "95% CI")
+odentures_c_reg_col_names <- c("Region", "n", "% Having removable dentures", "95% CI")
+
+# men, women, both sexes
+odentures_c_m_w_b <- join_m_w_b(odentures_c, 1, odentures_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+odentures_c_u_r <- join_u_r(odentures_c, 1, odentures_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(odentures_c_m_w_b$m, select(odentures_c_m_w_b$w, -agerange), select(odentures_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having removable dentures", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(odentures_c_u_r$m_u, odentures_c_u_r$m_r)
+tbl_w_u_r <- rbind(odentures_c_u_r$w_u, odentures_c_u_r$w_r)
+tbl_b_u_r <- rbind(odentures_c_u_r$b_u, odentures_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having removable dentures by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+odentures_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = odentures_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having removable dentures by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O5
+- R script name: Odentures
+
+***
+
+
+**Type of removable dentures among those having removable dentures**
+
+Description: Percentage of respondents who have an upper jaw denture, a lower jaw denture, or an upper and a lower jaw denture among those having removable dentures.
+
+Instrument questions:
+
+- Do you have any removable dentures?
+-	Which of the following removable dentures do you have?
+
+```{r odentures_d_e_f_tbls}
+# column names to use with huxtable
+odentures_dol_names <- c("Age Group (years)", "n", "%", "95% CI")
+tpdanger_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 - Percentage of respondents having an upper jaw denture among those having removable dentures
+odentures_d_m_w_b <- join_m_w_b(odentures_d, 1, odentures_dol_names)
+# 2 - Percentage of respondents having a lower jaw denture among those having removable dentures
+odentures_e_m_w_b <- join_m_w_b(odentures_e, 1, odentures_dol_names)
+# 3 - Percentage of respondents having an upper and a lower jaw denture among those having removable dentures
+odentures_f_m_w_b <- join_m_w_b(odentures_f, 1, odentures_dol_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+odentures_d_u_r <- join_u_r(odentures_d, 1, odentures_dol_names) # 1
+odentures_e_u_r <- join_u_r(odentures_e, 1, odentures_dol_names) # 2
+odentures_f_u_r <- join_u_r(odentures_f, 1, odentures_dol_names) # 3
+```
+
+<br>
+
+```{r}
+# 1
+cbind(odentures_d_m_w_b$m, select(odentures_d_m_w_b$w, -agerange), select(odentures_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having an upper jaw denture among those having removable dentures", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(odentures_e_m_w_b$m, select(odentures_e_m_w_b$w, -agerange), select(odentures_e_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having a lower jaw denture among those having removable dentures", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(odentures_f_m_w_b$m, select(odentures_f_m_w_b$w, -agerange), select(odentures_f_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having an upper and a lower jaw denture among those having removable dentures", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(odentures_d_u_r$m_u, odentures_d_u_r$m_r)
+tbl_w_u_r <- rbind(odentures_d_u_r$w_u, odentures_d_u_r$w_r)
+tbl_b_u_r <- rbind(odentures_d_u_r$b_u, odentures_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having an upper jaw denture among those having removable dentures by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(odentures_e_u_r$m_u, odentures_e_u_r$m_r)
+tbl_w_u_r <- rbind(odentures_e_u_r$w_u, odentures_e_u_r$w_r)
+tbl_b_u_r <- rbind(odentures_e_u_r$b_u, odentures_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having a lower jaw denture among those having removable dentures by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(odentures_f_u_r$m_u, odentures_f_u_r$m_r)
+tbl_w_u_r <- rbind(odentures_f_u_r$w_u, odentures_f_u_r$w_r)
+tbl_b_u_r <- rbind(odentures_f_u_r$b_u, odentures_f_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having an upper and a lower jaw denture among those having removable dentures by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+odentures_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having an upper jaw denture among those having removable dentures by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+odentures_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having a lower jaw denture among those having removable dentures by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+odentures_f$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = tpdanger_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having an upper and a lower jaw denture among those having removable dentures by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O6
+- R script name: Odentures
+
+***
+
+**Percentage of respondents having oral pain or discomfort**
+
+Description: Percentage of respondents who have pain or discomfort caused by their teeth or mouth during the past 12 months.
+
+Instrument questions:
+
+- During the past 12 months, did your teeth or mouth cause any pain or discomfort?
+
+```{r opain_c_tbls}
+# column names to use with huxtable
+opain_c_col_names <- c("Age Group (years)", "n", "% Having oral pain or discomfort", "95% CI")
+opain_c_reg_col_names <- c("Region", "n", "% Having oral pain or discomfort", "95% CI")
+
+# men, women, both sexes
+opain_c_m_w_b <- join_m_w_b(opain_c, 1, opain_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+opain_c_u_r <- join_u_r(opain_c, 1, opain_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(opain_c_m_w_b$m, select(opain_c_m_w_b$w, -agerange), select(opain_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage having oral pain or discomfort", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(opain_c_u_r$m_u, opain_c_u_r$m_r)
+tbl_w_u_r <- rbind(opain_c_u_r$w_u, opain_c_u_r$w_r)
+tbl_b_u_r <- rbind(opain_c_u_r$b_u, opain_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage having oral pain or discomfort by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+opain_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = opain_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage having oral pain or discomfort by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O7
+- R script name: Opain
+
+***
+
+
+**Percentage of respondents having seen a dentist during the past 12 months**
+
+Description: Percentage of respondents having seen a dentist during the past 12 months.
+
+Instrument questions:
+
+- How long has it been since you last saw a dentist?
+
+```{r odentalvisit_c_tbls}
+# column names to use with huxtable
+odentalvisit_c_col_names <- c("Age Group (years)", "n", "% Having seen a dentist during the past 12 months", "95% CI")
+odentalvisit_c_reg_col_names <- c("Region", "n", "% Having seen a dentist during the past 12 months", "95% CI")
+
+# men, women, both sexes
+odentalvisit_c_m_w_b <- join_m_w_b(odentalvisit_c, 1, odentalvisit_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+odentalvisit_c_u_r <- join_u_r(odentalvisit_c, 1, odentalvisit_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(odentalvisit_c_m_w_b$m, select(odentalvisit_c_m_w_b$w, -agerange), select(odentalvisit_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having seen a dentist during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(odentalvisit_c_u_r$m_u, odentalvisit_c_u_r$m_r)
+tbl_w_u_r <- rbind(odentalvisit_c_u_r$w_u, odentalvisit_c_u_r$w_r)
+tbl_b_u_r <- rbind(odentalvisit_c_u_r$b_u, odentalvisit_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having seen a dentist during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+odentalvisit_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = odentalvisit_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having seen a dentist during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O8
+- R script name: Odentalvisit
+
+***
+
+
+**Percentage of respondents who have never received dental care**
+
+Description: Percentage of respondents who have never received dental care.
+
+Instrument questions:
+
+- How long has it been since you last saw a dentist?
+
+```{r odentalvisit_d_tbls}
+# column names to use with huxtable
+odentalvisit_d_col_names <- c("Age Group (years)", "n", "% Never received dental care", "95% CI")
+odentalvisit_d_reg_col_names <- c("Region", "n", "% Never received dental care", "95% CI")
+
+# men, women, both sexes
+odentalvisit_d_m_w_b <- join_m_w_b(odentalvisit_d, 1, odentalvisit_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+odentalvisit_d_u_r <- join_u_r(odentalvisit_d, 1, odentalvisit_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(odentalvisit_d_m_w_b$m, select(odentalvisit_d_m_w_b$w, -agerange), select(odentalvisit_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents who have never received dental care", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(odentalvisit_d_u_r$m_u, odentalvisit_d_u_r$m_r)
+tbl_w_u_r <- rbind(odentalvisit_d_u_r$w_u, odentalvisit_d_u_r$w_r)
+tbl_b_u_r <- rbind(odentalvisit_d_u_r$b_u, odentalvisit_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents who have never received dental care by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+odentalvisit_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = odentalvisit_d_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents who have never received dental care by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O8
+- R script name: Odentalvisit
+
+***
+
+
+**Main reason for last visit to the dentist among those who ever visited a dentist**
+
+Description: Main reason for last visit to the dentist among those who ever visited a dentist.
+
+Instrument questions:
+
+- What was the reason for your last visit to the dentist?
+
+```{r oreasonvisit_c_tbls}
+# column names to use with huxtable
+oreasonvisit_c_col_names <- 
+  c("Age Group (years)", "n", "% Consultation/ advice", "95% CI", "% Pain or trouble with teeth or gums", "95% CI", 
+    "% Follow-up treatment", "95% CI", "% Routine check-up treatment", "95% CI", "% Other", "95% CI")
+
+# column names for region to use with huxtable
+oreasonvisit_c_reg_col_names <- 
+  c("Region", "n", "% Consultation/ advice", "95% CI", "% Pain or trouble with teeth or gums", "95% CI", 
+    "% Follow-up treatment", "95% CI", "% Routine check-up treatment", "95% CI", "% Other", "95% CI")
+
+# men, women, both sexes
+oreasonvisit_c_m_w_b <- join_m_w_b(oreasonvisit_c, 5, oreasonvisit_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oreasonvisit_c_u_r <- join_u_r(oreasonvisit_c, 5, oreasonvisit_c_col_names)
+```
+
+<br>
+
+```{r}
+oreasonvisit_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Main reason for last visit to the dentist among those who ever visited a dentist", 12)
+```
+
+<br>
+
+```{r}
+oreasonvisit_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Main reason for last visit to the dentist among those who ever visited a dentist", 12)
+```
+
+<br>
+
+```{r}
+oreasonvisit_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Main reason for last visit to the dentist among those who ever visited a dentist", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_c_u_r$m_u, oreasonvisit_c_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Main reason for last visit to the dentist among those who ever visited a dentist by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_c_u_r$w_u, oreasonvisit_c_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Main reason for last visit to the dentist among those who ever visited a dentist by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_c_u_r$b_u, oreasonvisit_c_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Main reason for last visit to the dentist among those who ever visited a dentist by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+oreasonvisit_c$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = oreasonvisit_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Main reason for last visit to the dentist among those who ever visited a dentist by region", 12) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O8, O9
+- R script name: Oreasonvisit
+
+***
+
+
+**Main reason not to visit a dentist during last 12 months**
+
+Description: Main reason not to visit a dentist during last 12 months among those who ever visited a dentist.
+
+Instrument questions:
+
+- What was the main reason not to visit a dentist during last 12 months
+
+```{r oreasonvisit_d_tbls}
+# column names to use with huxtable
+oreasonvisit_d_col_names <- 
+  c("Age Group (years)", "n", "% Did not need it", "95% CI", "% Did not have money", "95% CI", 
+    "% There is not a dentist in the neighborhood", "95% CI", "% Fear", "95% CI", "% Other", "95% CI")
+
+# column names for region to use with huxtable
+oreasonvisit_d_reg_col_names <- 
+  c("Region", "n", "% Did not need it", "95% CI", "% Did not have money", "95% CI", 
+    "% There is not a dentist in the neighborhood", "95% CI", "% Fear", "95% CI", "% Other", "95% CI")
+
+# men, women, both sexes
+oreasonvisit_d_m_w_b <- join_m_w_b(oreasonvisit_d, 5, oreasonvisit_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oreasonvisit_d_u_r <- join_u_r(oreasonvisit_d, 5, oreasonvisit_d_col_names)
+```
+
+<br>
+
+```{r}
+oreasonvisit_d_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Main reason not to visit a dentist during last 12 months", 12)
+```
+
+<br>
+
+```{r}
+oreasonvisit_d_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Main reason not to visit a dentist during last 12 months", 12)
+```
+
+<br>
+
+```{r}
+oreasonvisit_d_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Main reason not to visit a dentist during last 12 months", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_d_u_r$m_u, oreasonvisit_d_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Main reason not to visit a dentist during last 12 months by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_d_u_r$w_u, oreasonvisit_d_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Main reason not to visit a dentist during last 12 months by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(oreasonvisit_d_u_r$b_u, oreasonvisit_d_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Main reason not to visit a dentist during last 12 months by type of settlement", 12)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+oreasonvisit_d$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = oreasonvisit_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Main reason not to visit a dentist during last 12 months by region", 12) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O8, Ox2
+- R script name: Oreasonvisit
+
+***
+
+
+**Percentage cleaning teeth at least once / at least twice a day**
+
+Description: Percentage of respondents cleaning their teeth at least once / at least twice a day.
+
+Instrument questions:
+
+- How often do you clean your teeth?
+
+```{r ofreqclean_c_tbls}
+# column names to use with huxtable
+# 1 - Percentage of respondents cleaning their teeth at least once a day
+ofreqclean_c_col_names <- c("Age Group (years)", "n", "% Cleaning teeth at least daily", "95% CI")
+ofreqclean_c_reg_col_names <- c("Region", "n", "% Cleaning teeth at least daily", "95% CI")
+# 2 - Percentage of respondents cleaning their teeth at least twice a day
+ofreqclean_d_col_names <- c("Age Group (years)", "n", "% Cleaning teeth at least twice a day", "95% CI")
+ofreqclean_d_reg_col_names <- c("Region", "n", "% Cleaning teeth at least twice a day", "95% CI")
+
+# men, women, both sexes
+# 1
+ofreqclean_c_m_w_b <- join_m_w_b(ofreqclean_c, 1, ofreqclean_c_col_names)
+# 2
+ofreqclean_d_m_w_b <- join_m_w_b(ofreqclean_d, 1, ofreqclean_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1
+ofreqclean_c_u_r <- join_u_r(ofreqclean_c, 1, ofreqclean_c_col_names)
+# 2
+ofreqclean_d_u_r <- join_u_r(ofreqclean_d, 1, ofreqclean_d_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(ofreqclean_c_m_w_b$m, select(ofreqclean_c_m_w_b$w, -agerange), select(ofreqclean_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents cleaning their teeth at least once a day", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(ofreqclean_d_m_w_b$m, select(ofreqclean_d_m_w_b$w, -agerange), select(ofreqclean_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents cleaning their teeth at least twice a day", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(ofreqclean_c_u_r$m_u, ofreqclean_c_u_r$m_r)
+tbl_w_u_r <- rbind(ofreqclean_c_u_r$w_u, ofreqclean_c_u_r$w_r)
+tbl_b_u_r <- rbind(ofreqclean_c_u_r$b_u, ofreqclean_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents cleaning their teeth at least once a day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(ofreqclean_d_u_r$m_u, ofreqclean_d_u_r$m_r)
+tbl_w_u_r <- rbind(ofreqclean_d_u_r$w_u, ofreqclean_d_u_r$w_r)
+tbl_b_u_r <- rbind(ofreqclean_d_u_r$b_u, ofreqclean_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents cleaning their teeth at least twice a day by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+ofreqclean_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ofreqclean_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents cleaning their teeth at least once a day by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+ofreqclean_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ofreqclean_d_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents cleaning their teeth at least twice a day by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O10
+- R script name: Ofreqclean
+
+***
+
+
+**Percentage of respondents using toothpaste**
+
+Description: Percentage of respondents using toothpaste among those cleaning their teeth.
+
+Instrument questions:
+
+- Do you use toothpaste to clean your teeth?
+
+```{r otoothpaste_c_tbls}
+# column names to use with huxtable
+otoothpaste_c_col_names <- c("Age Group (years)", "n", "% Using toothpaste", "95% CI")
+otoothpaste_c_reg_col_names <- c("Region", "n", "% Using toothpaste", "95% CI")
+
+# men, women, both sexes
+otoothpaste_c_m_w_b <- join_m_w_b(otoothpaste_c, 1, otoothpaste_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+otoothpaste_c_u_r <- join_u_r(otoothpaste_c, 1, otoothpaste_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(otoothpaste_c_m_w_b$m, select(otoothpaste_c_m_w_b$w, -agerange), select(otoothpaste_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using toothpaste among those cleaning their teeth", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(otoothpaste_c_u_r$m_u, otoothpaste_c_u_r$m_r)
+tbl_w_u_r <- rbind(otoothpaste_c_u_r$w_u, otoothpaste_c_u_r$w_r)
+tbl_b_u_r <- rbind(otoothpaste_c_u_r$b_u, otoothpaste_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using toothpaste among those cleaning their teeth by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+otoothpaste_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = otoothpaste_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using toothpaste among those cleaning their teeth by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O11
+- R script name: Otoothpaste
+
+***
+
+
+**Percentage of respondents using toothpaste containing fluoride**
+
+Description: Percentage of respondents using toothpaste containing fluoride among those using toothpaste.
+
+Instrument questions:
+
+- Do you use toothpaste containing fluoride?
+
+```{r ofluoride_c_tbls}
+# column names to use with huxtable
+ofluoride_c_col_names <- c("Age Group (years)", "n", "% Using toothpaste containing fluoride", "95% CI")
+ofluoride_c_reg_col_names <- c("Region", "n", "% Using toothpaste containing fluoride", "95% CI")
+
+# men, women, both sexes
+ofluoride_c_m_w_b <- join_m_w_b(ofluoride_c, 1, ofluoride_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+ofluoride_c_u_r <- join_u_r(ofluoride_c, 1, ofluoride_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(ofluoride_c_m_w_b$m, select(ofluoride_c_m_w_b$w, -agerange), select(ofluoride_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using toothpaste containing fluoride among those using toothpaste", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(ofluoride_c_u_r$m_u, ofluoride_c_u_r$m_r)
+tbl_w_u_r <- rbind(ofluoride_c_u_r$w_u, ofluoride_c_u_r$w_r)
+tbl_b_u_r <- rbind(ofluoride_c_u_r$b_u, ofluoride_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using toothpaste containing fluoride among those using toothpaste by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+ofluoride_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ofluoride_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using toothpaste containing fluoride among those using toothpaste by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O12
+- R script name: Ofluoride
+
+***
+
+
+**Percentage using a various tools to clean teeth among those cleaning their teeth**
+
+Description: Percentage of respondents who use a tooth brush, wooden toothpicks, plastic toothpicks, thread (dental floss), charcoal, chewstick/miswak or something else to clean their teeth among those cleaning their teeth.
+
+Instrument questions:
+
+- Do you use any of the following to clean your teeth?
+
+```{r ocleaningtool_a_b_c_d_tbls}
+# column names to use with huxtable
+# 1 - Percentage of respondents using toothbrush
+ocleaningtool_a_col_names <- c("Age Group (years)", "n", "% Toothbrush", "95% CI")
+ocleaningtool_a_reg_col_names <- c("Region", "n", "% Toothbrush", "95% CI")
+# 2 - Percentage of respondents using wooden tooth-picks
+ocleaningtool_b_col_names <- c("Age Group (years)", "n", "% Wooden toothpicks", "95% CI")
+ocleaningtool_b_reg_col_names <- c("Region", "n", "% Wooden toothpicks", "95% CI")
+# 3 - Percentage of respondents using plastic tooth-picks
+ocleaningtool_c_col_names <- c("Age Group (years)", "n", "% Plastic toothpicks", "95% CI")
+ocleaningtool_c_reg_col_names <- c("Region", "n", "% Plastic toothpicks", "95% CI")
+# 4 - Percentage of respondents using thread (dental floss)
+ocleaningtool_d_col_names <- c("Age Group (years)", "n", "% Thread (dental floss)", "95% CI")
+ocleaningtool_d_reg_col_names <- c("Region", "n", "% Thread (dental floss)", "95% CI")
+# 5 - Percentage of respondents using charcoal
+ocleaningtool_e_col_names <- c("Age Group (years)", "n", "% Charcoal", "95% CI")
+ocleaningtool_e_reg_col_names <- c("Region", "n", "% Charcoal", "95% CI")
+# 6 - Percentage of respondents using chewstick
+ocleaningtool_f_col_names <- c("Age Group (years)", "n", "% Chewstick", "95% CI")
+ocleaningtool_f_reg_col_names <- c("Region", "n", "% Chewstick", "95% CI")
+# 7 - Percentage of respondents using other
+ocleaningtool_g_col_names <- c("Age Group (years)", "n", "% Other", "95% CI")
+ocleaningtool_g_reg_col_names <- c("Region", "n", "% Other", "95% CI")
+
+# men, women, both sexes
+# 1
+ocleaningtool_a_m_w_b <- join_m_w_b(ocleaningtool_a, 1, ocleaningtool_a_col_names)
+# 2
+ocleaningtool_b_m_w_b <- join_m_w_b(ocleaningtool_b, 1, ocleaningtool_b_col_names)
+# 3
+ocleaningtool_c_m_w_b <- join_m_w_b(ocleaningtool_c, 1, ocleaningtool_c_col_names)
+# 4
+ocleaningtool_d_m_w_b <- join_m_w_b(ocleaningtool_d, 1, ocleaningtool_d_col_names)
+# 5
+ocleaningtool_e_m_w_b <- join_m_w_b(ocleaningtool_e, 1, ocleaningtool_e_col_names)
+# 6
+ocleaningtool_f_m_w_b <- join_m_w_b(ocleaningtool_f, 1, ocleaningtool_f_col_names)
+# 7
+ocleaningtool_g_m_w_b <- join_m_w_b(ocleaningtool_g, 1, ocleaningtool_g_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1
+ocleaningtool_a_u_r <- join_u_r(ocleaningtool_a, 1, ocleaningtool_a_col_names)
+# 2
+ocleaningtool_b_u_r <- join_u_r(ocleaningtool_b, 1, ocleaningtool_b_col_names)
+# 3
+ocleaningtool_c_u_r <- join_u_r(ocleaningtool_c, 1, ocleaningtool_c_col_names)
+# 4
+ocleaningtool_d_u_r <- join_u_r(ocleaningtool_d, 1, ocleaningtool_d_col_names)
+# 5
+ocleaningtool_e_u_r <- join_u_r(ocleaningtool_e, 1, ocleaningtool_e_col_names)
+# 6
+ocleaningtool_f_u_r <- join_u_r(ocleaningtool_f, 1, ocleaningtool_f_col_names)
+# 7
+ocleaningtool_g_u_r <- join_u_r(ocleaningtool_g, 1, ocleaningtool_g_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(ocleaningtool_a_m_w_b$m, select(ocleaningtool_a_m_w_b$w, -agerange), select(ocleaningtool_a_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using toothbrush", .colspan_val = 10)
+```
+
+<br>
+
+```{r eval=FALSE, include=FALSE}
+# 2
+cbind(ocleaningtool_b_m_w_b$m, select(ocleaningtool_b_m_w_b$w, -agerange), select(ocleaningtool_b_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using wooden toothpicks", .colspan_val = 10)
+```
+
+<br>
+
+```{r eval=FALSE, include=FALSE}
+# 3
+cbind(ocleaningtool_c_m_w_b$m, select(ocleaningtool_c_m_w_b$w, -agerange), select(ocleaningtool_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using plastic toothpicks", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 4
+cbind(ocleaningtool_d_m_w_b$m, select(ocleaningtool_d_m_w_b$w, -agerange), select(ocleaningtool_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using thread (dental floss)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 5
+cbind(ocleaningtool_e_m_w_b$m, select(ocleaningtool_e_m_w_b$w, -agerange), select(ocleaningtool_e_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using charcoal", .colspan_val = 10)
+```
+
+<br>
+
+```{r eval=FALSE, include=FALSE}
+# 6
+cbind(ocleaningtool_f_m_w_b$m, select(ocleaningtool_f_m_w_b$w, -agerange), select(ocleaningtool_f_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using chewstick / miswak", .colspan_val = 10)
+```
+
+<br>
+
+```{r eval=FALSE, include=FALSE}
+# 7
+cbind(ocleaningtool_g_m_w_b$m, select(ocleaningtool_g_m_w_b$w, -agerange), select(ocleaningtool_g_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents using other", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(ocleaningtool_a_u_r$m_u, ocleaningtool_a_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_a_u_r$w_u, ocleaningtool_a_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_a_u_r$b_u, ocleaningtool_a_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using toothbrush by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(ocleaningtool_b_u_r$m_u, ocleaningtool_b_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_b_u_r$w_u, ocleaningtool_b_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_b_u_r$b_u, ocleaningtool_b_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using wooden toothpicks by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(ocleaningtool_c_u_r$m_u, ocleaningtool_c_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_c_u_r$w_u, ocleaningtool_c_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_c_u_r$b_u, ocleaningtool_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using plastic toothpicks by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+tbl_m_u_r <- rbind(ocleaningtool_d_u_r$m_u, ocleaningtool_d_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_d_u_r$w_u, ocleaningtool_d_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_d_u_r$b_u, ocleaningtool_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using thread (dental floss) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 5
+tbl_m_u_r <- rbind(ocleaningtool_e_u_r$m_u, ocleaningtool_e_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_e_u_r$w_u, ocleaningtool_e_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_e_u_r$b_u, ocleaningtool_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using charcoal by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 6
+tbl_m_u_r <- rbind(ocleaningtool_f_u_r$m_u, ocleaningtool_f_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_f_u_r$w_u, ocleaningtool_f_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_f_u_r$b_u, ocleaningtool_f_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using chewstick / miswak by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 7
+tbl_m_u_r <- rbind(ocleaningtool_g_u_r$m_u, ocleaningtool_g_u_r$m_r)
+tbl_w_u_r <- rbind(ocleaningtool_g_u_r$w_u, ocleaningtool_g_u_r$w_r)
+tbl_b_u_r <- rbind(ocleaningtool_g_u_r$b_u, ocleaningtool_g_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents using other by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+ocleaningtool_a$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_a_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using toothbrush by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+ocleaningtool_b$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_b_reg_col_names) %>%
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using wooden toothpicks by region", .colspan_val = 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+ocleaningtool_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_c_reg_col_names) %>%
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using plastic toothpicks by region", .colspan_val = 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+ocleaningtool_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_d_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using thread (dental floss) by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 5
+ocleaningtool_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_a_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using charcoal by region", .colspan_val = 4) 
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 6
+ocleaningtool_f$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_b_reg_col_names) %>%
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using chewstick / miswak by region", .colspan_val = 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 7
+ocleaningtool_g$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ocleaningtool_c_reg_col_names) %>%
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents using other by region", .colspan_val = 4)
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O13a-O13g
+- R script name: Ocleaningtool
+
+***
+
+
+**Percentage of respondents having difficulty in chewing foods**
+
+Description: Percentage of respondents having difficulty in chewing foods during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Difficulty in chewing foods?
+
+```{r oproblem_a_tbls}
+# column names to use with huxtable
+oproblem_a_col_names <- c("Age Group (years)", "n", "% Difficulty in chewing foods", "95% CI")
+oproblem_a_reg_col_names <- c("Region", "n", "% Difficulty in chewing foods", "95% CI")
+
+# men, women, both sexes
+oproblem_a_m_w_b <- join_m_w_b(oproblem_a, 1, oproblem_a_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_a_u_r <- join_u_r(oproblem_a, 1, oproblem_a_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_a_m_w_b$m, select(oproblem_a_m_w_b$w, -agerange), select(oproblem_a_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty in chewing foods during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_a_u_r$m_u, oproblem_a_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_a_u_r$w_u, oproblem_a_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_a_u_r$b_u, oproblem_a_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty in chewing foods during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_a$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_a_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having difficulty in chewing foods during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14a
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents having difficulty with speech/trouble pronouncing words**
+
+Description: Percentage of respondents having difficulty with speech/trouble pronouncing words during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Difficulty with speech/trouble pronouncing words?
+
+```{r oproblem_b_tbls}
+# column names to use with huxtable
+oproblem_b_col_names <- c("Age Group (years)", "n", "% Difficulty with speech/ pronouncing words", "95% CI")
+oproblem_b_reg_col_names <- c("Region", "n", "% Difficulty with speech/ pronouncing words", "95% CI")
+
+# men, women, both sexes
+oproblem_b_m_w_b <- join_m_w_b(oproblem_b, 1, oproblem_b_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_b_u_r <- join_u_r(oproblem_b, 1, oproblem_b_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_b_m_w_b$m, select(oproblem_b_m_w_b$w, -agerange), select(oproblem_b_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty with speech/trouble pronouncing words during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_b_u_r$m_u, oproblem_b_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_b_u_r$w_u, oproblem_b_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_b_u_r$b_u, oproblem_b_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty with speech/trouble pronouncing words during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_b$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_b_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having difficulty with speech/trouble pronouncing words during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14b
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents feeling tense because of problems with teeth or mouth**
+
+Description: Percentage of respondents feeling tense because of problems with teeth or mouth during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Felt tense because of problems with teeth or mouth?
+
+```{r oproblem_c_tbls}
+# column names to use with huxtable
+oproblem_c_col_names <- c("Age Group (years)", "n", "% Feeling tense", "95% CI")
+oproblem_c_reg_col_names <- c("Region", "n", "% Feeling tense", "95% CI")
+
+# men, women, both sexes
+oproblem_c_m_w_b <- join_m_w_b(oproblem_c, 1, oproblem_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_c_u_r <- join_u_r(oproblem_c, 1, oproblem_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_c_m_w_b$m, select(oproblem_c_m_w_b$w, -agerange), select(oproblem_c_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents feeling tense because of problems with teeth or mouth during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_c_u_r$m_u, oproblem_c_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_c_u_r$w_u, oproblem_c_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_c_u_r$b_u, oproblem_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents feeling tense because of problems with teeth or mouth during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_c_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents feeling tense because of problems with teeth or mouth during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14c
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents being embarrassed about appearance of teeth**
+
+Description: Percentage of respondents being embarrassed about appearance of teeth during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Embarrassed about appearance of teeth?
+
+```{r oproblem_d_tbls}
+# column names to use with huxtable
+oproblem_d_col_names <- c("Age Group (years)", "n", "% Embarrassed because of appearance of teeth", "95% CI")
+oproblem_d_reg_col_names <- c("Region", "n", "% Embarrassed because of appearance of teeth", "95% CI")
+
+# men, women, both sexes
+oproblem_d_m_w_b <- join_m_w_b(oproblem_d, 1, oproblem_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_d_u_r <- join_u_r(oproblem_d, 1, oproblem_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_d_m_w_b$m, select(oproblem_d_m_w_b$w, -agerange), select(oproblem_d_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents being embarrassed because of appearance of teeth during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_d_u_r$m_u, oproblem_d_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_d_u_r$w_u, oproblem_d_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_d_u_r$b_u, oproblem_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents being embarrassed because of appearance of teeth during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_d_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents being embarrassed because of appearance of teeth during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14d
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents avoiding smiling because of teeth**
+
+Description: Percentage of respondents avoiding smiling because of teeth during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Avoid smiling because of teeth?
+
+```{r oproblem_e_tbls}
+# column names to use with huxtable
+oproblem_e_col_names <- c("Age Group (years)", "n", "% Avoiding smiling because of teeth", "95% CI")
+oproblem_e_reg_col_names <- c("Region", "n", "% Avoiding smiling because of teeth", "95% CI")
+
+# men, women, both sexes
+oproblem_e_m_w_b <- join_m_w_b(oproblem_e, 1, oproblem_e_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_e_u_r <- join_u_r(oproblem_e, 1, oproblem_e_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_e_m_w_b$m, select(oproblem_e_m_w_b$w, -agerange), select(oproblem_e_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents avoiding smiling because of teeth during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_e_u_r$m_u, oproblem_e_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_e_u_r$w_u, oproblem_e_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_e_u_r$b_u, oproblem_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents avoiding smiling because of teeth during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_e_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents avoiding smiling because of teeth during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14e
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents with interruptions in sleep**
+
+Description: Percentage of respondents whose sleep was often interrupted during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Sleep is often interrupted?
+
+```{r oproblem_f_tbls}
+# column names to use with huxtable
+oproblem_f_col_names <- c("Age Group (years)", "n", "% Sleep often interrupted", "95% CI")
+oproblem_f_reg_col_names <- c("Region", "n", "% Sleep often interrupted", "95% CI")
+
+# men, women, both sexes
+oproblem_f_m_w_b <- join_m_w_b(oproblem_f, 1, oproblem_f_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_f_u_r <- join_u_r(oproblem_f, 1, oproblem_f_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_f_m_w_b$m, select(oproblem_f_m_w_b$w, -agerange), select(oproblem_f_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents with interruptions in sleep during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_f_u_r$m_u, oproblem_f_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_f_u_r$w_u, oproblem_f_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_f_u_r$b_u, oproblem_f_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents with interruptions in sleep during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_f$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_f_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents with interruptions in sleep during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14f
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents with days not at work because of teeth or mouth**
+
+Description: Percentage of respondents with days not at work because of teeth or mouth during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Days not at work because of teeth or mouth?
+
+```{r oproblem_g_tbls}
+# column names to use with huxtable
+oproblem_g_col_names <- c("Age Group (years)", "n", "% With days not at work", "95% CI")
+oproblem_g_reg_col_names <- c("Region", "n", "% With days not at work", "95% CI")
+
+# men, women, both sexes
+oproblem_g_m_w_b <- join_m_w_b(oproblem_g, 1, oproblem_g_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_g_u_r <- join_u_r(oproblem_g, 1, oproblem_g_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_g_m_w_b$m, select(oproblem_g_m_w_b$w, -agerange), select(oproblem_g_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents with days not at work because of teeth or mouth during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_g_u_r$m_u, oproblem_g_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_g_u_r$w_u, oproblem_g_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_g_u_r$b_u, oproblem_g_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents with days not at work because of teeth or mouth during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_g$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_g_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents with days not at work because of teeth or mouth during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14g
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents having difficulty doing usual activities**
+
+Description: Percentage of respondents having difficulty doing usual activities during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Difficulty doing usual activities?
+
+```{r oproblem_h_tbls}
+# column names to use with huxtable
+oproblem_h_col_names <- c("Age Group (years)", "n", "% Having difficulty doing usual activities", "95% CI")
+oproblem_h_reg_col_names <- c("Region", "n", "% Having difficulty doing usual activities", "95% CI")
+
+# men, women, both sexes
+oproblem_h_m_w_b <- join_m_w_b(oproblem_h, 1, oproblem_h_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_h_u_r <- join_u_r(oproblem_h, 1, oproblem_h_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_h_m_w_b$m, select(oproblem_h_m_w_b$w, -agerange), select(oproblem_h_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty doing usual activities during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_h_u_r$m_u, oproblem_h_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_h_u_r$w_u, oproblem_h_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_h_u_r$b_u, oproblem_h_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having difficulty doing usual activities during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_h$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_h_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having difficulty doing usual activities during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14h
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents being less tolerant of spouse or people close to them**
+
+Description: Percentage of respondents having been less tolerant of spouse or people close to them during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Less tolerant of spouse or people close to you?
+
+```{r oproblem_i_tbls}
+# column names to use with huxtable
+oproblem_i_col_names <- c("Age Group (years)", "n", "% Having been less tolerant", "95% CI")
+oproblem_i_reg_col_names <- c("Region", "n", "% Having been less tolerant", "95% CI")
+
+# men, women, both sexes
+oproblem_i_m_w_b <- join_m_w_b(oproblem_i, 1, oproblem_i_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_i_u_r <- join_u_r(oproblem_i, 1, oproblem_i_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_i_m_w_b$m, select(oproblem_i_m_w_b$w, -agerange), select(oproblem_i_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having been less tolerant of spouse or people close to them during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_i_u_r$m_u, oproblem_i_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_i_u_r$w_u, oproblem_i_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_i_u_r$b_u, oproblem_i_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having been less tolerant of spouse or people close to them during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_i$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_i_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having been less tolerant of spouse or people close to them during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14i
+- R script name: Oproblem
+
+***
+
+
+**Percentage of respondents having reduced participation in social activities**
+
+Description: Percentage of respondents having reduced participation in social activities during the past 12 months.
+
+Instrument questions:
+
+- Have you experienced any of the following problems during the past year because of the state of your teeth?
+- Reduced participation in social activities?
+
+```{r oproblem_j_tbls}
+# column names to use with huxtable
+oproblem_j_col_names <- c("Age Group (years)", "n", "% Having reduced participation in social activities", "95% CI")
+oproblem_j_reg_col_names <- c("Region", "n", "% Having reduced participation in social activities", "95% CI")
+
+# men, women, both sexes
+oproblem_j_m_w_b <- join_m_w_b(oproblem_j, 1, oproblem_j_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+oproblem_j_u_r <- join_u_r(oproblem_j, 1, oproblem_j_col_names)
+```
+
+<br>
+
+```{r}
+cbind(oproblem_j_m_w_b$m, select(oproblem_j_m_w_b$w, -agerange), select(oproblem_j_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents having reduced participation in social activities during the past 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(oproblem_j_u_r$m_u, oproblem_j_u_r$m_r)
+tbl_w_u_r <- rbind(oproblem_j_u_r$w_u, oproblem_j_u_r$w_r)
+tbl_b_u_r <- rbind(oproblem_j_u_r$b_u, oproblem_j_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents having reduced participation in social activities during the past 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+oproblem_j$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = oproblem_j_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of respondents having reduced participation in social activities during the past 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: O14j
+- R script name: Oproblem
+
+***
+
+<br>
+<br>

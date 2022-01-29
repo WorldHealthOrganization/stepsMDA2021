@@ -1,0 +1,179 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+cvd_data_dir <- here::here("DataBook", "Modules", "CardiovascularDiseaseRisk")
+
+# list all files in the directory
+# fs::dir_ls(cvd_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(cvd_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Cardiovascular disease risk
+
+**CVD risk of ≥30% or existing CVD**
+
+Description: Percentage of respondents aged 40–69 years with a 10-year cardiovascular disease (CVD) risk* ≥30% or with existing CVD.
+
+Instrument questions: combined from Step 1, 2 and 3
+
+- Gender, age
+- Current and former smoking
+- History of diabetes, CVD
+- Systolic blood pressure measurements
+- Fasting status, glucose and total cholesterol measurements.
+
+```{r cvdrisk_c_tbls}
+# column names to use with huxtable
+cvdrisk_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+cvdrisk_c_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+cvdrisk_c_m_w_b <- join_m_w_b(cvdrisk_c, 1, cvdrisk_c_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cvdrisk_c_u_r <- join_u_r(cvdrisk_c, 1, cvdrisk_c_col_names)
+```
+
+<br>
+
+```{r}
+cbind(cvdrisk_c_m_w_b$m, select(cvdrisk_c_m_w_b$w, -1), select(cvdrisk_c_m_w_b$b, -1)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of respondents with a 10-year CVD risk ≥30% or with existing CVD", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(cvdrisk_c_u_r$m_u, cvdrisk_c_u_r$m_r)
+tbl_w_u_r <- rbind(cvdrisk_c_u_r$w_u, cvdrisk_c_u_r$w_r)
+tbl_b_u_r <- rbind(cvdrisk_c_u_r$b_u, cvdrisk_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -1), select(tbl_b_u_r, -1)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents with a 10-year CVD risk ≥30% or with existing CVD by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cvdrisk_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = cvdrisk_c_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of respondents with a 10-year CVD risk ≥30% or with existing CVD by region", 4)
+```
+
+
+* A 10-year CVD risk of ≥30% is defined according to age, sex, blood pressure, smoking status (current smokers OR those who quit smoking less than 1 year before the assessment), total cholesterol, and diabetes (previously diagnosed OR a fasting plasma glucose concentration >7.0 mmol/l (126 mg/dl)). 
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: C1, C2, C3, T1, T8T10, T11a-c, H6, H7a, H17, M4a, M5a, M6a, M7, B1, B5, B8
+-   R script name: CVDrisk
+
+***
+
+
+**Drug therapy and counseling for those with CVD risk ≥30% or existing CVD**
+
+Description: Percentage of eligible persons (defined as aged 40–69 years with a 10-year cardiovascular disease (CVD) risk* ≥30%, including those with existing CVD) receiving drug therapy and counseling** (including glycaemic control) to prevent heart attacks and strokes.
+
+Instrument questions: combined from Step 1, 2 and 3
+
+- Gender, age
+- Current and former smoking
+- History of diabetes, CVD
+- Lifestyle advice
+- Systolic blood pressure measurements
+- Fasting status, glucose and total cholesterol measurements.
+
+```{r cvdrisk_d_tbls}
+# column names to use with huxtable
+cvdrisk_d_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+cvdrisk_d_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+cvdrisk_d_m_w_b <- join_m_w_b(cvdrisk_d, 1, cvdrisk_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+cvdrisk_d_u_r <- join_u_r(cvdrisk_d, 1, cvdrisk_d_col_names)
+```
+
+<br>
+
+```{r}
+cbind(cvdrisk_d_m_w_b$m, select(cvdrisk_d_m_w_b$w, -1), select(cvdrisk_d_m_w_b$b, -1)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of eligible persons receiving drug therapy and counseling to prevent heart attacks and strokes", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(cvdrisk_d_u_r$m_u, cvdrisk_d_u_r$m_r)
+tbl_w_u_r <- rbind(cvdrisk_d_u_r$w_u, cvdrisk_d_u_r$w_r)
+tbl_b_u_r <- rbind(cvdrisk_d_u_r$b_u, cvdrisk_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -1), select(tbl_b_u_r, -1)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of eligible persons receiving drug therapy and counseling to prevent heart attacks and strokes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+cvdrisk_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = cvdrisk_d_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Percentage of eligible persons receiving drug therapy and counseling to prevent heart attacks and strokes by region", 4)
+```
+
+<br>
+
+* A 10-year CVD risk of ≥30% is defined according to age, sex, blood pressure, smoking status (current smokers OR those who quit smoking less than 1 year before the assessment), total cholesterol, and diabetes (previously diagnosed OR a fasting plasma glucose concentration >7.0 mmol/l (126 mg/dl)). 
+
+**Counseling is defined as receiving advice from a doctor or other health worker to quit using tobacco or not start, reduce salt in diet, eat at least five servings of fruit and/or vegetables per day, reduce fat in diet, start or do more physical activity, maintain a healthy body weight or lose weight.
+
+
+**Analysis information**:
+
+-   Questions used: C1, C2, C3, T1, T8T10, T11a-c, H6, H7a, H8, H9, H13a, H14, H17, H18, H19, H20a-f, M4a, M5a, M6a, M7, B1, B5, B8
+-   R script name: CVDrisk
+
+***
+
+<br> 
+
+<br>

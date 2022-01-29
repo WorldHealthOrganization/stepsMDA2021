@@ -1,0 +1,794 @@
+---
+title: "STEPS MDA Data Book"
+author: "WHO NCD Office Moscow"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  word_document: default
+  html_document:
+    css: style.css
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(here)
+library(huxtable)
+library(tidyverse)
+library(fs)
+```
+
+```{r source, include=FALSE}
+biochemical_measurements_data_dir <- here::here("DataBook", "Modules", "BiochemicalMeasurements")
+
+# list all files in the directory
+# fs::dir_ls(biochemical_measurements_data_dir)
+
+# only R files
+r_files <- fs::dir_ls(biochemical_measurements_data_dir, regexp = "\\.R$") 
+# r_files
+
+# read in just one R file for testing
+# source(r_files[1])
+
+# scale up to all R files with a map function from purrr
+r_files %>% 
+  map(source, encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r databook_functions, echo=FALSE}
+source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
+```
+
+```{r}
+m_w_b <- c("m","w","b")
+u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
+```
+
+# Biochemical Measurements
+
+**Mean fasting blood glucose**
+
+Description: mean fasting blood glucose results including those currently on medication for diabetes (non-fasting recipients excluded).
+
+Instrument questions:
+
+- During the last 12 hours have you had anything to eat or drink, other than water?
+- Blood glucose measurement
+
+```{r bglucose_b5_b5mg_tbls}
+# column names to use with huxtable
+bglucose_b5_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+bglucose_b5_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# 1 - Mean fasting blood glucose (mmol/L)
+# men, women, both sexes
+bglucose_b5_m_w_b <- join_m_w_b(bglucose_b5, 1, bglucose_b5_col_names)
+
+# 2 - Mean fasting blood glucose (mg/dl)
+# men, women, both sexes
+bglucose_b5mg_m_w_b <- join_m_w_b(bglucose_b5mg, 1, bglucose_b5_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Mean fasting blood glucose (mmol/L)
+bglucose_b5_u_r <- join_u_r(bglucose_b5, 1, bglucose_b5_col_names)
+# 2 - Mean fasting blood glucose (mg/dl)
+bglucose_b5mg_u_r <- join_u_r(bglucose_b5mg, 1, bglucose_b5_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(bglucose_b5_m_w_b$m, select(bglucose_b5_m_w_b$w, -agerange), select(bglucose_b5_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean fasting blood glucose (mmol/L)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(bglucose_b5mg_m_w_b$m, select(bglucose_b5mg_m_w_b$w, -agerange), select(bglucose_b5mg_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean fasting blood glucose (mg/dl)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(bglucose_b5_u_r$m_u, bglucose_b5_u_r$m_r)
+tbl_w_u_r <- rbind(bglucose_b5_u_r$w_u, bglucose_b5_u_r$w_r)
+tbl_b_u_r <- rbind(bglucose_b5_u_r$b_u, bglucose_b5_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean fasting blood glucose (mmol/L) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(bglucose_b5mg_u_r$m_u, bglucose_b5mg_u_r$m_r)
+tbl_w_u_r <- rbind(bglucose_b5mg_u_r$w_u, bglucose_b5mg_u_r$w_r)
+tbl_b_u_r <- rbind(bglucose_b5mg_u_r$b_u, bglucose_b5mg_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean fasting blood glucose (mg/dl) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+bglucose_b5$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bglucose_b5_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean fasting blood glucose (mmol/L) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+bglucose_b5mg$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bglucose_b5_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean fasting blood glucose (mg/dl) by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: B1, B5
+-   R script name: Bglucose
+
+***
+
+**Raised blood glucose**
+
+Description: Categorization of respondents into blood glucose level categories and percentage of respondents currently on medication for raised blood glucose (non-fasting recipients excluded).
+
+Instrument questions:
+
+- In the past two weeks, have you taken any drugs (medication) for diabetes prescribed by a doctor or other health worker?
+- Are you currently taking insulin for diabetes prescribed by a doctor or other health worker?
+- During the last 12 hours have you had anything to eat or drink, other than water?
+- Blood glucose measurement 
+- Today, have you taken insulin or other drugs (medication) that have been prescribed by a doctor or other health worker?
+
+```{r bglucose_ifg_rbg_or_meds_medstext_tbls}
+# column names to use with huxtable
+bglucose_ifg_rbg_or_meds_medstext_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+bglucose_ifg_rbg_or_meds_medstext_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# prep titles
+.title_m_w_b <- "Impaired Fasting Glycaemia*"
+.title_u_r <- "by type of settlement"
+.title_reg <- "by region"
+
+# men, women, both sexes
+# 1 (a) - Impaired Fasting Glycaemia*
+bglucose_ifg_d_m_w_b <- join_m_w_b(bglucose_ifg_d, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+
+# 2 (b) - Raised blood glucose or currently on medication for diabetes**
+bglucose_rbg_or_meds_d_m_w_b <- join_m_w_b(bglucose_rbg_or_meds_d, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+
+# 3 (c) - Currently on medication for diabetes
+bglucose_medstext_m_w_b <- join_m_w_b(bglucose_medstext, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Impaired Fasting Glycaemia*
+bglucose_ifg_d_u_r <- join_u_r(bglucose_ifg_d, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+# 2 - Raised blood glucose or currently on medication for diabetes**
+bglucose_rbg_or_meds_d_u_r <- join_u_r(bglucose_rbg_or_meds_d, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+# 3 - Currently on medication for diabetes
+bglucose_medstext_u_r <- join_u_r(bglucose_medstext, 1, bglucose_ifg_rbg_or_meds_medstext_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(bglucose_ifg_d_m_w_b$m, select(bglucose_ifg_d_m_w_b$w, -agerange), select(bglucose_ifg_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = paste(.title_m_w_b), .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(bglucose_rbg_or_meds_d_m_w_b$m, select(bglucose_rbg_or_meds_d_m_w_b$w, -agerange), select(bglucose_rbg_or_meds_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Raised blood glucose or currently on medication for diabetes**", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+cbind(bglucose_medstext_m_w_b$m, select(bglucose_medstext_m_w_b$w, -agerange), select(bglucose_medstext_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Currently on medication for diabetes", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(bglucose_ifg_d_u_r$m_u, bglucose_ifg_d_u_r$m_r)
+tbl_w_u_r <- rbind(bglucose_ifg_d_u_r$w_u, bglucose_ifg_d_u_r$w_r)
+tbl_b_u_r <- rbind(bglucose_ifg_d_u_r$b_u, bglucose_ifg_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = paste(.title_m_w_b, .title_u_r), .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(bglucose_rbg_or_meds_d_u_r$m_u, bglucose_rbg_or_meds_d_u_r$m_r)
+tbl_w_u_r <- rbind(bglucose_rbg_or_meds_d_u_r$w_u, bglucose_rbg_or_meds_d_u_r$w_r)
+tbl_b_u_r <- rbind(bglucose_rbg_or_meds_d_u_r$b_u, bglucose_rbg_or_meds_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Raised blood glucose or currently on medication for diabetes** by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+tbl_m_u_r <- rbind(bglucose_medstext_u_r$m_u, bglucose_medstext_u_r$m_r)
+tbl_w_u_r <- rbind(bglucose_medstext_u_r$w_u, bglucose_medstext_u_r$w_r)
+tbl_b_u_r <- rbind(bglucose_medstext_u_r$b_u, bglucose_medstext_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Currently on medication for diabetes by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+bglucose_ifg_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bglucose_ifg_rbg_or_meds_medstext_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Impaired Fasting Glycaemia* by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+bglucose_rbg_or_meds_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bglucose_ifg_rbg_or_meds_medstext_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Raised blood glucose or currently on medication for diabetes** by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+bglucose_medstext$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bglucose_ifg_rbg_or_meds_medstext_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Currently on medication for diabetes by region", 4)
+```
+
+<br>
+
+*Impaired fasting glycaemia is defined as either
+  
+- plasma venous value: ≥6.1mmol/L (110mg/dl) and  <7.0mmol/L (126mg/dl)
+- capillary whole blood value: ≥5.6mmol/L (100mg/dl) and  <6.1mmol/L (110mg/dl)
+
+**Raised blood glucose is defined as either
+  
+- plasma venous value: ≥ 7.0 mmol/L (126 mg/dl)
+- capillary whole blood value: ≥ 6.1 mmol/L (110 mg/dl)
+
+**Analysis information**:
+
+-   Questions used: H8, H9, B1, B5, B6
+-   R script name: Bglucose
+
+***
+
+
+**Blood glucose diagnosis and treatment**
+
+Description: Raised blood glucose diagnosis and treatment among all respondents.
+
+Instrument questions:
+
+- Have you ever had your blood sugar measured by a doctor or other health worker?
+- Have you ever been told by a doctor or other health worker that you have raised blood sugar or diabetes?
+- In the past two weeks, have you taken any drugs (medication) for diabetes prescribed by a doctor or other health worker?
+- Are you currently taking insulin for diabetes prescribed by a doctor or other health worker?
+- During the last 12 hours have you had anything to eat or drink, other than water?
+- Blood glucose measurement 
+- Today, have you taken insulin or other drugs (medication) that have been prescribed by a doctor or other health worker?
+
+```{r bglucose_diagn_tbls}
+# column names to use with huxtable
+bglucose_diagn_col_names <- 
+  c("Age Group (years)", "n", "% with raised blood glucose, not previously diagnosed", "95% CI", 
+    "% with previously diagnosed raised blood glucose, not on medication", "95% CI", 
+    "% with previously diagnosed raised blood glucose, on medication", "95% CI")
+
+# column names for region to use with huxtable
+bglucose_diagn_reg_col_names <- 
+  c("Region", "n", "% with raised blood glucose, not previously diagnosed", "95% CI", 
+    "% with previously diagnosed raised blood glucose, not on medication", "95% CI", 
+    "% with previously diagnosed raised blood glucose, on medication", "95% CI")
+
+# men, women, both sexes
+bglucose_diagn_m_w_b <- join_m_w_b(bglucose_diagn, 3, bglucose_diagn_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+bglucose_diagn_u_r <- join_u_r(bglucose_diagn, 3, bglucose_diagn_col_names)
+```
+
+<br>
+
+```{r}
+bglucose_diagn_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Raised blood glucose diagnosis and treatment among all respondents", 8)
+```
+
+<br>
+
+```{r}
+bglucose_diagn_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Raised blood glucose diagnosis and treatment among all respondents", 8)
+```
+
+<br>
+
+```{r}
+bglucose_diagn_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Raised blood glucose diagnosis and treatment among all respondents", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bglucose_diagn_u_r$m_u, bglucose_diagn_u_r$m_r) %>% 
+  final_u_r_tbl(1, "Men", "Raised blood glucose diagnosis and treatment among all respondents by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bglucose_diagn_u_r$w_u, bglucose_diagn_u_r$w_r) %>% 
+  final_u_r_tbl(1, "Women", "Raised blood glucose diagnosis and treatment among all respondents by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+rbind(bglucose_diagn_u_r$b_u, bglucose_diagn_u_r$b_r) %>% 
+  final_u_r_tbl(1, "Both sexes", "Raised blood glucose diagnosis and treatment among all respondents by type of settlement", 8)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
+bglucose_diagn$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = bglucose_diagn_reg_col_names) %>% 
+  final_m_w_b_tbl(1, "Both sexes", "Raised blood glucose diagnosis and treatment among all respondents by region", 8) 
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: H6, H7a, H8, H9, B1, B5, B6
+-   R script name: Bglucose
+
+***
+
+
+**Total cholesterol**
+
+Description: Mean total cholesterol among all respondents including those currently on medication for raised cholesterol.
+
+Instrument questions:
+
+- Total cholesterol measurement
+
+```{r btotallipids_b8_b8mg_tbls}
+# column names to use with huxtable
+btotallipids_b8_b8mg_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+btotallipids_b8_b8mg_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+
+# prep titles
+.title_m_w_b <- "Mean total cholesterol (mmol/L)"
+.title_u_r <- "by type of settlement"
+.title_reg <- "by region"
+
+# men, women, both sexes
+# 1 - Mean total cholesterol (mmol/L)
+btotallipids_b8_m_w_b <- join_m_w_b(btotallipids_b8, 1, btotallipids_b8_b8mg_col_names)
+
+# 2 - Mean total cholesterol (mg/dl)
+btotallipids_b8mg_m_w_b <- join_m_w_b(btotallipids_b8mg, 1, btotallipids_b8_b8mg_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Mean total cholesterol (mmol/L)
+btotallipids_b8_u_r <- join_u_r(btotallipids_b8, 1, btotallipids_b8_b8mg_col_names)
+# 2 - Mean total cholesterol (mg/dl)
+btotallipids_b8mg_u_r <- join_u_r(btotallipids_b8mg, 1, btotallipids_b8_b8mg_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(btotallipids_b8_m_w_b$m, select(btotallipids_b8_m_w_b$w, -agerange), select(btotallipids_b8_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = paste(.title_m_w_b), .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(btotallipids_b8mg_m_w_b$m, select(btotallipids_b8mg_m_w_b$w, -agerange), select(btotallipids_b8mg_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean total cholesterol (mg/dl)", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(btotallipids_b8_u_r$m_u, btotallipids_b8_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_b8_u_r$w_u, btotallipids_b8_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_b8_u_r$b_u, btotallipids_b8_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = paste(.title_m_w_b, .title_u_r), .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(btotallipids_b8mg_u_r$m_u, btotallipids_b8mg_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_b8mg_u_r$w_u, btotallipids_b8mg_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_b8mg_u_r$b_u, btotallipids_b8mg_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean total cholesterol (mg/dl) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+btotallipids_b8$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_b8_b8mg_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean total cholesterol (mmol/L) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+btotallipids_b8mg$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_b8_b8mg_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean total cholesterol (mg/dl) by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: B8
+-   R script name: Btotallipids
+
+***
+
+
+**Raised total cholesterol**
+
+Description: Percentage of respondents with raised total cholesterol.
+
+Instrument questions:
+
+- Total cholesterol measurement
+
+```{r btotallipids_e_f_tbls}
+# column names to use with huxtable
+btotallipids_e_f_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+btotallipids_e_f_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 - Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl
+btotallipids_e_m_w_b <- join_m_w_b(btotallipids_e, 1, btotallipids_e_f_col_names)
+
+# 2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl
+btotallipids_f_m_w_b <- join_m_w_b(btotallipids_f, 1, btotallipids_e_f_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl
+btotallipids_e_u_r <- join_u_r(btotallipids_e, 1, btotallipids_e_f_col_names)
+# 2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl
+btotallipids_f_u_r <- join_u_r(btotallipids_f, 1, btotallipids_e_f_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(btotallipids_e_m_w_b$m, select(btotallipids_e_m_w_b$w, -agerange), select(btotallipids_e_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2 NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
+cbind(btotallipids_f_m_w_b$m, select(btotallipids_f_m_w_b$w, -agerange), select(btotallipids_f_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(btotallipids_e_u_r$m_u, btotallipids_e_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_e_u_r$w_u, btotallipids_e_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_e_u_r$b_u, btotallipids_e_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = paste("Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl by type of settlement"), .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(btotallipids_f_u_r$m_u, btotallipids_f_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_f_u_r$w_u, btotallipids_f_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_f_u_r$b_u, btotallipids_f_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+btotallipids_e$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_e_f_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2 NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
+btotallipids_f$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_e_f_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: B8
+-   R script name: Btotallipids
+
+***
+
+**Raised total cholesterol**
+
+Description: Percentage of respondents with raised total cholesterol and percentage of respondents currently on medication for raised cholesterol.
+
+Instrument questions:
+
+- Total cholesterol measurement
+- During the past two weeks, have you been treated for raised cholesterol with drugs (medication) prescribed by a doctor or other health worker?
+
+```{r btotallipids_c_d_tbls}
+# column names to use with huxtable
+btotallipids_c_d_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+btotallipids_c_d_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes
+# 1 - Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl or currently on medication for raised cholesterol
+btotallipids_c_m_w_b <- join_m_w_b(btotallipids_c, 1, btotallipids_c_d_col_names)
+
+# 2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol
+btotallipids_d_m_w_b <- join_m_w_b(btotallipids_d, 1, btotallipids_c_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl or currently on medication for raised cholesterol
+btotallipids_c_u_r <- join_u_r(btotallipids_c, 1, btotallipids_c_d_col_names)
+# 2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol
+btotallipids_d_u_r <- join_u_r(btotallipids_d, 1, btotallipids_c_d_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(btotallipids_c_m_w_b$m, select(btotallipids_c_m_w_b$w, -agerange), select(btotallipids_c_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl or currently on medication for raised cholesterol", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2 NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
+cbind(btotallipids_d_m_w_b$m, select(btotallipids_d_m_w_b$w, -agerange), select(btotallipids_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(btotallipids_c_u_r$m_u, btotallipids_c_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_c_u_r$w_u, btotallipids_c_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_c_u_r$b_u, btotallipids_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = paste("Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl or currently on medication for raised cholesterol by type of settlement"), .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(btotallipids_d_u_r$m_u, btotallipids_d_u_r$m_r)
+tbl_w_u_r <- rbind(btotallipids_d_u_r$w_u, btotallipids_d_u_r$w_r)
+tbl_b_u_r <- rbind(btotallipids_d_u_r$b_u, btotallipids_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+btotallipids_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_c_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Total cholesterol ≥ 5.0 mmol/L or ≥ 190 mg/dl or currently on medication for raised cholesterol by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2 NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
+btotallipids_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = btotallipids_c_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol by region", 4)
+```
+
+<br>
+
+**Analysis information**:
+
+-   Questions used: B8, B9
+-   R script name: Btotallipids
+
+***
+
+
+**High density lipoprotein (HDL)**
+
+Description: Mean HDL among all respondents and percentage of respondents with low HDL.
+
+Instrument questions:
+
+- HDL cholesterol measurement
+
+```{r bhdlipids_b17_b17mg_tbls}
+# column names to use with huxtable
+bhdlipids_b17_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
+bhdlipids_b17_reg_col_names <- c("Region", "n", "Mean", "95% CI")
+bhdlipids_c_d_col_names <- c("Age Group (years)", "n", "%", "95% CI")
+bhdlipids_c_d_reg_col_names <- c("Region", "n", "%", "95% CI")
+
+# men, women, both sexes 
+# 1 - Mean HDL (mmol/L)
+bhdlipids_b17_m_w_b <- join_m_w_b(bhdlipids_b17, 1, bhdlipids_b17_col_names)
+# 2 - Mean HDL (mg/dl)
+bhdlipids_b17mg_m_w_b <- join_m_w_b(bhdlipids_b17mg, 1, bhdlipids_b17_col_names)
+
+# men, women, both sexes
+# 3 - Percentage of respondents with HDL <1.03mmol/L or <40 mg/dl (USE MEN ONLY)
+bhdlipids_c_m_w_b <- join_m_w_b(bhdlipids_c, 1, bhdlipids_c_d_col_names)
+# 4 - Percentage of respondents with HDL <1.29mmol/L or <50 mg/dl (USE WOMEN ONLY)
+bhdlipids_d_m_w_b <- join_m_w_b(bhdlipids_d, 1, bhdlipids_c_d_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+# 1 - Mean HDL (mmol/L)
+bhdlipids_b17_u_r <- join_u_r(bhdlipids_b17, 1, bhdlipids_b17_col_names)
+# 2 - Mean HDL (mg/dl)
+bhdlipids_b17mg_u_r <- join_u_r(bhdlipids_b17mg, 1, bhdlipids_b17_col_names)
+
+# 3 - Percentage of respondents with HDL <1.03mmol/L or <40 mg/dl (USE MEN ONLY)
+bhdlipids_c_u_r <- join_u_r(bhdlipids_c, 1, bhdlipids_c_d_col_names)
+# 4 - Percentage of respondents with HDL <1.29mmol/L or <50 mg/dl (USE WOMEN ONLY)
+bhdlipids_d_u_r <- join_u_r(bhdlipids_d, 1, bhdlipids_c_d_col_names)
+```
+
+<br>
+
+```{r}
+# 1
+cbind(bhdlipids_b17_m_w_b$m, select(bhdlipids_b17_m_w_b$w, -agerange), select(bhdlipids_b17_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean HDL (mmol/L)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 2
+cbind(bhdlipids_b17mg_m_w_b$m, select(bhdlipids_b17mg_m_w_b$w, -agerange), select(bhdlipids_b17mg_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Mean HDL (mg/dl)", .colspan_val = 10)
+```
+
+<br>
+
+```{r}
+# 3
+# ONLY MEN INCLUDED
+bhdlipids_c$m %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bhdlipids_c_d_col_names) %>% final_m_w_b_tbl(1, "Men", "Percentage of respondents with HDL <1.03mmol/L or <40 mg/dl", 4)
+```
+
+<br>
+
+```{r}
+# 4
+# ONLY WOMEN INCLUDED
+bhdlipids_d$w %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bhdlipids_c_d_col_names) %>% final_m_w_b_tbl(1, "Women", "Percentage of respondents with HDL <1.29mmol/L or <50 mg/dl", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+tbl_m_u_r <- rbind(bhdlipids_b17_u_r$m_u, bhdlipids_b17_u_r$m_r)
+tbl_w_u_r <- rbind(bhdlipids_b17_u_r$w_u, bhdlipids_b17_u_r$w_r)
+tbl_b_u_r <- rbind(bhdlipids_b17_u_r$b_u, bhdlipids_b17_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean HDL (mmol/L) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+tbl_m_u_r <- rbind(bhdlipids_b17mg_u_r$m_u, bhdlipids_b17mg_u_r$m_r)
+tbl_w_u_r <- rbind(bhdlipids_b17mg_u_r$w_u, bhdlipids_b17mg_u_r$w_r)
+tbl_b_u_r <- rbind(bhdlipids_b17mg_u_r$b_u, bhdlipids_b17mg_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Mean HDL (mg/dl) by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 3
+# ONLY MEN INCLUDED
+tbl_m_u_r <- rbind(bhdlipids_c_u_r$m_u, bhdlipids_c_u_r$m_r)
+tbl_w_u_r <- rbind(bhdlipids_c_u_r$w_u, bhdlipids_c_u_r$w_r)
+tbl_b_u_r <- rbind(bhdlipids_c_u_r$b_u, bhdlipids_c_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents with HDL <1.03mmol/L or <40 mg/dl by type of settlement", .colspan_val = 4) %>% select(c(1:4))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 4
+# ONLY WOMEN INCLUDED
+tbl_m_u_r <- rbind(bhdlipids_d_u_r$m_u, bhdlipids_d_u_r$m_r)
+tbl_w_u_r <- rbind(bhdlipids_d_u_r$w_u, bhdlipids_d_u_r$w_r)
+tbl_b_u_r <- rbind(bhdlipids_d_u_r$b_u, bhdlipids_d_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Percentage of respondents with HDL <1.29mmol/L or <50 mg/dl by type of settlement", .colspan_val = 7) %>% select(c(1,5:7))
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 1
+bhdlipids_b17$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bhdlipids_b17_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean HDL (mmol/L) by region", 4)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# 2
+bhdlipids_b17mg$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = bhdlipids_b17_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Mean HDL (mg/dl) by region", 4)
+```
+
+<br>
+
+
+**Analysis information**:
+
+-   Questions used: B17
+-   R script name: Bhdlipids
+
+***
+
+
+<br> 
+
+<br>
