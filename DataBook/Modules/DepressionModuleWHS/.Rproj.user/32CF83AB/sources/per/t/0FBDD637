@@ -1,0 +1,25 @@
+{
+    "id": "0FBDD637",
+    "path": "~/World Health Organization/World Health Organization/STEPs/Country data/BLR2020/DataBook/R/DepressionModuleWHS/WHS_V2.R",
+    "project_path": "WHS_V2.R",
+    "type": "r_source",
+    "hash": "2689207253",
+    "contents": "",
+    "dirty": false,
+    "created": 1610042368445.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "cursorPosition": "725,41",
+        "scrollLine": "706",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1611525722,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1611525722340,
+    "read_only": false,
+    "read_only_alternatives": []
+}

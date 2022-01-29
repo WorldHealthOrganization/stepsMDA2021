@@ -1,0 +1,730 @@
+
+library(survey)
+library(RODBC)
+library(Hmisc) # needed to load mdb data in MacOS
+
+data1 <- mdb.get('STEPS.mdb', tables = 'data1') # Read in mdb data for MacOS by each table
+data2 <- mdb.get('STEPS.mdb', tables = 'data2') # Read in mdb data for MacOS by each table
+
+# Below is the part for loading data in Windows:
+#channel <- odbcConnectAccess("STEPS.mdb")
+#data1<-sqlFetch(channel,"data1")
+#data2<-sqlFetch(channel,"data2")
+#odbcClose(channel)
+
+# which variable names are identical in both datasets?
+intersect(names(data1), names(data2))
+
+# merge / join data from tables data1 and data2 by QR
+data<-merge(data1, data2, by="QR")
+
+# Names of the variables in the dataset
+names(data)
+
+# Clean column names to lower case
+library(dplyr)
+data <- data %>% rename_all(tolower)
+names(data)
+
+# Dimensions of the dataset
+dim(data)
+
+# variables used in the WHS method
+# DA1 DA5 DA6 DA7 DA8 DA9 DA10 DA11 DA12 DA13 DA14 DA15 DA16 DA17 DA18 DA19 DA20 DA21 DA22 DA23 
+# DA13 and DA17 don't exist in BLR yet still exist in the STATA script
+# check if da13 and da17 exist in data
+"da13" %in% colnames(df)  
+"da17" %in% colnames(df) 
+
+df <- data %>% select(c(
+  "qr", "agerange", "agerange2", "age", "sex", "c1", "valid", "ur", "region",
+  "da1","da5","da6","da7","da8","da9","da10","da11","da12","da14","da15","da16","da18","da19","da20","da21","da22","da23",
+  "psu", "stratum", "wstep1"
+))
+
+# changing the dash to an en dash in age ranges: "-" to "–"
+# this is needed for the final output tables 
+unique(df$agerange)
+unique(df$agerange2)
+
+library(stringr)
+df <- df %>% 
+  mutate(across("agerange", str_replace, "-", "–")) %>% 
+  mutate(across("agerange2", str_replace, "-", "–"))
+
+
+#unique(df$c1) # also gender variable
+unique(df$sex)
+unique(df$valid)
+
+# Changing 88 to NA in da1-da23
+df <- df %>%
+  mutate(across(
+    da1:da23,
+    ~na_if(., 88)
+  ))
+
+# checking NA values in wstep1 comparing with qr
+df$qr[is.na(df$wstep1)]
+
+table1 <- df %>% 
+  filter(qr=="15327679" | qr=="20138868" | qr=="44214786" | qr=="94118881")
+
+table1
+
+# Including only those respondents that are valid==1
+table(df$valid)
+df <- subset(df, valid==1)
+dim(df)
+table(df$valid)
+
+# checking NA values in wstep1 again, comparing with qr
+df$qr[is.na(df$wstep1)]
+
+# We include DA13 and DA17 for the sake of replication and assign NA values
+df <- df %>% 
+  mutate(da13 = NA) %>% 
+  mutate(da17 = NA)
+
+df$bb1 <- ifelse(df$da6==1 & df$da9==1 & df$da10==1, 1, 0)
+df$bb2 <- ifelse(df$da7==1 | df$da21==1, 1, 0)
+df$bb3 <- ifelse(df$da8==1, 1, 0)
+df$cc1 <- ifelse(df$da19==1 | df$da20==1, 1, 0)
+df$cc2 <- ifelse(df$da17==1 | df$da18==1, 1, 0)
+df$cc3 <- ifelse(df$da22==1 | df$da23==1, 1, 0)
+df$cc4 <- ifelse(df$da12==1 | df$da15==1, 1, 0)
+df$cc5 <- ifelse(df$da16==1, 1, 0)
+df$cc6 <- ifelse(df$da13==1 | df$da14==1, 1, 0)
+df$cc7 <- ifelse(df$da11==1, 1, 0)
+
+df$bb <- rowSums(df[,c("bb1","bb2","bb3")], na.rm = TRUE)
+df$bbc <- rowSums(df[,c("bb1","bb2","bb3","cc1","cc2","cc3","cc4","cc5","cc6","cc7")], na.rm = TRUE)
+
+
+df <- df %>% 
+  mutate(depression = 0)
+
+# From STATA:
+# replace depression=. if  (da6==. | da7==. | da8==.)
+# replace depression=1 if bb>=2 & bbc>=4
+# replace depression=1 if da1==1 & da5==1
+# replicating below:
+df <- df %>% 
+  mutate(depression = ifelse(is.na(da6) | is.na(da7) | is.na(da8), NA,
+                             ifelse(bb>=2 & bbc>=4, 1,
+                                    ifelse(da1==1 & da5==1, 1, depression)))) %>% 
+  filter(!is.na(depression))
+
+#summary(df$depression)
+
+# checking resulting columns
+table <- df %>% select(c("qr","da6","da7","da8","bb","bbc","da1","da5","depression"))
+
+# NA values
+# remove NAs from wstep1
+any(is.na(df$wstep1))
+df <- df[!(is.na(df$wstep1)),]
+#df <- subset(df, !is.na(wstep1))
+any(is.na(df$wstep1))
+
+any(is.na(df$psu))
+any(is.na(df$stratum))
+
+################################################################################
+
+# CHECKING STATA CSV EXPORT WITH R 
+
+# read in CSV
+library(readr)
+statacsv <- read_csv("blrdatamerged_export_stata.csv")
+statacsv_subset <- statacsv %>% select(c("qr","da6","da7","da8","bb","bbc","da1","da5","depression"))
+
+# joining with R df
+
+class(table$qr)
+class(statacsv_subset$qr)
+
+table$qr <- as.character(table$qr) # changing class for allowing to combine
+statacsv_subset$qr <- as.character(statacsv_subset$qr) # changing class for allowing to combine
+
+r_and_stata <- table %>% 
+  left_join(statacsv_subset, by = "qr") 
+
+r_and_stata
+
+comparison <- r_and_stata %>% 
+  mutate(bb_final = if_else(bb.x == bb.y, 1, 0)) %>% 
+  mutate(bbc_final = if_else(bbc.x == bbc.y, 1, 0)) %>% 
+  mutate(depression_final = if_else(depression.x == depression.y, 1, 0)) 
+  
+table(comparison$bb_final)
+table(comparison$bbc_final)
+table(comparison$depression_final)
+
+# the comparison showed that STATA and R produce identical bb, bbc and depression variables
+
+
+################################################################################
+
+# Specifying design
+library(srvyr)
+STEPSClean <- df %>% 
+  as_survey_design(ids=psu, strata=stratum, weights=wstep1, nest=TRUE)
+
+################################################################################
+
+
+library(tidyr) # for using function "unite"
+
+############
+
+# MEN
+
+# calculating depression 
+
+depr_m <- STEPSClean %>%
+  group_by(agerange, sex) %>%
+  filter(sex == "Men") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange) %>% 
+  ungroup()
+
+depr_m
+
+# urban disaggregation (by agerange2)
+
+depr_m_u <- STEPSClean %>%
+  group_by(agerange2, sex, ur) %>%
+  filter(sex == "Men", ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_m_u
+
+
+# urban disaggregation (total)
+
+depr_m_u_t <- STEPSClean %>%
+  group_by(ur, sex) %>%
+  filter(sex == "Men", ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_m_u_t
+
+
+# rural disaggregation (by agerange2)
+
+depr_m_r <- STEPSClean %>%
+  group_by(agerange2, sex, ur) %>%
+  filter(sex == "Men", ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_m_r
+
+
+# rural disaggregation (total)
+
+depr_m_r_t <- STEPSClean %>%
+  group_by(ur, sex) %>%
+  filter(sex == "Men", ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_m_r_t
+
+
+
+# regional disaggregation
+
+depr_m_reg <- STEPSClean %>%
+  group_by(region, sex) %>%
+  filter(sex == "Men") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = region) %>% 
+  ungroup()
+
+depr_m_reg
+
+
+####################
+
+# WOMEN
+
+# calculating depression 
+depr_w <- STEPSClean %>%
+  group_by(agerange, sex) %>%
+  filter(sex == "Women") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) 
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange) %>%
+  ungroup()
+
+depr_w
+
+
+# urban disaggregation (by agerange2)
+
+depr_w_u <- STEPSClean %>%
+  group_by(agerange2, sex, ur) %>%
+  filter(sex == "Women", ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_w_u
+
+
+# urban disaggregation (total)
+
+depr_w_u_t <- STEPSClean %>%
+  group_by(ur, sex) %>%
+  filter(sex == "Women", ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_w_u_t
+
+
+# rural disaggregation (by agerange2)
+
+depr_w_r <- STEPSClean %>%
+  group_by(agerange2, sex, ur) %>%
+  filter(sex == "Women", ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_w_r
+
+
+# rural disaggregation (total)
+
+depr_w_r_t <- STEPSClean %>%
+  group_by(ur, sex) %>%
+  filter(sex == "Women", ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_w_r_t
+
+# regional disaggregation
+
+depr_w_reg <- STEPSClean %>%
+  group_by(region, sex) %>%
+  filter(sex == "Women") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = region) %>% 
+  ungroup()
+
+depr_w_reg
+
+##########################
+
+
+# TOTAL for MEN and WOMEN
+depr_m_t <- STEPSClean %>%
+  group_by(sex) %>%
+  filter(sex == "Men") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) 
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_m_t
+
+depr_w_t <- STEPSClean %>%
+  group_by(sex) %>%
+  filter(sex == "Women") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) 
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE)%>% 
+  mutate(variable = "18–69", .before = "sex") %>% 
+  ungroup()
+
+depr_w_t
+
+
+#################
+
+
+# adding total rows to their previous tables
+
+# MEN
+
+depr_m_u$variable <- as.character(depr_m_u$variable) # changing class for allowing to combine
+depr_m_u_t$variable <- as.character(depr_m_u_t$variable) # changing class for allowing to combine
+depr_m_r$variable <- as.character(depr_m_r$variable) # changing class for allowing to combine
+depr_m_r_t$variable <- as.character(depr_m_r_t$variable) # changing class for allowing to combine
+depr_m_reg$variable <- as.character(depr_m_reg$variable) # changing class for allowing to combine
+
+depr_m_t_j <- bind_rows(depr_m, depr_m_t, depr_m_u, depr_m_u_t, depr_m_r, depr_m_r_t, depr_m_reg) %>% 
+  mutate(ID = row_number(), .before = "variable")
+depr_m_t_j 
+
+
+# WOMEN
+
+depr_w_u$variable <- as.character(depr_w_u$variable) # changing class for allowing to combine
+depr_w_u_t$variable <- as.character(depr_w_u_t$variable) # changing class for allowing to combine
+depr_w_r$variable <- as.character(depr_w_r$variable) # changing class for allowing to combine
+depr_w_r_t$variable <- as.character(depr_w_r_t$variable) # changing class for allowing to combine
+depr_w_reg$variable <- as.character(depr_w_reg$variable) # changing class for allowing to combine
+
+depr_w_t_j <- bind_rows(depr_w, depr_w_t, depr_w_u, depr_w_u_t, depr_w_r, depr_w_r_t, depr_w_reg) %>% 
+  mutate(ID = row_number(), .before = "variable")
+depr_w_t_j
+
+
+#################
+
+
+# calculating for BOTH SEXES
+
+depr_b <- STEPSClean %>%
+  group_by(agerange) %>%
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) 
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange) %>%
+  ungroup()
+
+depr_b
+
+
+# urban disaggregation (by agerange2)
+
+depr_b_u <- STEPSClean %>%
+  group_by(agerange2, ur) %>%
+  filter(ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_b_u
+
+
+# urban disaggregation (total)
+
+depr_b_u_t <- STEPSClean %>%
+  group_by(ur) %>%
+  filter(ur == "Urban") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "n") %>% 
+  ungroup()
+
+depr_b_u_t
+
+
+# rural disaggregation (by agerange2)
+
+depr_b_r <- STEPSClean %>%
+  group_by(agerange2, ur) %>%
+  filter(ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff, ur)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = agerange2) %>% 
+  ungroup()
+
+depr_b_r
+
+
+# rural disaggregation (total)
+
+depr_b_r_t <- STEPSClean %>%
+  group_by(ur) %>%
+  filter(ur == "Rural") %>% 
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = ur) %>% 
+  mutate(variable = "18–69", .before = "n") %>% 
+  ungroup()
+
+depr_b_r_t
+
+# regional disaggregation
+
+depr_b_reg <- STEPSClean %>%
+  group_by(region) %>%
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) # complete vartype = c("se", "ci", "var", "cv")
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  rename(variable = region) %>% 
+  ungroup()
+
+depr_b_reg
+
+
+# total for both sexes
+
+depr_b_t <- STEPSClean %>%
+  summarise(n = unweighted(n()),
+            mean = survey_mean(depression, vartype = c("se", "ci"), deff = TRUE) 
+  ) %>%
+  mutate(mean = round(100 * mean,1)) %>%
+  mutate(mean_se = round(100 * mean_se,1)) %>%
+  mutate(mean_low = round(100 * mean_low,1)) %>%
+  mutate(mean_upp = round(100 * mean_upp,1)) %>%
+  mutate(mean_deff = round(mean_deff,2)) %>%
+  select(-c(mean_se, mean_deff)) %>%
+  unite("95% CI", mean_low, mean_upp, sep = "–", remove = TRUE) %>% 
+  mutate(variable = "18–69", .before = "n") %>% 
+  ungroup()
+
+depr_b_t
+
+
+# adding the total row to the previous table
+# both sexes
+
+depr_b_u$variable <- as.character(depr_b_u$variable) # changing class for allowing to combine
+depr_b_u_t$variable <- as.character(depr_b_u_t$variable) # changing class for allowing to combine
+depr_b_r$variable <- as.character(depr_b_r$variable) # changing class for allowing to combine
+depr_b_r_t$variable <- as.character(depr_b_r_t$variable) # changing class for allowing to combine
+depr_b_reg$variable <- as.character(depr_b_reg$variable) # changing class for allowing to combine
+
+depr_b_t_j <- bind_rows(depr_b, depr_b_t, depr_b_u, depr_b_u_t, depr_b_r, depr_b_r_t, depr_b_reg) %>% 
+  mutate(ID = row_number(), .before = "variable")
+depr_b_t_j
+
+
+#################
+
+
+# joining all tables into one single table
+# men, women, both sexes
+
+#depr_m_t_j
+#depr_w_t_j
+#depr_b_t_j
+
+depr_m_w_b <- depr_m_t_j %>% 
+  left_join(depr_w_t_j, by = c("ID", "variable")) %>% 
+  left_join(depr_b_t_j, by = c("ID", "variable")) %>% 
+  select(-c(sex.x, sex.y, ID)) 
+depr_m_w_b
+
+depr_m_w_b <- depr_m_w_b[c(1:4,6:18,5),]
+depr_m_w_b
+
+#################
+
+# recreating a Data Book output table
+library(knitr)
+library(kableExtra)
+
+# either create a separate vector for names or add them directly into the kbl function
+names_spaced <- c("Variables", "n","% Depressed","95% CI","n","% Depressed","95% CI","n","% Depressed","95% CI")
+
+table_depr <- kbl(depr_m_w_b,
+                  #caption = "<center>WHS Depression</center>",
+                  align = "lccccccccc",
+                  #another option is to add col names directly:
+                  #col.names = c("Age group<br/> (years)","n","% Depressed","95% CI","n","% Depressed","95% CI","n","% Depressed","95% CI"),
+                  col.names = names_spaced,
+                  booktabs = T,
+                  digits = 1,
+                  escape = F) %>% ## disable HTML escape to make <br/> work
+  #kable_classic(full_width = F) %>%
+  kable_paper(full_width = F) %>%
+  row_spec(c(7, 10, 18), bold = T) %>% 
+  add_header_above(c(" ", "Men" = 3, "Women" = 3, "Both sexes" = 3), bold = T) %>% 
+  add_header_above(c("WHS Depression" = 10), bold = T) %>% 
+  group_rows(group_label = "Age groups (years)", start_row = 1, end_row = 4, indent=F,
+             #escape = F, label_row_css="padding-left: 50px"
+             ) %>% 
+  group_rows(group_label = "Type of settlement (Urban)", start_row = 5, end_row = 7, indent=F) %>% 
+  group_rows(group_label = "Type of settlement (Rural)", start_row = 8, end_row = 10, indent=F) %>% 
+  group_rows(group_label = "Macroregions", start_row = 11, end_row = 17, indent=F) %>% 
+  group_rows(group_label = "Total", start_row = 18, end_row = 18, indent=F) #%>% 
+  # another version of the function to create an HTML table 
+  #pack_rows("Age groups (years)", 1, 4) %>%
+  #pack_rows("Urban", 5, 7) %>% 
+  #pack_rows("Rural", 8, 10) %>%
+  #pack_rows("Type of settlement", 11, 17) %>%
+  #pack_rows("Total", 18, 18)
+  
+table_depr
+
