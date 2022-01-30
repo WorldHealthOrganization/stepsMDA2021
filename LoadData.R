@@ -121,6 +121,21 @@ data <- data %>% rename_all(tolower)
 # names(data)
 # dim(data)
 
+################################################################################
+
+# Core variable names that are used in the analysis
+data_names <- c("sex","valid","wstep1","wstep2","wstep3","psu","stratum",
+                "agerange","agerange2","ur","region")
+# Check which names are not in the data before proceeding
+if(!all(i <- rlang::has_name(data, data_names))) {
+  warning(sprintf(
+    "%s doesn't contain: %s",
+    deparse(substitute(data)),
+    paste(data_names[!i], collapse=", ")))
+}
+
+################################################################################
+
 # Checking & remove NA values from wstep1, etc.
 table(is.na(data$wstep1))
 table(is.na(data$wstep2))
@@ -157,7 +172,6 @@ unique(data$agerange2)
 unique(data$sex)
 
 data <- data %>%
-  #mutate(across("agerange", str_replace, "-", "–")) %>%
   # NOTE: agerange should be changed to a factor because sometimes age ranges are
   # dropped if there are 0 values in data and .drop = FALSE in group_by
   # doesn't work if it's not a factor.
