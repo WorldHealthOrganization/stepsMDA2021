@@ -1,6 +1,3 @@
-# stepsMDA2021
-STEPS data analysis for MDA 2021: R and RMD scripts
-
 # WHO STEPS MDA 2021
 
 R Project for analysis of the STEPS survey data conducted in the Republic of Moldova, in 2021.
