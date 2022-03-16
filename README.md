@@ -43,7 +43,7 @@ The WHO STEPS in MDA includes the following modules:
 
 15. Summary of Combined Risk Factors
 
-16. Health Services: Access to Health Care
+16. Tobacco Policy
 
 17. Oral Health
 
