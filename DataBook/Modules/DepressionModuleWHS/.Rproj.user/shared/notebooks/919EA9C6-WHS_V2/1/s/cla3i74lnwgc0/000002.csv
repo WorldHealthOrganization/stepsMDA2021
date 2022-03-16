@@ -1,8 +1,0 @@
-"0","# NA values
-# remove NAs from wstep1
-any(is.na(df$wstep1))
-"
-"1","[1]"
-"1"," TRUE"
-"1","
-"
