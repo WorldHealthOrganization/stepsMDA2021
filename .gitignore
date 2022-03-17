@@ -13,3 +13,5 @@
 # DOCX files that are produced for Data Book
 *.docx
 *.doc
+# Folders with EpiInfo programs
+EpiInfoPrograms/
