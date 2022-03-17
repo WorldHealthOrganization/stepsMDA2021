@@ -15,9 +15,6 @@ library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
-# Forestplot
-library(ggforestplot) # this requires m_se variable in the dataframe and m as numbers
-library(ggforce)
 ```
 
 ```{r source, include=FALSE}
@@ -80,12 +77,6 @@ tsmokestatus_d_u_r <- join_u_r(tsmokestatus_d, 1, tsmokestatus_d_col_names)
 ```{r}
 cbind(tsmokestatus_d_m_w_b$m, select(tsmokestatus_d_m_w_b$w, -agerange), select(tsmokestatus_d_m_w_b$b, -agerange)) %>% 
   final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of current smokers", .colspan_val = 10)
-```
-
-<br>
-
-```{r}
-# forestplot_steps(.data = tsmokestatus_d_list_long$m_w_b, .var = d, .var_val = "1) daily and non-daily smokers", .title = tsmokestatus_d_title, .xlab = "%")
 ```
 
 <br>
@@ -160,13 +151,6 @@ tsmokestatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Smoking status", 10)
 
 ```{r}
 tsmokestatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Smoking status", 10)
-```
-
-<br>
-
-```{r}
-# forestplot_steps(.data = tsmokestatus_c_list_long$m_w_b, .var = c, 
-#                  .title = tsmokestatus_c_title, .xlab = "%", .many_vals = TRUE)
 ```
 
 <br>
