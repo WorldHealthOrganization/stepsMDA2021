@@ -112,6 +112,8 @@ here("DataBook", "Modules", "TobaccoUse") %>%
 
 # pull "list_long" objects from the global environment 
 names_all <- ls(pattern = "_list_long")
+
+# set names (if needed), typically leave it commented out
 # names_all <- purrr::set_names(names_all)
 
 # create a list of all lists... 
@@ -120,7 +122,7 @@ names_all <- ls(pattern = "_list_long")
 # https://r4ds.had.co.nz/strings.html#anchors
 # excludes _list_long_type lists, otherwise use the 2nd option without $
 list_all_list_long <- mget(ls(pattern = "_list_long$"), envir = .GlobalEnv)
-#list_all_list_long <- mget(ls(pattern = "_list_long"), envir = .GlobalEnv)
+# list_all_list_long <- mget(ls(pattern = "_list_long"), envir = .GlobalEnv)
 
 # remove one extra list from the list
 list_all_list_long <- list_all_list_long %>% purrr::list_modify("list_all_list_long" = NULL)
@@ -128,7 +130,7 @@ list_all_list_long <- list_all_list_long %>% purrr::list_modify("list_all_list_l
 # View(list_all_list_long)
 
 
-# change all b, c, d, e, etc. columns to a common var column
+# change all a, b, c, d, e, etc. columns to a common "var" column name
 # for a deep nested list
 list_all_list_long_var <- lapply(list_all_list_long, function(x) 
   lapply(x, plyr::rename, c("a"="var","b"="var","c"="var","d"="var",
@@ -148,7 +150,7 @@ list_all_list_long_var <- lapply(list_all_list_long, function(x)
   imap(~ modify_depth(.x, 1, mutate, list_name=.y))
 
 # another possible way to add list name as a new column 
-# (if imap breaks in the future), using cbind
+# (in case if imap breaks in the future), using cbind
 # imap(~ modify_depth(.x, 1, cbind, list_name=.y))
 
 # View(list_all_list_long_var)
@@ -159,6 +161,7 @@ tidy_df_all <-
   flatten_dfr(list_all_list_long_var) %>% 
   # remove pattern "_list_long" from tbl titles, mutating a new column "short_name"
   mutate(short_name = str_remove(list_name, "_list_long"))
+
 View(tidy_df_all)
 
 # export to a Rds file for loading later in the second script 02_make_plots.R

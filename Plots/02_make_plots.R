@@ -73,6 +73,9 @@ generatePDF <- TRUE
 # MEN, WOMEN, BOTH SEXES
 for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
   
+  # single indicator for testing the for loop
+  # ind <- "tsmokestatus_d"
+  
   # prepare data for plotting
   plotvalues <- subset(tidy_df_all, short_name==ind) %>% 
     mutate(agerange = fct_reorder(agerange, desc(agerange))) %>% 
@@ -108,7 +111,7 @@ for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
                path = here("Plots", "PDFs"), scale = 1.25)
         ggsave(plot = p, filename = paste0(ind,".svg"), device = "svg", 
                path = here("Plots", "SVGs"), scale = 1.25)
-        # EMF format requires devEMF package
+        # NOTE: EMF format requires devEMF package
         ggsave(plot = p, filename = paste0(ind,".emf"), 
                device = {function(filename, ...) devEMF::emf(file = filename, ...)}, 
                path = here("Plots", "EMFs"), scale = 1.25)
@@ -148,6 +151,7 @@ for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
         theme(text = element_text(family = "ArialMT", size = 9),
               plot.title = element_text(size = 8), 
               # remove ylab for cases of vals_number == 1 
+              # NOTE: check code above for df_mapping
               # axis.text.y = element_blank()
               ) +
         # group plots by sex (with a function from ggforce)
@@ -162,7 +166,7 @@ for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
                path = here("Plots", "PDFs", "Urban_Rural"), scale = 1.25)
         ggsave(plot = p, filename = paste0(ind,"_u_r",".svg"), device = "svg", 
                path = here("Plots", "SVGs", "Urban_Rural"), scale = 1.25)
-        # EMF format requires devEMF package
+        # NOTE: EMF format requires devEMF package
         ggsave(plot = p, filename = paste0(ind,"_u_r",".emf"), 
                device = {function(filename, ...) devEMF::emf(file = filename, ...)}, 
                path = here("Plots", "EMFs", "Urban_Rural"), scale = 1.25)
@@ -202,6 +206,7 @@ for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
         theme(text = element_text(family = "ArialMT", size = 9),
               plot.title = element_text(size = 8),
               # remove ylab for cases of vals_number == 1 
+              # NOTE: check code above for df_mapping
               # axis.text.y = element_blank()
               ) +
         # group plots by sex (with a function from ggforce)
@@ -216,7 +221,7 @@ for (ind in intersect(inds$tbls_short_name, unique(data_inc$short_name))) {
                path = here("Plots", "PDFs", "Region"), scale = 1.25)
         ggsave(plot = p, filename = paste0(ind,"_reg",".svg"), device = "svg", 
                path = here("Plots", "SVGs", "Region"), scale = 1.25)
-        # EMF format requires devEMF package
+        # NOTE: EMF format requires devEMF package
         ggsave(plot = p, filename = paste0(ind,"_reg",".emf"), 
                device = {function(filename, ...) devEMF::emf(file = filename, ...)}, 
                path = here("Plots", "EMFs", "Region"), scale = 1.25)
