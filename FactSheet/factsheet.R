@@ -32,7 +32,7 @@ fs_df
 
 # create a Word table (two versions are possible with different packages)
 library(flextable)
-fs_df_flex <- qflextable(fs_df) # %>% width(width = 1.5)
+fs_df_flex <- qflextable(fs_df) %>% width(width = 1.5)
 save_as_docx("factsheet" = fs_df_flex, path = "FactSheet/fs_flextable_version.docx")
 
 library(huxtable)
