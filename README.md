@@ -17,33 +17,33 @@ The WHO STEPS in MDA includes the following modules:
 
 2.  Tobacco Use
 
-3.  Alcohol Consumption
+3.  Tobacco Policy
 
-4.  Diet
+4.  Alcohol Consumption
 
-5.  Physical Activity
+5.  Diet
 
-6.  History of Raised Blood Pressure
+6.  Physical Activity
 
-7.  History of Diabetes
+7.  History of Raised Blood Pressure
 
-8.  History of Raised Total Cholesterol
+8.  History of Diabetes
 
-9.  History of Cardiovascular Diseases
+9.  History of Raised Total Cholesterol
 
-10. Lifestyle Advice
+10.  History of Cardiovascular Diseases
 
-11. Cervical Cancer Screening
+11. Lifestyle Advice
 
-12. Physical Measurements
+12. Cervical Cancer Screening
 
-13. Biochemical Measurements
+13. Physical Measurements
 
-14. Cardiovascular disease risk
+14. Biochemical Measurements
 
-15. Summary of Combined Risk Factors
+15. Cardiovascular disease risk
 
-16. Tobacco Policy
+16. Summary of Combined Risk Factors
 
 17. Oral Health
 
