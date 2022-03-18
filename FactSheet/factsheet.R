@@ -5,17 +5,19 @@
 
 # load CSV data files for joining into one df for the FactSheet
 
-library(tidyverse)
-library(fs)
+# load packages
 library(here)
+library(tidyverse)
+library(fs) # for using dir_ls function
 
-data_dir <- here::here("FactSheet")
+# set the directory
+data_dir <- here("FactSheet")
 
 # list all files in the directory
-fs::dir_ls(data_dir)
+dir_ls(data_dir)
 
 # only CSV files
-csv_files <- fs::dir_ls(data_dir, regexp = "\\.csv$")
+csv_files <- dir_ls(data_dir, regexp = "\\.csv$")
 csv_files
 
 # read in just one file
@@ -28,20 +30,15 @@ fs_df <- csv_files %>%
 fs_df
 
 
-# create a Word table
-# library(officer)
-# doc_table <- read_docx(path = "FactSheet/ref_doc_02.docx") %>% 
-#   body_add_table(head(fs_df, n = 38),style = "TestStyle", first_column = TRUE) 
-# print(doc_table, target = "FactSheet/example_table.docx")
-
+# create a Word table (two versions are possible with different packages)
 library(flextable)
-fs_df <- qflextable(fs_df) #%>% width(width = 1.5)
-save_as_docx("factsheet" = fs_df, path = "FactSheet/flextable1.docx")
+fs_df_flex <- qflextable(fs_df) # %>% width(width = 1.5)
+save_as_docx("factsheet" = fs_df_flex, path = "FactSheet/fs_flextable_version.docx")
 
 library(huxtable)
-fs_df <- hux(fs_df)
-width(fs_df) <- 1
-quick_docx(fs_df, file = ("FactSheet/fs_output.docx"))
+fs_df_hux <- hux(fs_df)
+width(fs_df_hux) <- 1
+quick_docx(fs_df_hux, file = ("FactSheet/fs_huxtable_version.docx"))
 
 
 
