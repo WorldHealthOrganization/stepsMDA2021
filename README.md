@@ -62,9 +62,15 @@ There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_sav
 
 -   Scripts were written on the basis of Epi Info programmes/scripts and named respectively
 
--   `STEPS.mdb` data file for MDA is needed for the project
+-   `STEPS.mdb` data file for MDA is needed for the project and should be placed in the root folder
 
--   Some scripts in modules are tailored to the country-specific settings.
+-   `LoadData.R` script (located in the root folder) is used for adjusting the inclusion of disaggregations (by urban/rural and region)
+
+-   Code in the project contains comments and functions have descriptions of arguments
+
+-   Some scripts in modules are tailored to the country-specific settings
+
+-   It is advised to use RStudio software and `stepsMDA2021.Rproj` to load the project.
 
 ## Getting help
 
