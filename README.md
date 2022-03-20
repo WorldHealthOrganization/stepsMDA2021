@@ -2,13 +2,9 @@
 
 ## Overview
 
-------------------------------------------------------------------------
-
 R Project for analysis of the STEPS survey data conducted in the Republic of Moldova, in 2021. The project allows to create a data book, fact sheet in Word and generate forest plots in vector formats.
 
 ## Contents
-
-------------------------------------------------------------------------
 
 The WHO STEPS in MDA includes the following modules:
 
@@ -50,8 +46,6 @@ The WHO STEPS in MDA includes the following modules:
 
 ## Usage
 
-------------------------------------------------------------------------
-
 ### Data book
 
 Individual Rmd files are used to create Word documents for each module (located in DataBook folder).
@@ -73,7 +67,5 @@ NOTE:
 -   Some scripts in modules are tailored to the country-specific settings.
 
 ## Getting help
-
-------------------------------------------------------------------------
 
 If you encounter a clear bug, please file an issue with a minimal reproducible example on [GitHub](https://github.com/WorldHealthOrganization/stepsMDA2021/issues).
