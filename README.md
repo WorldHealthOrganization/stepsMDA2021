@@ -52,17 +52,17 @@ Individual Rmd files are used to create Word documents for each module (located 
 
 ### Fact sheet
 
-The \`factsheet.R\` script is used for creating a Word document out of CSV files that are written to FactSheet folder when Rmd files are run.
+The `factsheet.R` script is used for creating a Word document out of CSV files that are written to FactSheet folder when Rmd files are run.
 
 ### Forest plots
 
-There are two parts for creating plots in PDF, SVG and EMF formats, namely 01_load_save_scripts. R and 02_make_plots.R (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, adjusting which indicators are inlcuded, and plotting. The XLSX spreadsheet is used for adjusting which indicator is included for plotting (located in Plots folder).
+There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet is used for adjusting which indicators are included for plotting (located in Plots folder).
 
-NOTE:
+#### Note:
 
--   Scripts were written on the basis of Epi Info programs/scripts and named respectively
+-   Scripts were written on the basis of Epi Info programmes/scripts and named respectively
 
--   MDB data file for MDA is needed for the project, namely STEPS.mdb
+-   `STEPS.mdb` data file for MDA is needed for the project
 
 -   Some scripts in modules are tailored to the country-specific settings.
 
