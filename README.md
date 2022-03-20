@@ -1,13 +1,12 @@
 # WHO STEPS MDA 2021
 
-R Project for analysis of the STEPS survey data conducted in the Republic of Moldova, in 2021.
-The project allows to create a data book, fact sheet in Word and generate forest plots in vector formats.
+## Overview
 
 ------------------------------------------------------------------------
 
-Authors: Sergei Bychkov, Ivo Rakovac
+R Project for analysis of the STEPS survey data conducted in the Republic of Moldova, in 2021. The project allows to create a data book, fact sheet in Word and generate forest plots in vector formats.
 
-Copyright: WHO NCD Office
+## Contents
 
 ------------------------------------------------------------------------
 
@@ -31,7 +30,7 @@ The WHO STEPS in MDA includes the following modules:
 
 9.  History of Raised Total Cholesterol
 
-10.  History of Cardiovascular Diseases
+10. History of Cardiovascular Diseases
 
 11. Lifestyle Advice
 
@@ -49,7 +48,21 @@ The WHO STEPS in MDA includes the following modules:
 
 18. Depression
 
+## Usage
+
 ------------------------------------------------------------------------
+
+### Data book
+
+Individual Rmd files are used to create Word documents for each module (located in DataBook folder).
+
+### Fact sheet
+
+The \`factsheet.R\` script is used for creating a Word document out of CSV files that are written to FactSheet folder when Rmd files are run.
+
+### Forest plots
+
+There are two parts for creating plots in PDF, SVG and EMF formats, namely 01_load_save_scripts. R and 02_make_plots.R (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, adjusting which indicators are inlcuded, and plotting. The XLSX spreadsheet is used for adjusting which indicator is included for plotting (located in Plots folder).
 
 NOTE:
 
@@ -58,3 +71,9 @@ NOTE:
 -   MDB data file for MDA is needed for the project, namely STEPS.mdb
 
 -   Some scripts in modules are tailored to the country-specific settings.
+
+## Getting help
+
+------------------------------------------------------------------------
+
+If you encounter a clear bug, please file an issue with a minimal reproducible example on [GitHub](https://github.com/WorldHealthOrganization/stepsMDA2021/issues).
