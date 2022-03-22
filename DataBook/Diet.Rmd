@@ -20,23 +20,12 @@ library(fs)
 ```{r source, include=FALSE}
 diet_data_dir <- here::here("DataBook", "Modules", "Diet")
 
-# list all files in the directory
-# fs::dir_ls(diet_data_dir)
+# read in each R file, because in MDA not all scripts are used
+source(here::here(diet_data_dir, "DX1.R"))
+source(here::here(diet_data_dir, "Ddays.R"))
+source(here::here(diet_data_dir, "Dservings.R"))
+source(here::here(diet_data_dir, "Dfiveormore.R"))
 
-# only R files
-r_files <- fs::dir_ls(diet_data_dir, regexp = "\\.R$") 
-r_files
-
-# read in just each R file, because in MDA not scripts are used
-source(r_files[1]) # DX1
-source(r_files[4]) # Ddays
-source(r_files[13]) # Dservings
-source(r_files[6]) # Dfiveormore
-
-
-# scale up to all R files with a map function from purrr
-# r_files %>% 
-#   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
 ```{r databook_functions, echo=FALSE}
