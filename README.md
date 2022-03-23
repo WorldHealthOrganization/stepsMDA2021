@@ -70,7 +70,9 @@ There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_sav
 
 -   Some scripts in modules are tailored to the country-specific settings
 
--   It is advised to use RStudio software and `stepsMDA2021.Rproj` to load the project.
+-   It is advised to use RStudio software and `stepsMDA2021.Rproj` to load the project
+
+-   Project has been tested on MacOS 12.3 and Windows 10/11, using R version 4.1.3.
 
 ## Getting help
 
