@@ -48,9 +48,16 @@ here("DataBook", "Modules", "DepressionModuleWHS") %>%
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 
 # diet_data_dir 
-here("DataBook", "Modules", "Diet") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
+# NOT FULLY USED IN MDA (SEE CODE BELOW FOR DIET SCRIPTS)
+# here("DataBook", "Modules", "Diet") %>% 
+#   dir_ls(regexp = "\\.R$") %>% 
+#   map(source, encoding = "UTF-8", local = knitr::knit_global())
+
+# read in just each R file, because in MDA not scripts are used
+source(here("DataBook", "Modules", "Diet", "DX1.R"))
+source(here("DataBook", "Modules", "Diet", "Ddays.R"))
+source(here("DataBook", "Modules", "Diet", "Dservings.R"))
+source(here("DataBook", "Modules", "Diet", "Dfiveormore.R"))
 
 # prems_data_dir 
 # NOT USED IN MDA
