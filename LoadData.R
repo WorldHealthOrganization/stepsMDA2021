@@ -135,6 +135,13 @@ data <- data %>%
     # add the var t5f & t5fw for tsmoketype work properly
     t5f=NA, t5fw=NA)
 
+# MDA fixing MDB dataset (for Windows users)
+# NOTE: htp4 variable was not not set to numeric by default
+
+# class(data$htp4)
+data <- data %>% 
+  mutate(htp4 = as.numeric(htp4))
+
 ################################################################################
 
 
