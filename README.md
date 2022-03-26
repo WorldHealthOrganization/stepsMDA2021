@@ -8,17 +8,17 @@ R Project for analysis of the STEPS survey data conducted in the Republic of Mol
 
 -   `STEPS.mdb` data file for MDA is needed for the project and should be placed in the root folder
 
--   `LoadData.R` script (located in the root folder) is used for adjusting the inclusion of disaggregations (by urban/rural and region)
+-   `LoadData.R` script (located in the root folder) is used for manually adjusting the inclusion of disaggregations (by urban/rural and region)
 
 -   Code in the project contains comments and functions have descriptions of arguments
 
 -   Some scripts in modules are tailored to the country-specific settings
 
--   It is advised to use RStudio software and `stepsMDA2021.Rproj` to load the project
+-   It is suggested to use RStudio software and `stepsMDA2021.Rproj` file to load the project
 
 -   Setup RStudio:
 
-    -   Use a 32-bit R version on Windows (Tools ➔ Global Options ➔ General ➔ R version)
+    -   Use a 32-bit R version in Windows (Tools ➔ Global Options ➔ General ➔ R version)
 
     -   Use the project's directory for RMarkdown (Tools ➔ Global Options ➔ R Markdown ➔ Evaluate chunks in directory ➔ Project)
 
@@ -76,7 +76,7 @@ The `factsheet.R` script is used for creating a Word document out of CSV files t
 
 ### Forest plots
 
-There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet is used for adjusting which indicators are included for plotting (located in Plots folder).
+There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet is used for manually adjusting which indicators are included for plotting (located in Plots folder).
 
 ## Getting help
 
