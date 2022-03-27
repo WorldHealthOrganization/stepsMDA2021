@@ -46,24 +46,6 @@ tsmokeagetime_initiation_list_long <-
 tsmokeagetime_initiation <- 
   tbls_list_split(.data = tsmokeagetime_initiation_list_long, .vars_amount_number = 0)
 
-# Forestplot
-# library(ggforestplot) # this requires m_se variable in the dataframe and m as numbers
-# library(ggforce)
-# # MEN, WOMEN, BOTH SEXES
-# forestplot(
-#   df = tsmokeagetime_initiation_list_long$m_w_b,
-#   name = sex,
-#   estimate = m,
-#   se = m_se,
-#   colour = agerange,
-#   #shape = agerange,
-#   title = "Age started smoking, among current daily smokers",
-#   xlab = "Mean age") 
-
-# testplot.mean <- forestplot_steps(
-#   .data = tsmokeagetime_initiation_list_long$m_w_b, .title = "test mean", 
-#   .xlab = "mean age")
-
 ################################################################################
 
 # Duration of smoking, among current daily smokers

@@ -35,19 +35,6 @@ options(survey.lonely.psu="adjust") # conservative method
 # Load functions
 source("functions.R", encoding="UTF-8")
 
-# FUNCTION SPECIFICLY FOR THIS SCRIPT
-# unrec_mn <- function(.data, var) {
-#   summarize(.data, n = unweighted(n()), # calculating n for individual answer choices
-#             m = survey_mean({{ var }}, vartype = c("ci"))*100) %>%
-#     mutate(m_low = ifelse(m_low <0, 0.0, m_low)) %>% # rounding possible negative numbers to zero
-#     mutate(m_upp = ifelse(m_upp>100.0, 100.0, m_upp)) %>% # rounding possible over 100.1 numbers to 100.0
-#     # Keeping zeros after decimal point 
-#     mutate(m = sprintf("%.1f", m)) %>% 
-#     mutate(m_low = sprintf("%.1f", m_low)) %>% 
-#     mutate(m_upp = sprintf("%.1f", m_upp)) %>% 
-#     ungroup()
-# }
-
 ################################################################################
 
 # Percentage of unrecorded alcohol from all alcohol consumed during past 7 days
