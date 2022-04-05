@@ -12,13 +12,13 @@ library(tidyverse)
 ################################################################################
 
 # load the Rds, containing all previously saved lists
-tidy_df_all <- readRDS(here("DataBook", "Modules", "tidy_df_all_stratum_region.rds"))
+tidy_df_all <- readRDS(here("Plots", "tidy_df_all.rds"))
 
 ################################################################################
 
 # load the mapping spreadsheet
 data_book_mapping <- 
-  readxl::read_excel(here("DataBook", "Plots", "MDA_DataBook_mapping.xlsx"))
+  readxl::read_excel(here("Plots", "MDA_DataBook_mapping.xlsx"))
 
 # View(data_book_mapping)
 
