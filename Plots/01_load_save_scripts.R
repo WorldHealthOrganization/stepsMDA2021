@@ -105,7 +105,7 @@ here("DataBook", "Modules", "PhysicalMeasurements") %>%
   dir_ls(regexp = "\\.R$") %>% 
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 
-# combined_risk_factros_data_dir 
+# combined_risk_factors_data_dir 
 here("DataBook", "Modules", "SummaryofCombinedRiskFactors") %>% 
   dir_ls(regexp = "\\.R$") %>% 
   map(source, encoding = "UTF-8", local = knitr::knit_global())
