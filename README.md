@@ -76,7 +76,7 @@ The `factsheet.R` script is used for creating a Word document out of CSV files t
 
 ### Forest plots
 
-There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet is used for manually adjusting which indicators are included for plotting (located in Plots folder).
+There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet (located in Plots folder) is used for manually adjusting which indicators are included for plotting, using `include_in_analysis` variable.
 
 ## Getting help
 

@@ -69,7 +69,8 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
     scripts_inc <- intersect(inds$tbls_short_name, tidy_df_all$short_name)
     
     # filter data by column 26 - "short_name" to match the vector "reqnames"
-    data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) 
+    # data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) # superseded code to simplify
+    data_inc <- tidy_df_all %>% filter(short_name %in% reqnames)
     
     # list of values/answer choices that should be excluded from plotting
     # NOTE: the var "vals_exclude" in the mapping spreadsheet contains multiple 
@@ -118,15 +119,15 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
             labs(title = stringr::str_wrap(paste(inds$tbl_title[inds$tbls_short_name==ind]), 45)) + # add main title
             xlab(NULL) + # remove x label 
             ylab({{ .ylab }}) + # specify y label
-            #labs(color = .labs, shape = if(.ur) "Settlement" else NULL) + # adjust label text. NOTE: {{ }} syntax doesn't work here
             labs(color = if(deparse(substitute(.agerange))=="agerange" | 
                             deparse(substitute(.agerange))=="agerange2") "Age range" else "Region", 
-                 shape = if(.ur) "Settlement") + # adjust label text for agerange and ur
+                 shape = if(.ur) "Settlement") + # adjust label text for agerange and ur. NOTE: {{ }} syntax doesn't work here
             theme_bw() + # use a white background
             theme(axis.text.y = element_blank(),
                   axis.ticks.y = element_blank(),
                   panel.grid.major = element_blank(), 
-                  panel.grid.minor = element_blank()) + # remove xlab for cases of vals_number == 1
+                  panel.grid.minor = element_blank(), # remove xlab for cases of vals_number == 1
+                  plot.title = element_text(size = 10)) + # set title's font size
             geom_hline(yintercept = 0, linetype = 2, color = "grey") + # set horizontal lines for zero
             ggsci::scale_color_lancet() # color pattern for geom points in ggplot
           
@@ -180,7 +181,8 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
     scripts_inc <- intersect(inds$tbls_short_name, tidy_df_all$short_name)
     
     # filter data by column 26 - "short_name" to match the vector "reqnames"
-    data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) 
+    # data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) # superseded code to simplify
+    data_inc <- tidy_df_all %>% filter(short_name %in% reqnames)
     
     # list of values/answer choices that should be excluded from plotting
     # NOTE: the var "vals_exclude" in the mapping spreadsheet contains multiple 
@@ -230,12 +232,12 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
             labs(title = stringr::str_wrap(paste(inds$tbl_title[inds$tbls_short_name==ind]), 45)) + # add main title
             xlab(NULL) + # remove x label 
             ylab({{ .ylab }}) + # specify y label
-            #labs(color = .labs, shape = if(.ur) "Settlement") + # adjust label text 
             labs(color = if(deparse(substitute(.agerange))=="agerange" | 
                             deparse(substitute(.agerange))=="agerange2") "Age range" else "Region", 
                  shape = if(.ur) "Settlement") + # adjust label text for agerange and ur
             theme_bw() + # use a white background
-            theme(panel.grid = element_blank()) + # remove grid lines
+            theme(panel.grid = element_blank(), # remove grid lines
+                  plot.title = element_text(size = 10)) + # set title's font size
             geom_vline(xintercept = seq(0.5, length(plotvalues$var), by = 1), 
                        color = "gray", size = 0.5, alpha = 0.5) + # set vertical lines between x groups
             geom_hline(yintercept = 0, linetype = 2, color = "grey") + # set horizontal lines for zero
