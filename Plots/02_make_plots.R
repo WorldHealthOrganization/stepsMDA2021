@@ -136,13 +136,13 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
             
             # save into three common vectorized formats (for editing plots after saving)
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".pdf"), device = cairo_pdf, 
-                   path = here("DataBook", "Plots", "PDFs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "PDFs", if(!missing(.folder)) .folder ))
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".svg"), device = "svg", 
-                   path = here("DataBook", "Plots", "SVGs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "SVGs", if(!missing(.folder)) .folder ))
             # NOTE: EMF format requires devEMF package
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".emf"), 
                    device = {function(filename, ...) devEMF::emf(file = filename, ...)}, 
-                   path = here("DataBook", "Plots", "EMFs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "EMFs", if(!missing(.folder)) .folder ))
             
           }
           
@@ -247,13 +247,13 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
             
             # save into three common vectorized formats (for editing plots after saving)
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".pdf"), device = cairo_pdf, 
-                   path = here("DataBook", "Plots", "PDFs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "PDFs", if(!missing(.folder)) .folder ))
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".svg"), device = "svg", 
-                   path = here("DataBook", "Plots", "SVGs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "SVGs", if(!missing(.folder)) .folder ))
             # NOTE: EMF format requires devEMF package
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".emf"), 
                    device = {function(filename, ...) devEMF::emf(file = filename, ...)}, 
-                   path = here("DataBook", "Plots", "EMFs", if(!missing(.folder)) .folder ))
+                   path = here("Plots", "EMFs", if(!missing(.folder)) .folder ))
             
           }
           
