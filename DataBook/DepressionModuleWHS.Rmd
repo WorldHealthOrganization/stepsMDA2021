@@ -335,6 +335,63 @@ da5_f_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da
 
 
 
+**Suicidal thoughts**
+
+Description: Percentage of population who have thought of death, or wished they were dead, during the last 12 months.
+
+Instrument questions:
+
+- During the last 12 months, have you had a period lasting several days when you felt sad, empty or depressed?
+- During the last 12 months, have you had a period lasting several days when you lost interest in most things you usually enjoy such as personal relationships, work or hobbies/recreation?
+- During the last 12 months, have you had a period lasting several days when you have been feeling your energy decreased or that you are tired all the time?
+- Did you think of death, or wish you were dead?
+
+```{r da22_g_all_tbls}
+# column names to use with huxtable
+da22_g_all_col_names <- c("Age Group (years)", "n", "% Thought", "95% CI")
+da22_g_all_reg_col_names <- c("Region", "n", "% Thought", "95% CI")
+
+# men, women, both sexes
+da22_g_all_m_w_b <- join_m_w_b(da22_g_all, 1, da22_g_all_col_names)
+```
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# urban, rural
+da22_g_all_u_r <- join_u_r(da22_g_all, 1, da22_g_all_col_names)
+```
+
+<br>
+
+```{r}
+cbind(da22_g_all_m_w_b$m, select(da22_g_all_m_w_b$w, -agerange), select(da22_g_all_m_w_b$b, -agerange)) %>% 
+  final_m_w_b_tbl(.s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+tbl_m_u_r <- rbind(da22_g_all_u_r$m_u, da22_g_all_u_r$m_r)
+tbl_w_u_r <- rbind(da22_g_all_u_r$w_u, da22_g_all_u_r$w_r)
+tbl_b_u_r <- rbind(da22_g_all_u_r$b_u, da22_g_all_u_r$b_r)
+
+cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
+  final_u_r_tbl(.s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months by type of settlement", .colspan_val = 10)
+```
+
+<br>
+
+```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+da22_g_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da22_g_all_reg_col_names) %>% 
+  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Thought of death, or wished they were dead, during the last 12 months by region", .colspan_val = 4) 
+```
+
+<br>
+
+**Analysis information**:
+
+- Questions used: DA6, DA7, DA8, DA22
+- R script name: WHSdepression
+
+***
 
 <br>
 <br>

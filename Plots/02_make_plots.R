@@ -8,6 +8,7 @@
 # load packages
 library(here)
 library(tidyverse)
+library(svglite)
 
 ################################################################################
 
@@ -36,7 +37,7 @@ data_book_mapping <-
 # .agerange - agerange/agerange2/region - specify the value for the legend 
 # .folder - "Age_range_Sex"/"Urban_Rural"/"Region" - specify the output folder
 # .ur - TRUE/FALSE - if urban/rural disaggregation should be used (set to FALSE by default)
-# .save_plots - generate_pdf/generate_svg/generate_emf/empty for all three - save 
+# .save_plots - pdfs/svgs/emfs/empty for all three - save 
 # plots into vector formats (set to generate all by default)
 
 # NOTE: you can use ind <- "tsmokestatus_c" and/or ind <- "tsmokestatus_d" for testing 
@@ -114,7 +115,7 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
                           ymin = if(.pct_mn_md_val=="pct" | .pct_mn_md_val=="mn") m_low else md_low, 
                           ymax = if(.pct_mn_md_val=="pct" | .pct_mn_md_val=="mn") m_upp else md_upp, 
                           color = {{ .agerange }}, shape = if(.ur) ur)) +
-            geom_pointrange(position = position_dodge(width = 1), size = 0.25) +
+            geom_pointrange(position = position_dodge(width = 1), size = 0.15) +
             ggforce::facet_col(facets = ~sex, scales = "free_y", space = "free") + # group plots by sex
             coord_flip() +  # flip coordinates (puts labels on y axis)
             labs(title = stringr::str_wrap(paste(inds$tbl_title[inds$tbls_short_name==ind]), 60)) + # add main title
@@ -136,19 +137,19 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
           print(p)
           
           # save into three common vectorized formats (for editing plots after saving)
-          if (deparse(substitute(.save_plots))=="generate_pdf"){
+          if (deparse(substitute(.save_plots))=="pdfs"){
             
             # save into PDF
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".pdf"), device = cairo_pdf, 
                    path = here("Plots", "PDFs", if(!missing(.folder)) .folder ), width = 6, height = 6)
             
-          } else if (deparse(substitute(.save_plots))=="generate_svg"){
+          } else if (deparse(substitute(.save_plots))=="svgs"){
             
             # save into SVG
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".svg"), device = "svg",
                    path = here("Plots", "SVGs", if(!missing(.folder)) .folder ), width = 6, height = 6)
             
-          } else if (deparse(substitute(.save_plots))=="generate_emf"){
+          } else if (deparse(substitute(.save_plots))=="emfs"){
             
             # save into EMF
             # NOTE: EMF format requires devEMF package
@@ -248,7 +249,7 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
                           ymin = if(.pct_mn_md_val=="pct" | .pct_mn_md_val=="mn") m_low else md_low, 
                           ymax = if(.pct_mn_md_val=="pct" | .pct_mn_md_val=="mn") m_upp else md_upp, 
                           color = {{ .agerange }}, shape = if(.ur) ur)) +
-            geom_pointrange(position = position_dodge(width = 1), size = 0.25) +
+            geom_pointrange(position = position_dodge(width = 1), size = 0.15) +
             ggforce::facet_col(facets = ~sex, scales = "free_y", space = "free") + # group plots by sex
             coord_flip() +  # flip coordinates (puts labels on y axis)
             labs(title = stringr::str_wrap(paste(inds$tbl_title[inds$tbls_short_name==ind]), 60)) + # add main title
@@ -269,19 +270,19 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
           print(p)
           
           # save into three common vectorized formats (for editing plots after saving)
-          if (deparse(substitute(.save_plots))=="generate_pdf"){
+          if (deparse(substitute(.save_plots))=="pdfs"){
             
             # save into PDF
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".pdf"), device = cairo_pdf, 
                      path = here("Plots", "PDFs", if(!missing(.folder)) .folder ), width = 6, height = 6)
             
-          } else if (deparse(substitute(.save_plots))=="generate_svg"){
+          } else if (deparse(substitute(.save_plots))=="svgs"){
             
             # save into SVG
             ggsave(plot = p, filename = paste0(ind, if(.folder=="Region"){ paste0("_reg") } else if(.folder=="Urban_Rural"){ paste0("_u_r") }, ".svg"), device = "svg",
                    path = here("Plots", "SVGs", if(!missing(.folder)) .folder ), width = 6, height = 6)
             
-          } else if (deparse(substitute(.save_plots))=="generate_emf"){
+          } else if (deparse(substitute(.save_plots))=="emfs"){
             
             # save into EMF
             # NOTE: EMF format requires devEMF package
