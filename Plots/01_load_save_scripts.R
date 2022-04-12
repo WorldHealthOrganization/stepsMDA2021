@@ -15,113 +15,121 @@ library(magrittr)
 
 ################################################################################
 
-# alcohol_data_dir 
-here("DataBook", "Modules", "AlcoholConsumption") %>%
-  # list all files in the directory
-  dir_ls(regexp = "\\.R$") %>% 
-  # scale up to all R files with a map function from purrr
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
+# load all scripts into global environment by using a function
+run_all_scripts <- function() {
+  
+  # alcohol_data_dir 
+  here("DataBook", "Modules", "AlcoholConsumption") %>%
+    # list all files in the directory
+    dir_ls(regexp = "\\.R$") %>% 
+    # scale up to all R files with a map function from purrr
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # biochemical_measurements_data_dir 
+  here("DataBook", "Modules", "BiochemicalMeasurements") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # cvd_data_dir 
+  here("DataBook", "Modules", "CardiovascularDiseaseRisk") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # cervical_cancer_data_dir 
+  here("DataBook", "Modules", "CervicalCancerScreening") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # demog_info_data_dir 
+  here("DataBook", "Modules", "DemographicInformation") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # whs_depr_data_dir 
+  here("DataBook", "Modules", "DepressionModuleWHS") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # diet_data_dir 
+  # NOT FULLY USED IN MDA (SEE CODE BELOW FOR DIET SCRIPTS)
+  # here("DataBook", "Modules", "Diet") %>% 
+  #   dir_ls(regexp = "\\.R$") %>% 
+  #   map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # read in just each R file, because in MDA not scripts are used
+  source(here("DataBook", "Modules", "Diet", "DX1.R"))
+  source(here("DataBook", "Modules", "Diet", "Ddays.R"))
+  source(here("DataBook", "Modules", "Diet", "Dservings.R"))
+  source(here("DataBook", "Modules", "Diet", "Dfiveormore.R"))
+  
+  # prems_data_dir 
+  # NOT USED IN MDA
+  # here("DataBook", "Modules", "HealthServicesPREMS") %>% 
+  #   dir_ls(regexp = "\\.R$") %>% 
+  #   map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # cvd_data_dir 
+  here("DataBook", "Modules", "HistoryofCardiovascularDiseases") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # diabetes_data_dir 
+  here("DataBook", "Modules", "HistoryofDiabetes") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # bp_data_dir 
+  here("DataBook", "Modules", "HistoryofRaisedBloodPressure") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # cholesterol_data_dir 
+  here("DataBook", "Modules", "HistoryofRaisedTotalCholesterol") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # lifestyle_data_dir 
+  here("DataBook", "Modules", "LifestyleAdvice") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # oral_health_data_dir 
+  here("DataBook", "Modules", "OralHealth") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # pa_data_dir 
+  here("DataBook", "Modules", "PhysicalActivity") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # physical_measurements_data_dir 
+  here("DataBook", "Modules", "PhysicalMeasurements") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # combined_risk_factors_data_dir 
+  here("DataBook", "Modules", "SummaryofCombinedRiskFactors") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+  # tobacco_use_data_dir 
+  here("DataBook", "Modules", "TobaccoUse") %>% 
+    dir_ls(regexp = "\\.R$") %>% 
+    map(source, encoding = "UTF-8", local = knitr::knit_global())
+  
+}
 
-# biochemical_measurements_data_dir 
-here("DataBook", "Modules", "BiochemicalMeasurements") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# cvd_data_dir 
-here("DataBook", "Modules", "CardiovascularDiseaseRisk") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# cervical_cancer_data_dir 
-here("DataBook", "Modules", "CervicalCancerScreening") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# demog_info_data_dir 
-here("DataBook", "Modules", "DemographicInformation") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# whs_depr_data_dir 
-here("DataBook", "Modules", "DepressionModuleWHS") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# diet_data_dir 
-# NOT FULLY USED IN MDA (SEE CODE BELOW FOR DIET SCRIPTS)
-# here("DataBook", "Modules", "Diet") %>% 
-#   dir_ls(regexp = "\\.R$") %>% 
-#   map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# read in just each R file, because in MDA not scripts are used
-source(here("DataBook", "Modules", "Diet", "DX1.R"))
-source(here("DataBook", "Modules", "Diet", "Ddays.R"))
-source(here("DataBook", "Modules", "Diet", "Dservings.R"))
-source(here("DataBook", "Modules", "Diet", "Dfiveormore.R"))
-
-# prems_data_dir 
-# NOT USED IN MDA
-# here("DataBook", "Modules", "HealthServicesPREMS") %>% 
-#   dir_ls(regexp = "\\.R$") %>% 
-#   map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# cvd_data_dir 
-here("DataBook", "Modules", "HistoryofCardiovascularDiseases") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# diabetes_data_dir 
-here("DataBook", "Modules", "HistoryofDiabetes") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# bp_data_dir 
-here("DataBook", "Modules", "HistoryofRaisedBloodPressure") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# cholesterol_data_dir 
-here("DataBook", "Modules", "HistoryofRaisedTotalCholesterol") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# lifestyle_data_dir 
-here("DataBook", "Modules", "LifestyleAdvice") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# oral_health_data_dir 
-here("DataBook", "Modules", "OralHealth") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# pa_data_dir 
-here("DataBook", "Modules", "PhysicalActivity") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# physical_measurements_data_dir 
-here("DataBook", "Modules", "PhysicalMeasurements") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# combined_risk_factors_data_dir 
-here("DataBook", "Modules", "SummaryofCombinedRiskFactors") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
-
-# tobacco_use_data_dir 
-here("DataBook", "Modules", "TobaccoUse") %>% 
-  dir_ls(regexp = "\\.R$") %>% 
-  map(source, encoding = "UTF-8", local = knitr::knit_global())
+run_all_scripts()
 
 ################################################################################
 
-# pull "list_long" objects from the global environment 
-names_all <- ls(pattern = "_list_long")
-
-# set names (if needed), typically leave it commented out
-# names_all <- purrr::set_names(names_all)
+# the commented out code below is superseded
+# # pull "list_long" objects from the global environment 
+# # names_all <- ls(pattern = "_list_long")
+# 
+# # set names (if needed), typically leave it commented out
+# # names_all <- purrr::set_names(names_all)
 
 # create a list of all lists... 
 # ^ to match the start of the string.
@@ -131,7 +139,7 @@ names_all <- ls(pattern = "_list_long")
 list_all_list_long <- mget(ls(pattern = "_list_long$"), envir = .GlobalEnv)
 # list_all_list_long <- mget(ls(pattern = "_list_long"), envir = .GlobalEnv)
 
-# remove one extra list from the list
+# remove one extra list from the list (in case mget from above was run twice)
 list_all_list_long <- list_all_list_long %>% purrr::list_modify("list_all_list_long" = NULL)
 
 # View(list_all_list_long)

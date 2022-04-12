@@ -109,24 +109,6 @@ da5_f_all <- tbls_list_split(
 ################################################################################
 
 # EXTRA
-# a)
-# DA22 - FROM ALL RESPONDENTS (who answered yes to DA6 or DA7 or DA8)
-# Thought of death, or wished they were dead, during the last 12 months
-# 
-# NOTE: decided that it is not needed, because it is a bit difficult to explain, 
-# as we are using a mix of people with and without depression as denominator.
-# 
-# da22_g_all_list_long <- tbls_pct_summary(.variable = g, .cln = da22cln)
-# 
-# # DATABOOK prep
-# da22_g_all <- tbls_list_split(
-#   .data = da22_g_all_list_long, 
-#   .select_var = g, .vars_amount_number = 2,
-#   .select_var_val = "1) thought")
-
-################################################################################
-
-# b)
 # DA22 -  FROM DEPRESSED BASED ON WHS ALGORITHM (who answered yes to DA6 or DA7 or DA8)
 # Thought of death, or wished they were dead, during the last 12 months 
 # among those that are depressed based on the WHS algorithm
