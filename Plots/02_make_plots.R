@@ -37,8 +37,8 @@ data_book_mapping <-
 # .agerange - agerange/agerange2/region - specify the value for the legend 
 # .folder - "Age_range_Sex"/"Urban_Rural"/"Region" - specify the output folder
 # .ur - TRUE/FALSE - if urban/rural disaggregation should be used (set to FALSE by default)
-# .save_plots - pdfs/svgs/emfs/empty for all three - save 
-# plots into vector formats (set to generate all by default)
+# .save_plots - pdfs/svgs/emfs/empty for all three - save plots into vector 
+# formats (set to generate all by default)
 
 # NOTE: you can use ind <- "tsmokestatus_c" and/or ind <- "tsmokestatus_d" for testing 
 # the for loop on a single variable (check comments inside the function)
