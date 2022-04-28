@@ -70,8 +70,7 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
     # scripts to include that match
     scripts_inc <- intersect(inds$tbls_short_name, tidy_df_all$short_name)
     
-    # filter data by column 26 - "short_name" to match the vector "reqnames"
-    # data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) # superseded code to simplify
+    # filter data by column 26 ("short_name") to match the vector "reqnames"
     data_inc <- tidy_df_all %>% filter(short_name %in% reqnames)
     
     # list of values/answer choices that should be excluded from plotting
@@ -203,8 +202,7 @@ forestplot_steps_m_w_b_ur_reg <- function(.multi_vals = FALSE, .pct_mn_md_val,
     # scripts to include that match
     scripts_inc <- intersect(inds$tbls_short_name, tidy_df_all$short_name)
     
-    # filter data by column 26 - "short_name" to match the vector "reqnames"
-    # data_inc <- tidy_df_all %>% filter(!!sym(names(.)[26]) %in% reqnames) # superseded code to simplify
+    # filter data by column 26 ("short_name") to match the vector "reqnames"
     data_inc <- tidy_df_all %>% filter(short_name %in% reqnames)
     
     # list of values/answer choices that should be excluded from plotting
