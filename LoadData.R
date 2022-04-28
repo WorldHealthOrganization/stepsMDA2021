@@ -136,7 +136,7 @@ data <- data %>%
     t5f=NA, t5fw=NA)
 
 # MDA fixing MDB dataset (for Windows users)
-# NOTE: htp4 variable was not not set to numeric by default
+# NOTE: htp4 variable was not set to numeric by default
 
 # class(data$htp4)
 data <- data %>% 
