@@ -18,8 +18,6 @@ R Project for analysis of the STEPS survey data conducted in the Republic of Mol
 
 -   Setup RStudio:
 
-    -   Use a 32-bit R version in Windows (Tools ➔ Global Options ➔ General ➔ R version)
-
     -   Use the project's directory for RMarkdown (Tools ➔ Global Options ➔ R Markdown ➔ Evaluate chunks in directory ➔ Project)
 
 -   Project has been tested on MacOS 12.3 and Windows 10/11, using R version 4.1.3.
@@ -76,7 +74,7 @@ The `factsheet.R` script is used for creating a Word document out of CSV files t
 
 ### Forest plots
 
-There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet (located in Plots folder) is used for manually adjusting which indicators are included for plotting, using `include_in_analysis` variable.
+There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet (located in Plots folder) is used for manually adjusting which indicators are included for plotting, using `include_in_analysis` variable (TRUE or FALSE).
 
 ## Getting help
 
