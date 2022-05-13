@@ -20,7 +20,11 @@ R Project for analysis of the STEPS survey data conducted in the Republic of Mol
 
     -   Use the project's directory for RMarkdown (Tools ➔ Global Options ➔ R Markdown ➔ Evaluate chunks in directory ➔ Project)
 
--   Project has been tested on MacOS 12.3 and Windows 10/11, using R version 4.1.3.
+-   Project has been tested on MacOS 12.3 and Windows 10/11, using R version 4.1.3
+
+-   MS Office with Access is required to be installed for loading the MDB file
+
+    -   Use the 32-bit version of R when MS Office is also 32-bit
 
 ## Contents
 
