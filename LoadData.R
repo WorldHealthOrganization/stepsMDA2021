@@ -7,11 +7,12 @@
 # if TRUE - included
 # if FALSE - excluded
 
+# Write into the global environment 
 .u_r_reg <<- TRUE
 # OR
 # .GlobalEnv$.u_r_reg <- TRUE
 
-# check the global environment 
+# check the object
 .u_r_reg
 
 ################################################################################
@@ -20,6 +21,7 @@
 
 # Identify project's working directory
 library(here)
+path <- here()
 
 # Load other main packages
 library(readr)
@@ -29,17 +31,35 @@ library(tidyverse)
 
 # LOAD DATA 
 
+# Specify the name of STEPS MDB file 
+steps_mdb_name <- "STEPS.mdb"
+
+# Load data tables depending on the Operating System
 if(.Platform$OS.type == "unix") {
   # MacOS
   library(Hmisc) # needed to load mdb data in MacOS
-  data1 <- mdb.get("STEPS.mdb", tables = "data1")
-  data2 <- mdb.get("STEPS.mdb", tables = "data2") 
+  data1 <- mdb.get(steps_mdb_name, tables = "data1")
+  data2 <- mdb.get(steps_mdb_name, tables = "data2")
 } else {
   # Windows
+  # check for Microsoft Access Drivers in Windows 
+  library(odbc)
+  odbc_drivers <- odbcListDrivers() %>% 
+    # create mdb_driver variable and assign "mdb" to each to include all possible drivers 
+    mutate(mdb_driver = ifelse(name=="Microsoft Access Driver (*.mdb)", "mdb", 
+                               ifelse(name=="Microsoft Access Driver (*.mdb, *.accdb)", "mdb", 
+                                      ifelse(name=="Driver do Microsoft Access (*.mdb)", "mdb", 
+                                             ifelse(name=="Microsoft Access-Treiber (*.mdb)", "mdb", NA))))) %>% 
+    filter(!is.na(mdb_driver))
+  
+  # subset to only unique MDB drivers
+  unique_mdb <- unique(odbc_drivers$name)
+  
+  # open connection based on the available driver and fetch tables
   library(RODBC)
-  channel <- odbcConnectAccess("STEPS.mdb")
-  data1 <- sqlFetch(channel,"data1", as.is = TRUE)
-  data2 <- sqlFetch(channel,"data2", as.is = TRUE)
+  channel <- odbcDriverConnect(paste0("Driver={", unique_mdb[1], "};DBQ=", path, "/", steps_mdb_name))
+  data1 <- sqlFetch(channel, "data1", as.is = TRUE)
+  data2 <- sqlFetch(channel, "data2", as.is = TRUE)
   odbcClose(channel)
 }
 
@@ -71,6 +91,7 @@ data <- data %>% rename_all(tolower)
 #     deparse(substitute(data)),
 #     paste(data_names[!i], collapse=", ")))
 # }
+# NOTE: in MDA data doesn't contain: agerange2, ur (ur is called urbanrural)
 
 ################################################################################
 
