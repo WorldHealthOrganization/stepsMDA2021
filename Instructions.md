@@ -1,6 +1,4 @@
-# WHO STEPS MDA 2021 R Project
-
-## Instructions
+# Instructions
 
 ### Initial Setup
 
@@ -59,6 +57,8 @@ The list of functions:
 8\. `tbls_list_split` - split the original list (by sex, urban/rural, region) from the summary function (tbls_mn_summary or tbls_pct_summary) into smaller lists for joining later with the join functions in the Data Book
 
 9\. `forestplot_steps` - create individual forest plots (using ggforestplot package)
+
+### R Markdown Functions
 
 The `databook_functions.R` script (located in DataBook folder) contains functions used in RMDs for creating Word documents.
 
