@@ -8,11 +8,11 @@
 # 1.1 summary_mn_unwt - unweighted
 # 2. summary_pct - core for percentages (weighted)
 # 2.1 summary_pct_unwt - unweighted
-# 3. pa_summary_mn - means for Physical Activity module (no rounding of m_upp)
+# 3. pa_summary_md - median for Physical Activity module
 
 # 4. tbls_mn_summary - calculate means (including both parts: age range rows & total row)
 # 5. tbls_pct_summary - calculate percentages (inc. both parts: age range rows & total row)
-# 6. fs_summary - create FactSheet summary
+# 6. fs_summary - create a FactSheet summary
 # 7. sort_rename_vars - pivot the table (for percentages with more than two answer choices) 
 # and rename columns for standardization to produce the output used in DataBook
 # 8. tbls_list_split - split the original list (by sex, urban/rural, region) from 
@@ -96,7 +96,7 @@ summary_pct_unwt <- function(.data) {
 
 ################################################################################
 
-# FUNCTION FOR SUMMARIZE *MEDIAN* IN SRVYR SPECIFICALLY FOR PHYSICAL ACTIVITY AND OTHER SUCH CASES
+# FUNCTION TO SUMMARIZE *MEDIAN* IN SRVYR SPECIFICALLY FOR PHYSICAL ACTIVITY AND OTHER SUCH CASES
 # Arguments description:
 # .var - variable name 
 pa_summary_md <- function(.data, .var) {
