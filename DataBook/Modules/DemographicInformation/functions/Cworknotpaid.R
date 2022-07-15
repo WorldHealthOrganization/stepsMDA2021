@@ -23,8 +23,8 @@ cworknotpaid <- function(.data) {
       mutate(c = replace(c, c8==5, "2) Student")) %>% 
       mutate(c = replace(c, c8==6, "3) Homemaker")) %>% 
       mutate(c = replace(c, c8==7, "4) Retired")) %>% 
-      mutate(c = replace(c, c8==8, "4) Unemployed able to work")) %>% 
-      mutate(c = replace(c, c8==9, "4) Unemployed unable to work")) %>% 
+      mutate(c = replace(c, c8==8, "5) Unemployed able to work")) %>% 
+      mutate(c = replace(c, c8==9, "6) Unemployed unable to work")) %>% 
       mutate(c = factor(c)) %>% 
       mutate(cln = if_else(is.na(c) | valid==2, 2, 1, missing = 1))
   }

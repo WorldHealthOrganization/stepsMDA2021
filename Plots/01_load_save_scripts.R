@@ -56,7 +56,7 @@ run_all_scripts <- function() {
   #   dir_ls(regexp = "\\.R$") %>% 
   #   map(source, encoding = "UTF-8", local = knitr::knit_global())
   
-  # read in just each R file, because in MDA not scripts are used
+  # read in each R file, because in MDA not all scripts are used
   source(here("DataBook", "Modules", "Diet", "DX1.R"))
   source(here("DataBook", "Modules", "Diet", "Ddays.R"))
   source(here("DataBook", "Modules", "Diet", "Dservings.R"))
