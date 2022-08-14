@@ -424,7 +424,7 @@ ptotal_md$b_reg %>% unite_ci(.ci_amount = "q") %>% apply_hux(.col_names = ptotal
 **Analysis information**:
 
 -   Questions used: P1-P15b
--   R script name: Ptotal
+-   R script name: Ptotalmedian
 
 ***
 
