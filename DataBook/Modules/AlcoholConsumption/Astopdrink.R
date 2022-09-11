@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Stopping drinking due to health reasons
-astopdrink_c_list_long <- tbls_pct_summary(.variable = c)
+astopdrink_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 astopdrink_c <- tbls_list_split(

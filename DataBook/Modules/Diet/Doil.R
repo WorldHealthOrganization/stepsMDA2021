@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Type of oil or fat most often used for meal preparation in household
-doil_c_list_long <- tbls_pct_summary(.variable = c)
+doil_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 doil_c <- 

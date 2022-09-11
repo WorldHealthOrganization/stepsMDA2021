@@ -3,6 +3,13 @@
 # Copyright: WHO NCD Office
 ################################################################################
 
+# Set a variable for the dynamic author in RMD files
+set_author <- "WHO NCD Office Moscow"
+# Set a variable for the dynamic title in RMD files
+set_title <- "STEPS MDA Data Book"
+
+################################################################################
+
 # INCLUSION OF URBAN/RURAL AND REGION
 # if TRUE - included
 # if FALSE - excluded
@@ -17,6 +24,16 @@
 
 ################################################################################
 
+# R PACKAGES
+list_of_packages <- c("here", "tidyverse", "RODBC", "odbc", "Hmisc", "rlang", "srvyr", 
+                      "survey", "ggforce", "devEMF", "ggsci", "huxtable", "fs", "flextable", 
+                      "rmarkdown", "knitr", "magrittr", "plyr", "readxl", "svglite")
+
+# Checking if already installed packages contain the required packages
+install.packages(setdiff(list_of_packages, rownames(installed.packages()))) 
+
+################################################################################
+
 # LOADING AND CLEANING DATA
 
 # Identify project's working directory
@@ -24,7 +41,6 @@ library(here)
 path <- here()
 
 # Load other main packages
-library(readr)
 library(tidyverse)
 
 ################################################################################
@@ -153,7 +169,7 @@ data <- data %>%
     # heated tobacco products were excluded and "other" shifted
     t5g=t5f, t5gw=t5fw) %>%
   mutate(
-    # add the var t5f & t5fw for tsmoketype work properly
+    # add the var t5f & t5fw for tsmoketype to work properly
     t5f=NA, t5fw=NA)
 
 # MDA fixing MDB dataset (for Windows users)

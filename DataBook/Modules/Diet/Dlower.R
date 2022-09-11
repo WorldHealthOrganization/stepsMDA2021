@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Importance of lowering salt in diet
-dlower_c_list_long <- tbls_pct_summary(.variable = c)
+dlower_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dlower_c <- 

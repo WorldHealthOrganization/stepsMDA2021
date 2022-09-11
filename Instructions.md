@@ -2,76 +2,54 @@
 
 ### Initial Setup
 
-Install R (latest version 4.2 or 4.1) and RStudio Desktop (2022.02), Open Source License: <https://cloud.r-project.org/>; <https://www.rstudio.com/products/rstudio/download/>
+Install R (latest version 4.0+) and RStudio Desktop, Open-Source License: <https://cloud.r-project.org/>; <https://www.rstudio.com/products/rstudio/download/>
 
-In Windows, MS Office with Access is required to be installed for loading MDB files. Make sure to use a 32-bit version of R when MS Office is also 32-bit. In RStudio, follow: Tools ➔ Global Options ➔ General
-
-Install packages used in the project by running the following:
-
-`install.packages(c("here", "tidyverse", "RODBC", "odbc", "Hmisc", "rlang", "srvyr", "survey", "ggforce", "devEMF", "huxtable", "fs", "flextable", "rmarkdown"))`
-
-Setup RStudio to evaluate R Markdown (RMD) code chunks from the project. Follow in RStudio: Tools ➔ Global Options ➔ R Markdown ➔ Evaluate chunks in directory ➔ Project
+In Windows, MS Office with Access is required to be installed for loading Microsoft Access database (MDB) files. Make sure to use a 32-bit version of R when MS Office is also 32-bit. In RStudio, follow: Tools ➔ Global Options ➔ General
 
 Make sure that the MDB file is located in the root folder of the project. The MDB must be named "STEPS.mdb", otherwise, the name should be adjusted in `LoadData.R` script. If you use a CSV or XLSX instead of a MDB make sure you adjust `LoadData.R` script accordingly.
+
+Required R packages are installed automatically when `LoadData.R` script is run.
 
 ### Starting the Project
 
 Always start the project by loading the Rproj file inside the root folder (`stepsMDA2021.Rproj`).
 
-Start with opening and adjusting `LoadData.R` (located in the root folder). The `LoadData.R` is used for loading and cleaning data before applying functions for creating output tables. The script contains and often needs additional recoding of variables for countries to work with original scripts based on Epi Info programs.
+Start with opening and adjusting `LoadData.R` (located in the root folder). The `LoadData.R` is used for loading and cleaning data before applying functions for creating output tables. The script contains and often needs additional recoding of variables for countries to work with original scripts based on Epi Info programmes.
 
-Decide on whether you need to include urban/rural and regional disaggregations or not, by changing between TRUE (included) or FALSE (excluded).
+Decide on whether the inclusion of urban, rural and regional disaggregations is needed or not, by manually changing between `TRUE` (included) or `FALSE` (excluded).
 
-The Project is designed in such a way that the Data Book is produced first by individual modules, after which, the Fact Sheet and forest plots can be produced. In DataBook folder, there are individual RMD files that correspond to sub-folders in Modules folder. Those sub-folders are named the same as RMD files and represent the Data Book modules. Each module's sub-folder contains R scripts, named according to program names in Epi Info, as well as the functions sub-folder with R functions, written on the basis of Epi Info programs. The R functions may need to be manually adjusted to country-specific settings, when the STEPS questionnaire has different answer choices.
+The Project is designed so that the data book is produced first by individual modules, after which, the fact sheet and forest plots can be produced. In `DataBook/` folder, there are individual R Markdown (RMD) files that correspond to sub-folders in `Modules/` folder. Those sub-folders are named the same as RMD files and represent the data book modules. Each module's sub-folder contains R scripts, named according to programme names in Epi Info, as well as `functions/` sub-folder with R functions, written on the basis of Epi Info programmes. The R functions may need to be manually adjusted to country-specific settings, when the STEPS questionnaire has different answer choices.
 
-In order to create an individual Word document for each module, you can use RMD scripts. The RMD scripts would need to be manually adjusted for country-specific STEPS, when modules are abridged or somehow changed.
+In order to create an individual Word document for each module, use RMD scripts. The RMD scripts would need to be manually adjusted for country-specific STEPS, when modules are abridged or somehow changed.
 
 ### Data Book and Fact Sheet Functions
 
-There are main and supporting functions. The main functions do calculations and generate raw table lists, whereas supporting functions create formatted output documents and charts.
+There are main and supporting functions. The main functions do computations and generate raw table lists, whereas supporting functions create formatted output documents and charts.
 
-Function names have been designed to hold a generic meaning of variables and/or what they are used for, such as "m" (male), "f" (female), "b" (both sexes), "u" (urban), "r" (rural), "reg" (region), "ci" (confidence interval), "m_low" (lower bound/limit), "m_upp" (upper bound/limit), "tbl" (table), "mn" (mean), "pct" (percentage), "unwt" (unweighted), "fs" (fact sheet), "pa" (physical activity), "vars" (variables).
+To make functions, their arguments and output variables easier to read, their names have been designed to hold a generic meaning and/or what they are used for, such as "m" (men), "w" (women), "b" (both sexes), "u" (urban), "r" (rural), "reg" (region), "ci" (confidence interval), "m_low" (lower bound/limit), "m_upp" (upper bound/limit), "tbl" (table), "mn" (mean), "pct" (percentage), "md" (median), "wt" (weighted), "unwt" (unweighted), "fs" (fact sheet), "vars" (variables), "val" (value), etc.
 
-The `functions.R` script (located in root folder) contains functions used for calculating means and percentages (weighted and unweighted) for each indicator. Unweighted is indicated by the abbreviation "unwt" at the end of function name. There are core functions and functions built on top of them in order to filter (e.g., by "clean" (CLN) variables) and group data before calculating various disaggregations. Those functions include age range rows and total row for a Data Book and return a list of tables, depending on whether urban/rural and regional disaggregations are included at the beginning of `LoadData.R` script (e.g., "m_w\_b", "m_w\_b_u\_r", "b_reg").
+The `functions.R` script (located in root folder) contains functions used for calculating means, percentages and medians (weighted and unweighted) for each indicator. The functions are used for calculating weighted and unweighted means, percentages and medians for each indicator. Weighted is pre-selected and calculated by default, whereas unweighted is manually indicated as a function argument, which, for example, is used in the Demographic Information module. The main functions do computations and generate raw table lists, whereas supporting functions create formatted output documents and charts. Moreover, the main functions contain core functions and functions built on top of them to filter (e.g., by "clean" (CLN) variables) and group data before calculating various disaggregations, which was implemented via specific arguments. Those functions include age range rows and a total row for the data book tables and return a list of tables, depending on whether urban, rural, and regional disaggregations are included at the beginning of `LoadData.R` script (e.g., "m_w\_b", "m_w\_b_u\_r", "b_reg"). Regional disaggregations are calculated only for both sexes, as in some country-specific settings there are many regions, making additional comparisons between men and women insignificant. The CLN variables are those that represent a specific condition or several conditions as a single variable, on which the data are subsequently filtered to make the analysis more specific or representative.
 
-The list of functions:
+The main functions include:
 
-1\. `summary_mn` - core for means (weighted)
+1\. `tbls_summary()` - calculates means, percentages, and medians as a list of data frames (including both parts of a data book table: age range rows & total row);
 
-1.1 `summary_mn_unwt` - unweighted
+2\. `tbls_list_split()` - splits the original list (by sex, urban, rural, and region) made by the `tbls_summary()` function into smaller lists for joining later with the join function in the data book;
 
-2\. `summary_pct` - core for percentages (weighted)
+3\. `fs_summary()` - creates a fact sheet summary.
 
-2.1 `summary_pct_unwt` - unweighted
+### R Markdown and Forest Plots Functions
 
-3\. `pa_summary_md` - median for Physical Activity module
+The supporting functions are used in RMD scripts for creating Word documents and include:
 
-4\. `tbls_mn_summary` - calculate means (including both parts: age range rows & total row)
+1\. `unite_ci()` -- unites lower and upper confidence interval values into one CI variable;
 
-5\. `tbls_pct_summary` - calculate percentages (inc. both parts: age range rows & total row)
+2\. `apply_hux()` -- creates hux styled tables (using the huxtable R package);
 
-6\. `fs_summary` - create a Fact Sheet summary
+3\. `join_tbls()` -- creates individual hux tables and joining them into one list (men, women, both sexes, urban, and rural disaggregations);
 
-7\. `sort_rename_vars` - pivot the table (for percentages with more than two answer choices) and rename columns for standardization to produce the output used in the Data Book
+4\. `final_tbl()` -- applies styling to hux tables generated by `join_tbls()` function (men, women, both sexes, urban, rural, and regional disaggregations).
 
-8\. `tbls_list_split` - split the original list (by sex, urban/rural, region) from the summary function (tbls_mn_summary or tbls_pct_summary) into smaller lists for joining later with the join functions in the Data Book
+The `make_plots.R` script (located in `Plots/` folder) is used for creating forest plots for additional analysis of indicators with weighted calculations. The plots are generated by one supporting function:
 
-9\. `forestplot_steps` - create individual forest plots (using ggforestplot package)
-
-### R Markdown Functions
-
-The `databook_functions.R` script (located in DataBook folder) contains functions used in RMDs for creating Word documents.
-
-The list of functions:
-
-`unite_ci` - unite low and upper confidence intervals into one CI variable
-
-`apply_hux` - create hux tables (using huxtable package)
-
-`final_m_w_b_tbl` - output clean-looking main tables (for men, women, both sexes)
-
-`final_u_r_tbl` - output clean-looking urban/rural tables
-
-`join_m_w_b` - join individual hux tables into one (men, women, both sexes)
-
-`join_u_r` - join individual hux tables into one (urban, rural disaggregation)
+5\. `forestplot_steps()` -- creates forest plots in vector graphics (PDF, SVG, EMF) and saves them into dedicated folders.

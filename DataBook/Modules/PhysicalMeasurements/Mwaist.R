@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 ################################################################################
 
-mwaist_list_long <- tbls_mn_summary(.variable = m14, .cln = m14cln)
+mwaist_list_long <- tbls_summary(.mn_pct_md = mn, .variable = m14, .cln = m14cln)
 
 # DATABOOK prep
 mwaist <- tbls_list_split(.data = mwaist_list_long, .vars_amount_number = 0)
@@ -53,7 +53,6 @@ fs_24_mwaist_joint <- cbind(fs_24_mwaist_m,
                             fs_24_mwaist_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Average waist circumference (cm)", .before = 1)
-fs_24_mwaist_joint
 
 readr::write_excel_csv(fs_24_mwaist_joint, here("FactSheet", "24_fs_mwaist.csv"))
 

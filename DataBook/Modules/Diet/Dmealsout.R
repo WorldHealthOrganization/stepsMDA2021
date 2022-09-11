@@ -37,18 +37,12 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Type of oil or fat most often used for meal preparation in household
-dmealsout_list_long <- tbls_mn_summary(.variable = d13)
+dmealsout_list_long <- tbls_summary(.mn_pct_md = mn, .variable = d13)
 
 # DATABOOK prep
 dmealsout_tbls <- tbls_list_split(.data = dmealsout_list_long, .vars_amount_number = 0)
 
 ################################################################################
-
-
-
-
-
-
 
 
 

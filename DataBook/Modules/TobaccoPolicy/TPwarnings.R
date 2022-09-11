@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current smokers who noticed health warnings on cigarette packages
-tpwarnings_c_list_long <- tbls_pct_summary(.variable = c)
+tpwarnings_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tpwarnings_c <- tbls_list_split(

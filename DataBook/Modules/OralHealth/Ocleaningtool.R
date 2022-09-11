@@ -39,7 +39,7 @@ source("functions.R", encoding="UTF-8")
 # Percentage of respondents using various tools to clean teeth
 
 # 1 - toothbrush
-ocleaningtool_a_list_long <- tbls_pct_summary(.variable = a, .cln = o13acln)
+ocleaningtool_a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = a, .cln = o13acln)
 
 # DATABOOK prep
 ocleaningtool_a <- tbls_list_split(
@@ -49,7 +49,7 @@ ocleaningtool_a <- tbls_list_split(
 ################################################################################
 
 # 2 - wooden tooth-picks
-ocleaningtool_b_list_long <- tbls_pct_summary(.variable = b, .cln = o13bcln)
+ocleaningtool_b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = b, .cln = o13bcln)
 
 # DATABOOK prep
 ocleaningtool_b <- tbls_list_split(
@@ -59,7 +59,7 @@ ocleaningtool_b <- tbls_list_split(
 ################################################################################
 
 # 3 - plastic tooth-picks
-ocleaningtool_c_list_long <- tbls_pct_summary(.variable = c, .cln = o13ccln)
+ocleaningtool_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = o13ccln)
 
 # DATABOOK prep
 ocleaningtool_c <- tbls_list_split(
@@ -69,7 +69,7 @@ ocleaningtool_c <- tbls_list_split(
 ################################################################################
 
 # 4 - Thread (dental floss)
-ocleaningtool_d_list_long <- tbls_pct_summary(.variable = d, .cln = o13dcln)
+ocleaningtool_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = o13dcln)
 
 # DATABOOK prep
 ocleaningtool_d <- tbls_list_split(
@@ -79,7 +79,7 @@ ocleaningtool_d <- tbls_list_split(
 ################################################################################
 
 # 5 - charcoal
-ocleaningtool_e_list_long <- tbls_pct_summary(.variable = e, .cln = o13ecln)
+ocleaningtool_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = o13ecln)
 
 # DATABOOK prep
 ocleaningtool_e <- tbls_list_split(
@@ -89,7 +89,7 @@ ocleaningtool_e <- tbls_list_split(
 ################################################################################
 
 # 6 - chewstick
-ocleaningtool_f_list_long <- tbls_pct_summary(.variable = f, .cln = o13fcln)
+ocleaningtool_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln = o13fcln)
 
 # DATABOOK prep
 ocleaningtool_f <- tbls_list_split(
@@ -99,7 +99,7 @@ ocleaningtool_f <- tbls_list_split(
 ################################################################################
 
 # 7 - other
-ocleaningtool_g_list_long <- tbls_pct_summary(.variable = g, .cln = o13gcln)
+ocleaningtool_g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = g, .cln = o13gcln)
 
 # DATABOOK prep
 ocleaningtool_g <- tbls_list_split(

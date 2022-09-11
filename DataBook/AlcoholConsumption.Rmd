@@ -1,49 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-
-alcohol_data_dir <- here::here("DataBook", "Modules", "AlcoholConsumption")
-
-# list all files in the directory
-# fs::dir_ls(alcohol_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(alcohol_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "AlcoholConsumption") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # Alcohol Consumption
 
@@ -66,57 +49,57 @@ aconsumption_col_names <- c("Age Group (years)", "n", "% Current drinker (past 3
 
 # column names for region to use with huxtable
 aconsumption_reg_col_names <- c("Region", "n", "% Current drinker (past 30 days)", "95% CI",
-                              "% Drank in past 12 months, not current", "95% CI", 
-                              "% Past 12 months abstainer", "95% CI", "% Lifetime abstainer", "95% CI")
+                                "% Drank in past 12 months, not current", "95% CI", 
+                                "% Past 12 months abstainer", "95% CI", "% Lifetime abstainer", "95% CI")
 
 # men, women, both sexes
-aconsumption_c_m_w_b <- join_m_w_b(aconsumption_c, 4, aconsumption_col_names)
+aconsumption_c_m_w_b <- join_tbls(aconsumption_c, m_w_b, 4, aconsumption_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-aconsumption_c_u_r <- join_u_r(aconsumption_c, 4, aconsumption_col_names)
+aconsumption_c_u_r <- join_tbls(aconsumption_c, u_r, 4, aconsumption_col_names)
 ```
 
 <br>
 
 ```{r}
 aconsumption_c_m_w_b$m %>% 
-  final_m_w_b_tbl(.s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r}
 aconsumption_c_m_w_b$w %>% 
-  final_m_w_b_tbl(.s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r}
 aconsumption_c_m_w_b$b %>% 
-  final_m_w_b_tbl(.s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(aconsumption_c_u_r$m_u, aconsumption_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_val = "Men", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(aconsumption_c_u_r$w_u, aconsumption_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_val = "Women", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(aconsumption_c_u_r$b_u, aconsumption_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_val = "Both sexes", .s_amount = 1, .title = "Alcohol consumption status by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -124,7 +107,7 @@ rbind(aconsumption_c_u_r$b_u, aconsumption_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 aconsumption_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = aconsumption_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Alcohol consumption status by region", .colspan_val = 10)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Alcohol consumption status by region", .colspan_val = 10)
 ```
 <br>
 
@@ -152,18 +135,18 @@ astopdrink_col_names <- c("Age Group (years)", "n", "% stopping due to health re
 astopdrink_reg_col_names <- c("Region", "n", "% stopping due to health reasons", "95% CI")
 
 # men, women, both sexes
-astopdrink_c_m_w_b <- join_m_w_b(astopdrink_c, 1, astopdrink_col_names)
+astopdrink_c_m_w_b <- join_tbls(astopdrink_c, m_w_b, 1, astopdrink_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-astopdrink_c_u_r <- join_u_r(astopdrink_c, 1, astopdrink_col_names)
+astopdrink_c_u_r <- join_tbls(astopdrink_c, u_r, 1, astopdrink_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(astopdrink_c_m_w_b$m, select(astopdrink_c_m_w_b$w, -agerange), select(astopdrink_c_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Stopping drinking due to health reasons", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Stopping drinking due to health reasons", .colspan_val = 10)
 ```
 
 <br>
@@ -174,7 +157,7 @@ tbl_w_u_r <- rbind(astopdrink_c_u_r$w_u, astopdrink_c_u_r$w_r)
 tbl_b_u_r <- rbind(astopdrink_c_u_r$b_u, astopdrink_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Stopping drinking due to health reasons by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Stopping drinking due to health reasons by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -182,7 +165,7 @@ cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 astopdrink_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = astopdrink_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Stopping drinking due to health reasons by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Stopping drinking due to health reasons by region", .colspan_val = 4)
 ```
 <br>
 
@@ -224,53 +207,53 @@ afrequency_reg_col_names <- c(
   "% < once a month", "95% CI")
 
 # men, women, both sexes
-afrequency_c_m_w_b <- join_m_w_b(afrequency_c, 6, afrequency_col_names)
+afrequency_c_m_w_b <- join_tbls(afrequency_c, m_w_b, 6, afrequency_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-afrequency_c_u_r <- join_u_r(afrequency_c, 6, afrequency_col_names)
+afrequency_c_u_r <- join_tbls(afrequency_c, u_r, 6, afrequency_col_names)
 ```
 
 <br>
 
 ```{r}
 afrequency_c_m_w_b$m %>% 
-  final_m_w_b_tbl(1., "Men", "Frequency of alcohol consumption in the past 12 months", 14)
+  final_tbl(.disaggregation = m_w_b, 1, "Men", "Frequency of alcohol consumption in the past 12 months", 14)
 ```
 
 <br>
 
 ```{r}
 afrequency_c_m_w_b$w %>% 
-  final_m_w_b_tbl(1., "Women", "Frequency of alcohol consumption in the past 12 months", 14)
+  final_tbl(.disaggregation = m_w_b, 1, "Women", "Frequency of alcohol consumption in the past 12 months", 14)
 ```
 
 <br>
 
 ```{r}
 afrequency_c_m_w_b$b %>% 
-  final_m_w_b_tbl(1., "Both sexes", "Frequency of alcohol consumption in the past 12 months", 14)
+  final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Frequency of alcohol consumption in the past 12 months", 14)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afrequency_c_u_r$m_u, afrequency_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afrequency_c_u_r$w_u, afrequency_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afrequency_c_u_r$b_u, afrequency_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Frequency of alcohol consumption in the past 12 months by type of settlement", 14)
 ```
 
 <br>
@@ -278,7 +261,7 @@ rbind(afrequency_c_u_r$b_u, afrequency_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 afrequency_c$b_reg %>% unite_ci(.ci_amount = 6) %>% apply_hux(.col_names = afrequency_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", .title = "Frequency of alcohol consumption in the past 12 months by region", 14)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", .title = "Frequency of alcohol consumption in the past 12 months by region", 14)
 ```
 <br>
 
@@ -306,18 +289,18 @@ aoccasions_a6_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
 aoccasions_a6_reg_col_names <- c("Region", "n", "Mean", "95% CI")
 
 # men, women, both sexes
-aoccasions_a6_m_w_b <- join_m_w_b(aoccasions_a6, 1, aoccasions_a6_col_names)
+aoccasions_a6_m_w_b <- join_tbls(aoccasions_a6, m_w_b, 1, aoccasions_a6_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-aoccasions_a6_u_r <- join_u_r(aoccasions_a6, 1, aoccasions_a6_col_names)
+aoccasions_a6_u_r <- join_tbls(aoccasions_a6, u_r, 1, aoccasions_a6_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(aoccasions_a6_m_w_b$m, select(aoccasions_a6_m_w_b$w, -agerange), select(aoccasions_a6_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers", .colspan_val = 10)
 ```
 
 <br>
@@ -328,7 +311,7 @@ tbl_w_u_r <- rbind(aoccasions_a6_u_r$w_u, aoccasions_a6_u_r$w_r)
 tbl_b_u_r <- rbind(aoccasions_a6_u_r$b_u, aoccasions_a6_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -336,7 +319,7 @@ cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 aoccasions_a6$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aoccasions_a6_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers by region", 4)
 ```
 <br>
 
@@ -364,18 +347,18 @@ anumdrinkperday_a7_col_names <- c("Age Group (years)", "n", "Mean", "95% CI")
 anumdrinkperday_a7_reg_col_names <- c("Region", "n", "Mean", "95% CI")
 
 # men, women, both sexes
-anumdrinkperday_a7_m_w_b <- join_m_w_b(anumdrinkperday_a7, 1, anumdrinkperday_a7_col_names)
+anumdrinkperday_a7_m_w_b <- join_tbls(anumdrinkperday_a7, m_w_b, 1, anumdrinkperday_a7_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-anumdrinkperday_a7_u_r <- join_u_r(anumdrinkperday_a7, 1, anumdrinkperday_a7_col_names)
+anumdrinkperday_a7_u_r <- join_tbls(anumdrinkperday_a7, u_r, 1, anumdrinkperday_a7_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(anumdrinkperday_a7_m_w_b$m, select(anumdrinkperday_a7_m_w_b$w, -agerange), select(anumdrinkperday_a7_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers", .colspan_val = 10)
 ```
 
 <br>
@@ -386,7 +369,7 @@ tbl_w_u_r <- rbind(anumdrinkperday_a7_u_r$w_u, anumdrinkperday_a7_u_r$w_r)
 tbl_b_u_r <- rbind(anumdrinkperday_a7_u_r$b_u, anumdrinkperday_a7_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -394,7 +377,7 @@ cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 anumdrinkperday_a7$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = anumdrinkperday_a7_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers by region", 4)
 ```
 <br>
 
@@ -429,26 +412,26 @@ acategories_low_reg_b_col_names <- c("Region", "n", "% lower-end level", "95% CI
 ################################################################################
 # men, women, both sexes
 # 1 high
-a_high_m_w_b <- join_m_w_b(acategories_high, 1, acategories_col_names)
+a_high_m_w_b <- join_tbls(acategories_high, m_w_b, 1, acategories_col_names)
 
 # 2 intermediate
-a_int_m_w_b <- join_m_w_b(acategories_int, 1, acategories_col_names)
+a_int_m_w_b <- join_tbls(acategories_int, m_w_b, 1, acategories_col_names)
 
 # 3 low
-a_low_m_w_b <- join_m_w_b(acategories_low, 1, acategories_col_names)
+a_low_m_w_b <- join_tbls(acategories_low, m_w_b, 1, acategories_col_names)
 
 ################################################################################
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
 # 1 high
-a_high_u_r <- join_u_r(acategories_high, 1, acategories_col_names)
+a_high_u_r <- join_tbls(acategories_high, u_r, 1, acategories_col_names)
 
 # 2 intermediate
-a_int_u_r <- join_u_r(acategories_int, 1, acategories_col_names)
+a_int_u_r <- join_tbls(acategories_int, u_r, 1, acategories_col_names)
 
 # 3 low
-a_low_u_r <- join_u_r(acategories_low, 1, acategories_col_names)
+a_low_u_r <- join_tbls(acategories_low, u_r, 1, acategories_col_names)
 ```
 
 <br>
@@ -457,7 +440,7 @@ a_low_u_r <- join_u_r(acategories_low, 1, acategories_col_names)
 cbind(a_high_m_w_b$m, select(a_high_m_w_b$w, -agerange), select(a_high_m_w_b$b, -agerange)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% ≥60g", "95% CI", "n", "% ≥40g", "95% CI", 
                                 "n", "% high-end level", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women)", .colspan_val = 10)
 ```
 
 <br>
@@ -466,7 +449,7 @@ cbind(a_high_m_w_b$m, select(a_high_m_w_b$w, -agerange), select(a_high_m_w_b$b, 
 cbind(a_int_m_w_b$m, select(a_int_m_w_b$w, -agerange), select(a_int_m_w_b$b, -agerange)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% 40–59.9g", "95% CI", "n", "% 20–39.9g", "95% CI", 
                                 "n", "% intermediate level", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women)", .colspan_val = 10)
 ```
 
 <br>
@@ -475,7 +458,7 @@ cbind(a_int_m_w_b$m, select(a_int_m_w_b$w, -agerange), select(a_int_m_w_b$b, -ag
 cbind(a_low_m_w_b$m, select(a_low_m_w_b$w, -agerange), select(a_low_m_w_b$b, -agerange)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% <40g", "95% CI", "n", "% <20g", "95% CI", 
                                 "n", "% lower-end level", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women)", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women)", .colspan_val = 10)
 ```
 
 <br>
@@ -488,7 +471,7 @@ a_high_b_u_r <- rbind(a_high_u_r$b_u, a_high_u_r$b_r)
 cbind(a_high_m_u_r, select(a_high_w_u_r, -agerange2), select(a_high_b_u_r, -agerange2)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% ≥60g", "95% CI", "n", "% ≥40g", "95% CI", 
                                 "n", "% high-end level", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -501,7 +484,7 @@ a_int_b_u_r <- rbind(a_int_u_r$b_u, a_int_u_r$b_r)
 cbind(a_int_m_u_r, select(a_int_w_u_r, -agerange2), select(a_int_b_u_r, -agerange2)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% 40–59.9g", "95% CI", "n", "% 20–39.9g", "95% CI", 
                                 "n", "% intermediate level", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -514,7 +497,7 @@ a_low_b_u_r <- rbind(a_low_u_r$b_u, a_low_u_r$b_r)
 cbind(a_low_m_u_r, select(a_low_w_u_r, -agerange2), select(a_low_b_u_r, -agerange2)) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% <40g", "95% CI", "n", "% <20g", "95% CI", 
                                 "n", "% lower-end level", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -522,7 +505,7 @@ cbind(a_low_m_u_r, select(a_low_w_u_r, -agerange2), select(a_low_b_u_r, -agerang
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region - high
 acategories_high$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_high_reg_b_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Drinking at high-end level among all respondents (≥60g of pure alcohol on average per occasion among men and ≥40g of pure alcohol on average per occasion among women) by region", 4)
 ```
 
 <br>
@@ -530,7 +513,7 @@ acategories_high$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = a
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region - intermediate
 acategories_int$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_int_reg_b_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Drinking at intermediate level among all respondents (40–59.9g of pure alcohol on average per occasion among men and 20–39.9g of pure alcohol on average per occasion among women) by region", 4)
 ```
 
 <br>
@@ -538,7 +521,7 @@ acategories_int$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ac
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region - low
 acategories_low$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = acategories_low_reg_b_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Drinking at lower-end level among all respondents (<40g of pure alcohol on average per occasion among men and <20g of pure alcohol on average per occasion among women) by region", 4)
 ```
 <br>
 
@@ -568,11 +551,11 @@ acategories_drinker_reg_col_names <-
   c("Region", "n", "% high-end", "95% CI", "% intermediate", "95% CI", "% lower-end", "95% CI")
 
 # men, women, both sexes
-acategories_drinker_m_w_b <- join_m_w_b(acategories_drinker, 3, acategories_drinker_col_names)
+acategories_drinker_m_w_b <- join_tbls(acategories_drinker, m_w_b, 3, acategories_drinker_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-acategories_drinker_u_r <- join_u_r(acategories_drinker, 3, acategories_drinker_col_names)
+acategories_drinker_u_r <- join_tbls(acategories_drinker, u_r, 3, acategories_drinker_col_names)
 ```
 
 <br>
@@ -581,7 +564,7 @@ acategories_drinker_u_r <- join_u_r(acategories_drinker, 3, acategories_drinker_
 acategories_drinker_m_w_b$m %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥60g)", "95% CI", 
                                 "% intermediate (40-59.9g)", "95% CI", "% lower-end (<40g)", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
 ```
 
 <br>
@@ -590,7 +573,7 @@ acategories_drinker_m_w_b$m %>%
 acategories_drinker_m_w_b$w %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥40g)", "95% CI", 
                                 "% intermediate (20-39.9g)", "95% CI", "% lower-end (<20g)", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
 ```
 
 <br>
@@ -599,7 +582,7 @@ acategories_drinker_m_w_b$w %>%
 acategories_drinker_m_w_b$b %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end", "95% CI", 
                                 "% intermediate", "95% CI", "% lower-end", "95% CI")) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers", .colspan_val = 8)
 ```
 
 <br>
@@ -608,7 +591,7 @@ acategories_drinker_m_w_b$b %>%
 rbind(acategories_drinker_u_r$m_u, acategories_drinker_u_r$m_r) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥60g)", "95% CI", 
                                 "% intermediate (40-59.9g)", "95% CI", "% lower-end (<40g)", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
@@ -617,7 +600,7 @@ rbind(acategories_drinker_u_r$m_u, acategories_drinker_u_r$m_r) %>%
 rbind(acategories_drinker_u_r$w_u, acategories_drinker_u_r$w_r) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end (≥40g)", "95% CI", 
                                 "% intermediate (20-39.9g)", "95% CI", "% lower-end (<20g)", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
@@ -626,17 +609,15 @@ rbind(acategories_drinker_u_r$w_u, acategories_drinker_u_r$w_r) %>%
 rbind(acategories_drinker_u_r$b_u, acategories_drinker_u_r$b_r) %>% 
   set_contents(1, everywhere, c("Age Group (years)", "n", "% high-end", "95% CI", 
                                 "% intermediate", "95% CI", "% lower-end", "95% CI")) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
-# acategories_drinker_e_b_t_reg_j %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = acategories_drinker_reg_col_names) %>% 
-#   final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by region", .colspan_val = 8)
-
+# region
 acategories_drinker$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = acategories_drinker_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by region", .colspan_val = 8)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers by region", .colspan_val = 8)
 ```
 
 <br>
@@ -665,18 +646,18 @@ alargestnum_a8_col_names <- c("Age Group (years)", "n", "Mean maximum  number", 
 alargestnum_a8_reg_col_names <- c("Region", "n", "Mean maximum  number", "95% CI")
 
 # men, women, both sexes
-alargestnum_a8_m_w_b <- join_m_w_b(alargestnum_a8, 1, alargestnum_a8_col_names)
+alargestnum_a8_m_w_b <- join_tbls(alargestnum_a8, m_w_b, 1, alargestnum_a8_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-alargestnum_a8_u_r <- join_u_r(alargestnum_a8, 1, alargestnum_a8_col_names)
+alargestnum_a8_u_r <- join_tbls(alargestnum_a8, u_r, 1, alargestnum_a8_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(alargestnum_a8_m_w_b$m, select(alargestnum_a8_m_w_b$w, -agerange), select(alargestnum_a8_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days", .colspan_val = 10)
 ```
 
 <br>
@@ -687,14 +668,15 @@ tbl_w_u_r <- rbind(alargestnum_a8_u_r$w_u, alargestnum_a8_u_r$w_r)
 tbl_b_u_r <- rbind(alargestnum_a8_u_r$b_u, alargestnum_a8_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 alargestnum_a8$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = alargestnum_a8_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Mean maximum number of standard drinks consumed on one occasion in the past 30 days by region", .colspan_val = 4)
 ```
 
 <br>
@@ -723,18 +705,18 @@ aepisodic_c_col_names <- c("Age Group (years)", "n", "% ≥ 6 drinks", "95% CI")
 aepisodic_c_reg_col_names <- c("Region", "n", "% ≥ 6 drinks", "95% CI")
 
 # men, women, both sexes
-aepisodic_c_m_w_b <- join_m_w_b(aepisodic_c, 1, aepisodic_c_col_names)
+aepisodic_c_m_w_b <- join_tbls(aepisodic_c, m_w_b, 1, aepisodic_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-aepisodic_c_u_r <- join_u_r(aepisodic_c, 1, aepisodic_c_col_names)
+aepisodic_c_u_r <- join_tbls(aepisodic_c, u_r, 1, aepisodic_c_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(aepisodic_c_m_w_b$m, select(aepisodic_c_m_w_b$w, -agerange), select(aepisodic_c_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population", .colspan_val = 10)
 ```
 
 <br>
@@ -745,14 +727,15 @@ tbl_w_u_r <- rbind(aepisodic_c_u_r$w_u, aepisodic_c_u_r$w_r)
 tbl_b_u_r <- rbind(aepisodic_c_u_r$b_u, aepisodic_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 aepisodic_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aepisodic_c_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Six or more drinks on a single occasion at least once during the past 30 days among total population by region", .colspan_val = 4)
 ```
 
 <br>
@@ -781,18 +764,18 @@ aepisodic_a9_col_names <- c("Age Group (years)", "n", "Mean number of times", "9
 aepisodic_a9_reg_col_names <- c("Region", "n", "Mean number of times", "95% CI")
 
 # men, women, both sexes
-aepisodic_a9_m_w_b <- join_m_w_b(aepisodic_a9, 1, aepisodic_a9_col_names)
+aepisodic_a9_m_w_b <- join_tbls(aepisodic_a9, m_w_b, 1, aepisodic_a9_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-aepisodic_a9_u_r <- join_u_r(aepisodic_a9, 1, aepisodic_a9_col_names)
+aepisodic_a9_u_r <- join_tbls(aepisodic_a9, u_r, 1, aepisodic_a9_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(aepisodic_a9_m_w_b$m, select(aepisodic_a9_m_w_b$w, -agerange), select(aepisodic_a9_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers", .colspan_val = 10)
 ```
 
 <br>
@@ -803,14 +786,15 @@ tbl_w_u_r <- rbind(aepisodic_a9_u_r$w_u, aepisodic_a9_u_r$w_r)
 tbl_b_u_r <- rbind(aepisodic_a9_u_r$b_u, aepisodic_a9_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 aepisodic_a9$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aepisodic_a9_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Mean number of times with six or more drinks during a single occasion in the past 30 days among current drinkers by region", .colspan_val = 4)
 ```
 
 <br>
@@ -842,36 +826,36 @@ apastweek_reg_col_names <- c("Region", "n", "% Daily", "95% CI", "% 5-6 days", "
                              "% 3-4 days", "95% CI", "% 1-2 days", "95% CI", "% 0 days", "95% CI")
 
 # men, women, both sexes
-apastweek_c_m_w_b <- join_m_w_b(apastweek_c, 5, apastweek_col_names)
+apastweek_c_m_w_b <- join_tbls(apastweek_c, m_w_b, 5, apastweek_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-apastweek_c_u_r <- join_u_r(apastweek_c, 5, apastweek_col_names)
+apastweek_c_u_r <- join_tbls(apastweek_c, u_r, 5, apastweek_col_names)
 ```
 
 <br>
 
 ```{r}
-apastweek_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+apastweek_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
 ```
 
 <br>
 
 ```{r}
-apastweek_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+apastweek_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
 ```
 
 <br>
 
 ```{r}
-apastweek_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
+apastweek_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days", .colspan_val = 12)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(apastweek_c_u_r$m_u, apastweek_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
 
 ```
 
@@ -879,14 +863,14 @@ rbind(apastweek_c_u_r$m_u, apastweek_c_u_r$m_r) %>%
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(apastweek_c_u_r$w_u, apastweek_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(apastweek_c_u_r$b_u, apastweek_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by type of settlement", .colspan_val = 12)
 ```
 
 <br>
@@ -894,7 +878,7 @@ rbind(apastweek_c_u_r$b_u, apastweek_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 apastweek_c$b_reg %>% unite_ci(.ci_amount = 5) %>% apply_hux(.col_names = apastweek_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by region", .colspan_val = 12)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of alcohol consumption in the past 7 days by region", .colspan_val = 12)
 ```
 
 <br>
@@ -923,11 +907,11 @@ apastweek_drinksday_col_names <- c("Age Group (years)", "n", "Mean number", "95%
 apastweek_drinksday_reg_col_names <- c("Region", "n", "Mean number", "95% CI")
 
 # men, women, both sexes
-apastweek_drinksday_m_w_b <- join_m_w_b(apastweek_drinksday, 1, apastweek_drinksday_col_names)
+apastweek_drinksday_m_w_b <- join_tbls(apastweek_drinksday, m_w_b, 1, apastweek_drinksday_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-apastweek_drinksday_u_r <- join_u_r(apastweek_drinksday, 1, apastweek_drinksday_col_names)
+apastweek_drinksday_u_r <- join_tbls(apastweek_drinksday, u_r, 1, apastweek_drinksday_col_names)
 ```
 
 <br>
@@ -935,7 +919,7 @@ apastweek_drinksday_u_r <- join_u_r(apastweek_drinksday, 1, apastweek_drinksday_
 ```{r}
 cbind(apastweek_drinksday_m_w_b$m, select(apastweek_drinksday_m_w_b$w, -agerange), 
       select(apastweek_drinksday_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
 ```
 
 <br>
@@ -946,14 +930,15 @@ tbl_w_u_r <- rbind(apastweek_drinksday_u_r$w_u, apastweek_drinksday_u_r$w_r)
 tbl_b_u_r <- rbind(apastweek_drinksday_u_r$b_u, apastweek_drinksday_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 apastweek_drinksday$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = apastweek_drinksday_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
 ```
 
 <br>
@@ -983,18 +968,18 @@ aunrecorded_c_col_names <- c("Age Group (years)", "n", "% consuming unrecorded a
 aunrecorded_c_reg_col_names <- c("Region", "n", "% consuming unrecorded alcohol", "95% CI")
 
 # men, women, both sexes
-aunrecorded_c_m_w_b <- join_m_w_b(aunrecorded_c, 1, aunrecorded_c_col_names)
+aunrecorded_c_m_w_b <- join_tbls(aunrecorded_c, m_w_b, 1, aunrecorded_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-aunrecorded_c_u_r <- join_u_r(aunrecorded_c, 1, aunrecorded_c_col_names)
+aunrecorded_c_u_r <- join_tbls(aunrecorded_c, u_r, 1, aunrecorded_c_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(aunrecorded_c_m_w_b$m, select(aunrecorded_c_m_w_b$w, -agerange), select(aunrecorded_c_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Consumption of unrecorded alcohol", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Consumption of unrecorded alcohol", .colspan_val = 10)
 ```
 
 <br>
@@ -1005,14 +990,15 @@ tbl_w_u_r <- rbind(aunrecorded_c_u_r$w_u, aunrecorded_c_u_r$w_r)
 tbl_b_u_r <- rbind(aunrecorded_c_u_r$b_u, aunrecorded_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Consumption of unrecorded alcohol by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Consumption of unrecorded alcohol by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 aunrecorded_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = aunrecorded_c_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Consumption of unrecorded alcohol by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Consumption of unrecorded alcohol by region", .colspan_val = 4)
 ```
 
 <br>
@@ -1039,18 +1025,18 @@ ameanunrecorded_col_names <- c("Age Group (years)", "n", "Mean number", "95% CI"
 ameanunrecorded_reg_col_names <- c("Region", "n", "Mean number", "95% CI")
 
 # men, women, both sexes
-ameanunrecorded_m_w_b <- join_m_w_b(ameanunrecorded, 1, ameanunrecorded_col_names)
+ameanunrecorded_m_w_b <- join_tbls(ameanunrecorded, m_w_b, 1, ameanunrecorded_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-ameanunrecorded_u_r <- join_u_r(ameanunrecorded, 1, ameanunrecorded_col_names)
+ameanunrecorded_u_r <- join_tbls(ameanunrecorded, u_r, 1, ameanunrecorded_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(ameanunrecorded_m_w_b$m, select(ameanunrecorded_m_w_b$w, -agerange), select(ameanunrecorded_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, 3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers", .colspan_val = 10)
 ```
 
 <br>
@@ -1061,14 +1047,15 @@ tbl_w_u_r <- rbind(ameanunrecorded_u_r$w_u, ameanunrecorded_u_r$w_r)
 tbl_b_u_r <- rbind(ameanunrecorded_u_r$b_u, ameanunrecorded_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 ameanunrecorded$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = ameanunrecorded_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Mean number of standard drinks of unrecorded alcohol consumed on average per day in the past 7 days among current drinkers by region", .colspan_val = 4)
 ```
 
 <br>
@@ -1113,7 +1100,7 @@ aunrecordedpastweek_u_r <- aunrecordedpastweek %>%
 ```{r}
 cbind(aunrecordedpastweek_m_w_b$m, select(aunrecordedpastweek_m_w_b$w, -agerange), 
       select(aunrecordedpastweek_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days", .colspan_val = 10)
 ```
 
 <br>
@@ -1124,15 +1111,16 @@ tbl_w_u_r <- rbind(aunrecordedpastweek_u_r$w_u, aunrecordedpastweek_u_r$w_r)
 tbl_b_u_r <- rbind(aunrecordedpastweek_u_r$b_u, aunrecordedpastweek_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>%
-  final_u_r_tbl(.s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
+# region
 aunrecordedpastweek$b_reg %>% mutate(., ci = "–") %>% 
   apply_hux(.col_names = aunrecordedpastweek_reg_col_names) %>%
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by region", .colspan_val = 4)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Percentage of unrecorded alcohol from all alcohol consumed during past 7 days by region", .colspan_val = 4)
 ```
 
 <br>
@@ -1178,44 +1166,44 @@ aunrecpastweektype_u_r <- aunrecpastweektype %>%
 <br>
 
 ```{r}
-aunrecpastweektype_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+aunrecpastweektype_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
 ```
 
 <br>
 
 ```{r}
-aunrecpastweektype_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+aunrecpastweektype_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
 ```
 
 <br>
 
 ```{r}
-aunrecpastweektype_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
+aunrecpastweektype_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type", .colspan_val = 7)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
-rbind(aunrecpastweektype_u_r$m_u, aunrecpastweektype_u_r$m_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+rbind(aunrecpastweektype_u_r$m_u, aunrecpastweektype_u_r$m_r) %>% final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
-rbind(aunrecpastweektype_u_r$w_u, aunrecpastweektype_u_r$w_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+rbind(aunrecpastweektype_u_r$w_u, aunrecpastweektype_u_r$w_r) %>% final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
-rbind(aunrecpastweektype_u_r$b_u, aunrecpastweektype_u_r$b_r) %>% final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
+rbind(aunrecpastweektype_u_r$b_u, aunrecpastweektype_u_r$b_r) %>% final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by type of settlement)", .colspan_val = 7) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
-aunrecpastweektype$b_reg %>% apply_hux(., .col_names = aunrecpastweektype_reg_col_names) %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by region)", .colspan_val = 7)
+aunrecpastweektype$b_reg %>% apply_hux(., .col_names = aunrecpastweektype_reg_col_names) %>% final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Unrecorded alcohol consumption during the past 7 days by type (and by region)", .colspan_val = 7)
 ```
 
 <br>
@@ -1248,50 +1236,50 @@ anotabletostop_reg_col_names <- c("Region", "n", "% monthly or more frequently",
                                   "% less than monthly", "95% CI", "% never", "95% CI")
 
 # men, women, both sexes
-anotabletostop_c_m_w_b <- join_m_w_b(anotabletostop_c, 3, anotabletostop_col_names)
+anotabletostop_c_m_w_b <- join_tbls(anotabletostop_c, m_w_b, 3, anotabletostop_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-anotabletostop_c_u_r <- join_u_r(anotabletostop_c, 3, anotabletostop_col_names)
+anotabletostop_c_u_r <- join_tbls(anotabletostop_c, u_r, 3, anotabletostop_col_names)
 ```
 
 <br>
 
 ```{r}
-anotabletostop_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+anotabletostop_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-anotabletostop_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+anotabletostop_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-anotabletostop_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+anotabletostop_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(anotabletostop_c_u_r$m_u, anotabletostop_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(anotabletostop_c_u_r$w_u, anotabletostop_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(anotabletostop_c_u_r$b_u, anotabletostop_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
@@ -1299,7 +1287,7 @@ rbind(anotabletostop_c_u_r$b_u, anotabletostop_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 anotabletostop_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = anotabletostop_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of not being able to stop drinking once started during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
 ```
 <br>
 
@@ -1331,50 +1319,50 @@ afailexpected_reg_col_names <- c("Region", "n", "% monthly or more frequently", 
                                   "% less than monthly", "95% CI", "% never", "95% CI")
 
 # men, women, both sexes
-afailexpected_c_m_w_b <- join_m_w_b(afailexpected_c, 3, afailexpected_col_names)
+afailexpected_c_m_w_b <- join_tbls(afailexpected_c, m_w_b, 3, afailexpected_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-afailexpected_c_u_r <- join_u_r(afailexpected_c, 3, afailexpected_col_names)
+afailexpected_c_u_r <- join_tbls(afailexpected_c, u_r, 3, afailexpected_col_names)
 ```
 
 <br>
 
 ```{r}
-afailexpected_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+afailexpected_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-afailexpected_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+afailexpected_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-afailexpected_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+afailexpected_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afailexpected_c_u_r$m_u, afailexpected_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afailexpected_c_u_r$w_u, afailexpected_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afailexpected_c_u_r$b_u, afailexpected_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8) 
 ```
 
 <br>
@@ -1382,7 +1370,7 @@ rbind(afailexpected_c_u_r$b_u, afailexpected_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 afailexpected_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = afailexpected_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of failing to do what was normally expected from you during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
 ```
 <br>
 
@@ -1413,50 +1401,50 @@ amorningdrink_reg_col_names <- c("Region", "n", "% monthly or more frequently", 
                                  "% less than monthly", "95% CI", "% never", "95% CI")
 
 # men, women, both sexes
-amorningdrink_c_m_w_b <- join_m_w_b(amorningdrink_c, 3, amorningdrink_col_names)
+amorningdrink_c_m_w_b <- join_tbls(amorningdrink_c, m_w_b, 3, amorningdrink_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-amorningdrink_c_u_r <- join_u_r(amorningdrink_c, 3, amorningdrink_col_names)
+amorningdrink_c_u_r <- join_tbls(amorningdrink_c, u_r, 3, amorningdrink_col_names)
 ```
 
 <br>
 
 ```{r}
-amorningdrink_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+amorningdrink_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-amorningdrink_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+amorningdrink_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-amorningdrink_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
+amorningdrink_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(amorningdrink_c_u_r$m_u, amorningdrink_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(amorningdrink_c_u_r$w_u, amorningdrink_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(amorningdrink_c_u_r$b_u, amorningdrink_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by type of settlement", .colspan_val = 8)
 ```
 
 <br>
@@ -1464,7 +1452,7 @@ rbind(amorningdrink_c_u_r$b_u, amorningdrink_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 amorningdrink_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = amorningdrink_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of needing a first drink in the morning to get going during the past 12 months among past 12 month drinkers by region", .colspan_val = 8)
 ```
 <br>
 
@@ -1495,50 +1483,50 @@ afamproblem_reg_col_names <- c("Region", "n", "% monthly or more frequently", "9
                                "% less than monthly", "95% CI", "% never", "95% CI")
 
 # men, women, both sexes
-afamproblem_c_m_w_b <- join_m_w_b(afamproblem_c, 3, afamproblem_col_names)
+afamproblem_c_m_w_b <- join_tbls(afamproblem_c, m_w_b, 3, afamproblem_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-afamproblem_c_u_r <- join_u_r(afamproblem_c, 3, afamproblem_col_names)
+afamproblem_c_u_r <- join_tbls(afamproblem_c, u_r, 3, afamproblem_col_names)
 ```
 
 <br>
 
 ```{r}
-afamproblem_c_m_w_b$m %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+afamproblem_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-afamproblem_c_m_w_b$w %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+afamproblem_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r}
-afamproblem_c_m_w_b$b %>% final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
+afamproblem_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afamproblem_c_u_r$m_u, afamproblem_c_u_r$m_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Men", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afamproblem_c_u_r$w_u, afamproblem_c_u_r$w_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Women", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(afamproblem_c_u_r$b_u, afamproblem_c_u_r$b_r) %>% 
-  final_u_r_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
+  final_tbl(.disaggregation = u_r, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by type of settlement", .colspan_val = 8)
 ```
 
 <br>
@@ -1546,7 +1534,7 @@ rbind(afamproblem_c_u_r$b_u, afamproblem_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 afamproblem_c$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = afamproblem_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by region", .colspan_val = 8)
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Frequency of family/partner problems due to someone else’s drinking during the past 12 months among all respondents by region", .colspan_val = 8)
 ```
 <br>
 

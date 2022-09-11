@@ -45,7 +45,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # No vigorous physical activity
-pnovigorous_c_list_long <- tbls_pct_summary(.variable = c)
+pnovigorous_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 pnovigorous_c <- tbls_list_split(
@@ -67,7 +67,6 @@ fs_19_pnovigorous_c_joint <- cbind(fs_19_pnovigorous_c_b,
                                    fs_19_pnovigorous_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage not engaging in vigorous activity", .before = 1)
-fs_19_pnovigorous_c_joint
 
 readr::write_excel_csv(fs_19_pnovigorous_c_joint, here("FactSheet", "19_fs_pnovigorous_c.csv"))
 

@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # Frequency of family/partner problems due to someone else’s drinking 
 # during the past 12 months among all respondents
-afamproblem_c_list_long <- tbls_pct_summary(.variable = c)
+afamproblem_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 afamproblem_c <- 

@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 # Frequency of needing a first drink in the morning to get going during 
 # the past 12 months among past 12 month drinkers
-amorningdrink_c_list_long <- tbls_pct_summary(.variable = c)
+amorningdrink_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 amorningdrink_c <- 

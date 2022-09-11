@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Add salt always or often before eating or when eating 
-dcooking_c_list_long <- tbls_pct_summary(.variable = c)
+dcooking_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dcooking_c <- tbls_list_split(
@@ -47,15 +47,6 @@ dcooking_c <- tbls_list_split(
   .select_var_val = "1) always or often added salt")
 
 ################################################################################
-
-
-
-
-
-
-
-
-
 
 
 

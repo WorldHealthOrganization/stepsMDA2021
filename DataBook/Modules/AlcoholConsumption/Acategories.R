@@ -39,7 +39,8 @@ source("functions.R", encoding="UTF-8")
 # to produce the same results, as individual variables produce in Epi Info
 
 # 1 PART
-acategories_high_int_low_list_long <- tbls_pct_summary(.variable = e)
+acategories_high_int_low_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e)
+
 
 # Drinking at high-end level among all respondents (≥60g of pure alcohol on average 
 # per occasion among men and ≥40g of pure alcohol on average per occasion among women)
@@ -80,7 +81,7 @@ acategories_low <-
 
 # 2 PART
 # High-end, intermediate, and lower-end level drinking among current (past 30 days) drinkers
-acategories_drinker_list_long <- tbls_pct_summary(.variable = e, .cln = clndrinker)
+acategories_drinker_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = clndrinker)
 
 # DATABOOK prep
 acategories_drinker <- 

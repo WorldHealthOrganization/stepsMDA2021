@@ -40,7 +40,7 @@ source("functions.R", encoding="UTF-8")
 
 # Age started smoking, among current daily smokers
 tsmokeagetime_initiation_list_long <- 
-  tbls_mn_summary(.variable = initiation, .cln2 = t2, .cln2_val = 1)
+  tbls_summary(.mn_pct_md = mn, .variable = initiation, .cln2 = t2, .cln2_val = 1)
 
 # DATABOOK prep
 tsmokeagetime_initiation <- 
@@ -50,7 +50,7 @@ tsmokeagetime_initiation <-
 
 # Duration of smoking, among current daily smokers
 tsmokeagetime_duration_list_long <- 
-  tbls_mn_summary(.variable = duration, .cln2 = t2, .cln2_val = 1)
+  tbls_summary(.mn_pct_md = mn, .variable = duration, .cln2 = t2, .cln2_val = 1)
 
 # DATABOOK prep
 tsmokeagetime_duration <- 
@@ -71,10 +71,8 @@ fs_tsmokeagetime_initiation_joint <- cbind(fs_tsmokeagetime_initiation_b,
                                            fs_tsmokeagetime_initiation_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Average age started smoking (years)", .before = 1)
-fs_tsmokeagetime_initiation_joint
 
-library(readr)
-write_excel_csv(fs_tsmokeagetime_initiation_joint, here("FactSheet", "03_fs_initiation.csv"))
+readr::write_excel_csv(fs_tsmokeagetime_initiation_joint, here("FactSheet", "03_fs_initiation.csv"))
 
 ################################################################################
 ################################################################################

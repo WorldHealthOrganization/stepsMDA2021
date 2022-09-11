@@ -45,21 +45,21 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # % Activity from work
-pcomposition_work_list_long <- tbls_mn_summary(.variable = percentwork)
+pcomposition_work_list_long <- tbls_summary(.mn_pct_md = mn, .variable = percentwork)
 # DATABOOK prep
 pcomposition_work <- tbls_list_split(
   .data = pcomposition_work_list_long, .vars_amount_number = 0)
 
 
 # % Activity for transport
-pcomposition_trans_list_long <- tbls_mn_summary(.variable = percenttrans)
+pcomposition_trans_list_long <- tbls_summary(.mn_pct_md = mn, .variable = percenttrans)
 # DATABOOK prep
 pcomposition_trans <- tbls_list_split(
   .data = pcomposition_trans_list_long, .vars_amount_number = 0)
 
 
 # % Activity during leisure time
-pcomposition_rec_list_long <- tbls_mn_summary(.variable = percentrec)
+pcomposition_rec_list_long <- tbls_summary(.mn_pct_md = mn, .variable = percentrec)
 # DATABOOK prep
 pcomposition_rec <- tbls_list_split(
   .data = pcomposition_rec_list_long, .vars_amount_number = 0)

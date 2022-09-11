@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean maximum number of standard drinks consumed on one occasion in the past 30 days
-alargestnum_a8_list_long <- tbls_mn_summary(.variable = a8)
+alargestnum_a8_list_long <- tbls_summary(.mn_pct_md = mn, .variable = a8)
 
 # DATABOOK prep
 alargestnum_a8 <- tbls_list_split(.data = alargestnum_a8_list_long, .vars_amount_number = 0)

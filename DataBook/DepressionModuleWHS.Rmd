@@ -1,48 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-whs_depr_data_dir <- here::here("DataBook", "Modules", "DepressionModuleWHS")
-
-# list all files in the directory
-# fs::dir_ls(whs_depr_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(whs_depr_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "DepressionModuleWHS") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # Depression
 
@@ -85,18 +69,18 @@ whs_depression_c_col_names <- c("Age Group (years)", "n", "%", "95% CI")
 whs_depression_c_reg_col_names <- c("Region", "n", "%", "95% CI")
 
 # men, women, both sexes
-whs_depression_c_m_w_b <- join_m_w_b(whs_depression_c, 1, whs_depression_c_col_names)
+whs_depression_c_m_w_b <- join_tbls(whs_depression_c, m_w_b, 1, whs_depression_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-whs_depression_c_u_r <- join_u_r(whs_depression_c, 1, whs_depression_c_col_names)
+whs_depression_c_u_r <- join_tbls(whs_depression_c, u_r, 1, whs_depression_c_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(whs_depression_c_m_w_b$m, select(whs_depression_c_m_w_b$w, -agerange), select(whs_depression_c_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm", .colspan_val = 10)
 ```
 
 <br>
@@ -107,14 +91,14 @@ tbl_w_u_r <- rbind(whs_depression_c_u_r$w_u, whs_depression_c_u_r$w_r)
 tbl_b_u_r <- rbind(whs_depression_c_u_r$b_u, whs_depression_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Prevalence of depressive symptoms using established WHS algorithm by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 whs_depression_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = whs_depression_c_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Prevalence of depressive symptoms using established WHS algorithm by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Prevalence of depressive symptoms using established WHS algorithm by region", .colspan_val = 4) 
 ```
 
 <br>
@@ -142,18 +126,18 @@ da1_d_whs_col_names <- c("Age Group (years)", "n", "% Told", "95% CI")
 da1_d_whs_reg_col_names <- c("Region", "n", "% Told", "95% CI")
 
 # men, women, both sexes
-da1_d_whs_m_w_b <- join_m_w_b(da1_d_whs, 1, da1_d_whs_col_names)
+da1_d_whs_m_w_b <- join_tbls(da1_d_whs, m_w_b, 1, da1_d_whs_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-da1_d_whs_u_r <- join_u_r(da1_d_whs, 1, da1_d_whs_col_names)
+da1_d_whs_u_r <- join_tbls(da1_d_whs, u_r, 1, da1_d_whs_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(da1_d_whs_m_w_b$m, select(da1_d_whs_m_w_b$w, -agerange), select(da1_d_whs_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm)", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm)", .colspan_val = 10)
 ```
 
 <br>
@@ -164,14 +148,14 @@ tbl_w_u_r <- rbind(da1_d_whs_u_r$w_u, da1_d_whs_u_r$w_r)
 tbl_b_u_r <- rbind(da1_d_whs_u_r$b_u, da1_d_whs_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 da1_d_whs$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da1_d_whs_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression (from those that are depressed based on WHS algorithm) by region", .colspan_val = 4) 
 ```
 
 <br>
@@ -198,18 +182,18 @@ da1_d_all_col_names <- c("Age Group (years)", "n", "% Told", "95% CI")
 da1_d_all_reg_col_names <- c("Region", "n", "% Told", "95% CI")
 
 # men, women, both sexes
-da1_d_all_m_w_b <- join_m_w_b(da1_d_all, 1, da1_d_all_col_names)
+da1_d_all_m_w_b <- join_tbls(da1_d_all, m_w_b, 1, da1_d_all_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-da1_d_all_u_r <- join_u_r(da1_d_all, 1, da1_d_all_col_names)
+da1_d_all_u_r <- join_tbls(da1_d_all, u_r, 1, da1_d_all_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(da1_d_all_m_w_b$m, select(da1_d_all_m_w_b$w, -agerange), select(da1_d_all_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Told by a doctor or health worker that have a depression", .colspan_val = 10)
 ```
 
 <br>
@@ -220,14 +204,14 @@ tbl_w_u_r <- rbind(da1_d_all_u_r$w_u, da1_d_all_u_r$w_r)
 tbl_b_u_r <- rbind(da1_d_all_u_r$b_u, da1_d_all_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Told by a doctor or health worker that have a depression by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Told by a doctor or health worker that have a depression by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 da1_d_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da1_d_all_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Told by a doctor or health worker that have a depression by region", .colspan_val = 4) 
 ```
 
 <br>
@@ -256,16 +240,16 @@ da4_e_da5_f_all_reg_col_names <- c("Region", "n", "% On medication", "95% CI")
 
 # men, women, both sexes
 # 1 - Have been taking medications or other treatment for depression in the last 12 months
-da4_e_all_m_w_b <- join_m_w_b(da4_e_all, 1, da4_e_da5_f_all_col_names)
+da4_e_all_m_w_b <- join_tbls(da4_e_all, m_w_b, 1, da4_e_da5_f_all_col_names)
 # 2 - Have been taking medications or other treatment for depression in the last 2 weeks
-da5_f_all_m_w_b <- join_m_w_b(da5_f_all, 1, da4_e_da5_f_all_col_names)
+da5_f_all_m_w_b <- join_tbls(da5_f_all, m_w_b, 1, da4_e_da5_f_all_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
 # 1
-da4_e_all_u_r <- join_u_r(da4_e_all, 1, da4_e_da5_f_all_col_names)
+da4_e_all_u_r <- join_tbls(da4_e_all, u_r, 1, da4_e_da5_f_all_col_names)
 # 2
-da5_f_all_u_r <- join_u_r(da5_f_all, 1, da4_e_da5_f_all_col_names)
+da5_f_all_u_r <- join_tbls(da5_f_all, u_r, 1, da4_e_da5_f_all_col_names)
 ```
 
 <br>
@@ -273,7 +257,7 @@ da5_f_all_u_r <- join_u_r(da5_f_all, 1, da4_e_da5_f_all_col_names)
 ```{r}
 # 1
 cbind(da4_e_all_m_w_b$m, select(da4_e_all_m_w_b$w, -agerange), select(da4_e_all_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months", .colspan_val = 10)
 ```
 
 <br>
@@ -281,7 +265,7 @@ cbind(da4_e_all_m_w_b$m, select(da4_e_all_m_w_b$w, -agerange), select(da4_e_all_
 ```{r}
 # 2
 cbind(da5_f_all_m_w_b$m, select(da5_f_all_m_w_b$w, -agerange), select(da5_f_all_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks", .colspan_val = 10)
 ```
 
 <br>
@@ -293,7 +277,7 @@ tbl_w_u_r <- rbind(da4_e_all_u_r$w_u, da4_e_all_u_r$w_r)
 tbl_b_u_r <- rbind(da4_e_all_u_r$b_u, da4_e_all_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 12 months by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -305,7 +289,7 @@ tbl_w_u_r <- rbind(da5_f_all_u_r$w_u, da5_f_all_u_r$w_r)
 tbl_b_u_r <- rbind(da5_f_all_u_r$b_u, da5_f_all_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Have been taking medications or other treatment for depression in the last 2 weeks by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -313,7 +297,7 @@ cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 1
 da4_e_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da5_f_all_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 12 months by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 12 months by region", .colspan_val = 4) 
 ```
 
 <br>
@@ -321,7 +305,7 @@ da4_e_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 2
 da5_f_all$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da4_e_da5_f_all_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 2 weeks by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Have been taking medications or other treatment for depression in the last 2 weeks by region", .colspan_val = 4) 
 ```
 
 <br>
@@ -348,18 +332,18 @@ da22_g_whs_col_names <- c("Age Group (years)", "n", "% Thought", "95% CI")
 da22_g_whs_reg_col_names <- c("Region", "n", "% Thought", "95% CI")
 
 # men, women, both sexes
-da22_g_whs_m_w_b <- join_m_w_b(da22_g_whs, 1, da22_g_whs_col_names)
+da22_g_whs_m_w_b <- join_tbls(da22_g_whs, m_w_b, 1, da22_g_whs_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-da22_g_whs_u_r <- join_u_r(da22_g_whs, 1, da22_g_whs_col_names)
+da22_g_whs_u_r <- join_tbls(da22_g_whs, u_r, 1, da22_g_whs_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(da22_g_whs_m_w_b$m, select(da22_g_whs_m_w_b$w, -agerange), select(da22_g_whs_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm)", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm)", .colspan_val = 10)
 ```
 
 <br>
@@ -370,14 +354,14 @@ tbl_w_u_r <- rbind(da22_g_whs_u_r$w_u, da22_g_whs_u_r$w_r)
 tbl_b_u_r <- rbind(da22_g_whs_u_r$b_u, da22_g_whs_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm) by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm) by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 da22_g_whs$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = da22_g_whs_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm) by region", .colspan_val = 4) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Thought of death, or wished they were dead, during the last 12 months (from those that are depressed based on WHS algorithm) by region", .colspan_val = 4) 
 ```
 
 <br>

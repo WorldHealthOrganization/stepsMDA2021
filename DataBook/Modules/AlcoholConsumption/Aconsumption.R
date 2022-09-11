@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Alcohol consumption status
-aconsumption_c_list_long <- tbls_pct_summary(.variable = c)
+aconsumption_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 aconsumption_c <- 
@@ -56,7 +56,6 @@ fs_6_aconsumption_c_joint <- cbind(fs_6_aconsumption_c_b,
                                    fs_6_aconsumption_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who are lifetime abstainers", .before = 1)
-fs_6_aconsumption_c_joint
 
 readr::write_excel_csv(fs_6_aconsumption_c_joint, here("FactSheet", "06_fs_aconsumption_c.csv"))
 
@@ -70,7 +69,6 @@ fs_7_aconsumption_c_joint <- cbind(fs_7_aconsumption_c_b,
                                    fs_7_aconsumption_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who are past 12-month abstainers", .before = 1)
-fs_7_aconsumption_c_joint
 
 readr::write_excel_csv(fs_7_aconsumption_c_joint, here("FactSheet", "07_fs_aconsumption_c.csv"))
 
@@ -85,15 +83,9 @@ fs_8_aconsumption_c_joint <- cbind(fs_8_aconsumption_c_b,
                                    fs_8_aconsumption_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who currently drink (drank alcohol in the past 30 days)", .before = 1)
-fs_8_aconsumption_c_joint
 
 readr::write_excel_csv(fs_8_aconsumption_c_joint, here("FactSheet", "08_fs_aconsumption_c.csv"))
 
 ################################################################################
 ################################################################################
-
-
-
-
-
 

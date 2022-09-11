@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - Advised by doctor or health worker to quit using tobacco or don’t start
-hlifestyle_a_list_long <- tbls_pct_summary(.variable = a, .cln = h20acln)
+hlifestyle_a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = a, .cln = h20acln)
 # DATABOOK prep
 hlifestyle_a <- tbls_list_split(
   .data = hlifestyle_a_list_long, .select_var = a, 
@@ -45,7 +45,7 @@ hlifestyle_a <- tbls_list_split(
 
 
 # 2 - Advised by doctor or health worker to reduce salt in the diet
-hlifestyle_b_list_long <- tbls_pct_summary(.variable = b, .cln = h20bcln)
+hlifestyle_b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = b, .cln = h20bcln)
 # DATABOOK prep
 hlifestyle_b <- tbls_list_split(
   .data = hlifestyle_b_list_long, .select_var = b, 
@@ -53,7 +53,7 @@ hlifestyle_b <- tbls_list_split(
 
 
 # 3 - Advised by doctor or health worker to eat at least five servings of fruit and/or vegetables each day
-hlifestyle_c_list_long <- tbls_pct_summary(.variable = c, .cln = h20ccln)
+hlifestyle_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = h20ccln)
 # DATABOOK prep
 hlifestyle_c <- tbls_list_split(
   .data = hlifestyle_c_list_long, .select_var = c, 
@@ -61,7 +61,7 @@ hlifestyle_c <- tbls_list_split(
 
 
 # 4 - Advised by doctor or health worker to reduce fat in the diet
-hlifestyle_d_list_long <- tbls_pct_summary(.variable = d, .cln = h20dcln)
+hlifestyle_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h20dcln)
 # DATABOOK prep
 hlifestyle_d <- tbls_list_split(
   .data = hlifestyle_d_list_long, .select_var = d, 
@@ -69,7 +69,7 @@ hlifestyle_d <- tbls_list_split(
 
 
 # 5 - Advised by doctor or health worker to start or do more physical activity
-hlifestyle_e_list_long <- tbls_pct_summary(.variable = e, .cln = h20ecln)
+hlifestyle_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = h20ecln)
 # DATABOOK prep
 hlifestyle_e <- tbls_list_split(
   .data = hlifestyle_e_list_long, .select_var = e, 
@@ -77,7 +77,7 @@ hlifestyle_e <- tbls_list_split(
 
 
 # 6 - Advised by doctor or health worker to maintain a healthy body weight or to lose weight
-hlifestyle_f_list_long <- tbls_pct_summary(.variable = f, .cln = h20fcln)
+hlifestyle_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln = h20fcln)
 # DATABOOK prep
 hlifestyle_f <- tbls_list_split(
   .data = hlifestyle_f_list_long, .select_var = f, 
@@ -85,7 +85,7 @@ hlifestyle_f <- tbls_list_split(
 
 
 # 7 - Advised by doctor or health worker to reduce sugary beverages in diet 
-hlifestyle_g_list_long <- tbls_pct_summary(.variable = g, .cln = h20gcln)
+hlifestyle_g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = g, .cln = h20gcln)
 # DATABOOK prep
 hlifestyle_g <- tbls_list_split(
   .data = hlifestyle_g_list_long, .select_var = g, 

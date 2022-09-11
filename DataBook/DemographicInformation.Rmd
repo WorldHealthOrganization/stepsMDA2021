@@ -1,48 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-demog_info_data_dir <- here::here("DataBook", "Modules", "DemographicInformation")
-
-# list all files in the directory
-# fs::dir_ls(demog_info_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(demog_info_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "DemographicInformation") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # Demographic Information Results
 
@@ -61,18 +45,18 @@ cagesex_col_names <- c("Age Group (years)", "n", "%")
 cagesex_reg_col_names <- c("Region", "n", "%")
 
 # men, women, both sexes
-cagesex_m_w_b <- join_m_w_b(cagesex, 0, cagesex_col_names)
+cagesex_m_w_b <- join_tbls(cagesex, m_w_b, 0, cagesex_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-cagesex_u_r <- join_u_r(cagesex, 0, cagesex_col_names)
+cagesex_u_r <- join_tbls(cagesex, u_r, 0, cagesex_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(cagesex_m_w_b$m, select(cagesex_m_w_b$w, -agerange), select(cagesex_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = "unwt_3", .title = "Age group and sex of respondents", .colspan_val = 7)
+  final_tbl(.disaggregation = m_w_b, .s_amount = "unwt_3", .title = "Age group and sex of respondents", .colspan_val = 7)
 ```
 
 <br>
@@ -83,14 +67,14 @@ tbl_w_u_r <- rbind(cagesex_u_r$w_u, cagesex_u_r$w_r)
 tbl_b_u_r <- rbind(cagesex_u_r$b_u, cagesex_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = "unwt_3", .title = "Age group and sex of respondents by type of settlement", .colspan_val = 7)
+  final_tbl(.disaggregation = u_r, .s_amount = "unwt_3", .title = "Age group and sex of respondents by type of settlement", .colspan_val = 7)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 cagesex$b_reg %>% apply_hux(.col_names = cagesex_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Age group and sex of respondents by region", .colspan_val = 3) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Age group and sex of respondents by region", .colspan_val = 3) 
 ```
 
 <br>
@@ -116,18 +100,18 @@ ceduyears_col_names <- c("Age Group (years)", "n", "Mean")
 ceduyears_reg_col_names <- c("Region", "n", "Mean")
 
 # men, women, both sexes
-ceduyears_m_w_b <- join_m_w_b(ceduyears, 0, ceduyears_col_names)
+ceduyears_m_w_b <- join_tbls(ceduyears, m_w_b, 0, ceduyears_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-ceduyears_u_r <- join_u_r(ceduyears, 0, ceduyears_col_names)
+ceduyears_u_r <- join_tbls(ceduyears, u_r, 0, ceduyears_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(ceduyears_m_w_b$m, select(ceduyears_m_w_b$w, -agerange), select(ceduyears_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = "unwt_3", .title = "Mean number of years of education", .colspan_val = 7)
+  final_tbl(.disaggregation = m_w_b, .s_amount = "unwt_3", .title = "Mean number of years of education", .colspan_val = 7)
 ```
 
 <br>
@@ -138,14 +122,14 @@ tbl_w_u_r <- rbind(ceduyears_u_r$w_u, ceduyears_u_r$w_r)
 tbl_b_u_r <- rbind(ceduyears_u_r$b_u, ceduyears_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = "unwt_3", .title = "Mean number of years of education by type of settlement", .colspan_val = 7)
+  final_tbl(.disaggregation = u_r, .s_amount = "unwt_3", .title = "Mean number of years of education by type of settlement", .colspan_val = 7)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 ceduyears$b_reg %>% apply_hux(.col_names = ceduyears_reg_col_names) %>% 
-  final_m_w_b_tbl(.s_amount = 1, .s_val = "Both sexes", .title = "Mean number of years of education by region", .colspan_val = 3) 
+  final_tbl(.disaggregation = reg, .s_amount = 1, .s_val = "Both sexes", .title = "Mean number of years of education by region", .colspan_val = 3) 
 ```
 
 <br>
@@ -180,50 +164,50 @@ ceduhigh_c_reg_col_names <-
     "% College/ University completed", "% Post graduate degree completed")
 
 # men, women, both sexes
-ceduhigh_c_m_w_b <- join_m_w_b(ceduhigh_c, 0, ceduhigh_c_col_names)
+ceduhigh_c_m_w_b <- join_tbls(ceduhigh_c, m_w_b, 0, ceduhigh_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-ceduhigh_c_u_r <- join_u_r(ceduhigh_c, 0, ceduhigh_c_col_names)
+ceduhigh_c_u_r <- join_tbls(ceduhigh_c, u_r, 0, ceduhigh_c_col_names)
 ```
 
 <br>
 
 ```{r}
-ceduhigh_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Highest level of education", 9)
+ceduhigh_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, 1, "Men", "Highest level of education", 9)
 ```
 
 <br>
 
 ```{r}
-ceduhigh_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Highest level of education", 9)
+ceduhigh_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, 1, "Women", "Highest level of education", 9)
 ```
 
 <br>
 
 ```{r}
-ceduhigh_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Highest level of education", 9)
+ceduhigh_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Highest level of education", 9)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(ceduhigh_c_u_r$m_u, ceduhigh_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Highest level of education by type of settlement", 9)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Highest level of education by type of settlement", 9)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(ceduhigh_c_u_r$w_u, ceduhigh_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Highest level of education by type of settlement", 9)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Highest level of education by type of settlement", 9)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(ceduhigh_c_u_r$b_u, ceduhigh_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Highest level of education by type of settlement", 9)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Highest level of education by type of settlement", 9)
 ```
 
 <br>
@@ -231,7 +215,7 @@ rbind(ceduhigh_c_u_r$b_u, ceduhigh_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 ceduhigh_c$b_reg %>% apply_hux(.col_names = ceduhigh_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Highest level of education by region", 9) 
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Highest level of education by region", 9) 
 ```
 
 <br>
@@ -266,50 +250,50 @@ cethnic_c_reg_col_names <-
     "% Russian", "% Gagauz", "% Roma", "% Other")
 
 # men, women, both sexes
-cethnic_c_m_w_b <- join_m_w_b(cethnic_c, 0, cethnic_c_col_names)
+cethnic_c_m_w_b <- join_tbls(cethnic_c, m_w_b, 0, cethnic_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-cethnic_c_u_r <- join_u_r(cethnic_c, 0, cethnic_c_col_names)
+cethnic_c_u_r <- join_tbls(cethnic_c, u_r, 0, cethnic_c_col_names)
 ```
 
 <br>
 
 ```{r}
-cethnic_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Ethnic group of respondents", 8)
+cethnic_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, 1, "Men", "Ethnic group of respondents", 8)
 ```
 
 <br>
 
 ```{r}
-cethnic_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Ethnic group of respondents", 8)
+cethnic_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, 1, "Women", "Ethnic group of respondents", 8)
 ```
 
 <br>
 
 ```{r}
-cethnic_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Ethnic group of respondents", 8)
+cethnic_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Ethnic group of respondents", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cethnic_c_u_r$m_u, cethnic_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Ethnic group of respondents by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Ethnic group of respondents by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cethnic_c_u_r$w_u, cethnic_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Ethnic group of respondents by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Ethnic group of respondents by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cethnic_c_u_r$b_u, cethnic_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Ethnic group of respondents by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Ethnic group of respondents by type of settlement", 8)
 ```
 
 <br>
@@ -317,7 +301,7 @@ rbind(cethnic_c_u_r$b_u, cethnic_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 cethnic_c$b_reg %>% apply_hux(.col_names = cethnic_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Ethnic group of respondents by region", 8) 
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Ethnic group of respondents by region", 8) 
 ```
 
 <br>
@@ -350,50 +334,50 @@ cmaritalstatus_c_reg_col_names <-
     "% Separated", "% Divorced", "% Widowed", "% Cohabiting")
 
 # men, women, both sexes
-cmaritalstatus_c_m_w_b <- join_m_w_b(cmaritalstatus_c, 0, cmaritalstatus_c_col_names)
+cmaritalstatus_c_m_w_b <- join_tbls(cmaritalstatus_c, m_w_b, 0, cmaritalstatus_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-cmaritalstatus_c_u_r <- join_u_r(cmaritalstatus_c, 0, cmaritalstatus_c_col_names)
+cmaritalstatus_c_u_r <- join_tbls(cmaritalstatus_c, u_r, 0, cmaritalstatus_c_col_names)
 ```
 
 <br>
 
 ```{r}
-cmaritalstatus_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Marital status", 8)
+cmaritalstatus_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, 1, "Men", "Marital status", 8)
 ```
 
 <br>
 
 ```{r}
-cmaritalstatus_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Marital status", 8)
+cmaritalstatus_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, 1, "Women", "Marital status", 8)
 ```
 
 <br>
 
 ```{r}
-cmaritalstatus_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Marital status", 8)
+cmaritalstatus_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Marital status", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cmaritalstatus_c_u_r$m_u, cmaritalstatus_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Marital status by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Marital status by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cmaritalstatus_c_u_r$w_u, cmaritalstatus_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Marital status by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Marital status by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cmaritalstatus_c_u_r$b_u, cmaritalstatus_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Marital status by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Marital status by type of settlement", 8)
 ```
 
 <br>
@@ -401,7 +385,7 @@ rbind(cmaritalstatus_c_u_r$b_u, cmaritalstatus_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 cmaritalstatus_c$b_reg %>% apply_hux(.col_names = cmaritalstatus_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Marital status by region", 8) 
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Marital status by region", 8) 
 ```
 
 <br>
@@ -432,50 +416,50 @@ cworkpaid_c_reg_col_names <-
   c("Region", "n", "% Government employee", "% Non-government employee", "% Self-employed", "% Unpaid")
 
 # men, women, both sexes
-cworkpaid_c_m_w_b <- join_m_w_b(cworkpaid_c, 0, cworkpaid_c_col_names)
+cworkpaid_c_m_w_b <- join_tbls(cworkpaid_c, m_w_b, 0, cworkpaid_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-cworkpaid_c_u_r <- join_u_r(cworkpaid_c, 0, cworkpaid_c_col_names)
+cworkpaid_c_u_r <- join_tbls(cworkpaid_c, u_r, 0, cworkpaid_c_col_names)
 ```
 
 <br>
 
 ```{r}
-cworkpaid_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Employment status", 6)
+cworkpaid_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, 1, "Men", "Employment status", 6)
 ```
 
 <br>
 
 ```{r}
-cworkpaid_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Employment status", 6)
+cworkpaid_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, 1, "Women", "Employment status", 6)
 ```
 
 <br>
 
 ```{r}
-cworkpaid_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Employment status", 6)
+cworkpaid_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Employment status", 6)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworkpaid_c_u_r$m_u, cworkpaid_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Employment status by type of settlement", 6)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Employment status by type of settlement", 6)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworkpaid_c_u_r$w_u, cworkpaid_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Employment status by type of settlement", 6)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Employment status by type of settlement", 6)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworkpaid_c_u_r$b_u, cworkpaid_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Employment status by type of settlement", 6)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Employment status by type of settlement", 6)
 ```
 
 <br>
@@ -483,7 +467,7 @@ rbind(cworkpaid_c_u_r$b_u, cworkpaid_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 cworkpaid_c$b_reg %>% apply_hux(.col_names = cworkpaid_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Employment status by region", 6) 
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Employment status by region", 6) 
 ```
 
 <br>
@@ -516,17 +500,17 @@ cworknotpaid_c_reg_col_names <-
     "% Unemployed (Able to work)", "% Unemployed (Not able to work)")
 
 # men, women, both sexes
-cworknotpaid_c_m_w_b <- join_m_w_b(cworknotpaid_c, 0, cworknotpaid_c_col_names)
+cworknotpaid_c_m_w_b <- join_tbls(cworknotpaid_c, m_w_b, 0, cworknotpaid_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-cworknotpaid_c_u_r <- join_u_r(cworknotpaid_c, 0, cworknotpaid_c_col_names)
+cworknotpaid_c_u_r <- join_tbls(cworknotpaid_c, u_r, 0, cworknotpaid_c_col_names)
 ```
 
 <br>
 
 ```{r}
-cworknotpaid_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Unpaid work and unemployed", 8) #%>% 
+cworknotpaid_c_m_w_b$m %>% final_tbl(.disaggregation = m_w_b, 1, "Men", "Unpaid work and unemployed", 8) #%>% 
   # insert_row(c("","","","","","","Unemployed",""), after = 2) %>% 
   # merge_cells(row = 3, col = c(7:8)) %>% merge_cells(row = 3, col = c(1:6))
 ```
@@ -534,34 +518,34 @@ cworknotpaid_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Unpaid work and unemployed
 <br>
 
 ```{r}
-cworknotpaid_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Unpaid work and unemployed", 8)
+cworknotpaid_c_m_w_b$w %>% final_tbl(.disaggregation = m_w_b, 1, "Women", "Unpaid work and unemployed", 8)
 ```
 
 <br>
 
 ```{r}
-cworknotpaid_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Unpaid work and unemployed", 8)
+cworknotpaid_c_m_w_b$b %>% final_tbl(.disaggregation = m_w_b, 1, "Both sexes", "Unpaid work and unemployed", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworknotpaid_c_u_r$m_u, cworknotpaid_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Unpaid work and unemployed by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Men", "Unpaid work and unemployed by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworknotpaid_c_u_r$w_u, cworknotpaid_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Unpaid work and unemployed by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Women", "Unpaid work and unemployed by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(cworknotpaid_c_u_r$b_u, cworknotpaid_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Unpaid work and unemployed by type of settlement", 8)
+  final_tbl(.disaggregation = u_r, 1, "Both sexes", "Unpaid work and unemployed by type of settlement", 8)
 ```
 
 <br>
@@ -569,7 +553,7 @@ rbind(cworknotpaid_c_u_r$b_u, cworknotpaid_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 cworknotpaid_c$b_reg %>% apply_hux(.col_names = cworknotpaid_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Unpaid work and unemployed by region", 8) 
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Unpaid work and unemployed by region", 8) 
 ```
 
 <br>

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - Limit consumption of processed foods
-dcontrol_a_list_long <- tbls_pct_summary(.variable = a, .cln = d11acln)
+dcontrol_a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = a, .cln = d11acln)
 
 # DATABOOK prep
 dcontrol_a <- tbls_list_split(
@@ -47,7 +47,7 @@ dcontrol_a <- tbls_list_split(
 ################################################################################
 
 # 2 - Look at the salt or sodium content on food labels
-dcontrol_b_list_long <- tbls_pct_summary(.variable = b, .cln = d11bcln)
+dcontrol_b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = b, .cln = d11bcln)
 
 # DATABOOK prep
 dcontrol_b <- tbls_list_split(
@@ -57,7 +57,7 @@ dcontrol_b <- tbls_list_split(
 ################################################################################
 
 # 3 - Buy low salt/sodium alternatives
-dcontrol_c_list_long <- tbls_pct_summary(.variable = c, .cln = d11ccln)
+dcontrol_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = d11ccln)
 
 # DATABOOK prep
 dcontrol_c <- tbls_list_split(
@@ -67,7 +67,7 @@ dcontrol_c <- tbls_list_split(
 ################################################################################
 
 # 4 - Use spices other than salt when cooking
-dcontrol_d_list_long <- tbls_pct_summary(.variable = d, .cln = d11dcln)
+dcontrol_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = d11dcln)
 
 # DATABOOK prep
 dcontrol_d <- tbls_list_split(
@@ -77,7 +77,7 @@ dcontrol_d <- tbls_list_split(
 ################################################################################
 
 # 5 - Avoid eating foods prepared outside of a home
-dcontrol_e_list_long <- tbls_pct_summary(.variable = e, .cln = d11ecln)
+dcontrol_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = d11ecln)
 
 # DATABOOK prep
 dcontrol_e <- tbls_list_split(
@@ -87,7 +87,7 @@ dcontrol_e <- tbls_list_split(
 ################################################################################
 
 # 6 - Do other things specifically to control your salt intake
-dcontrol_f_list_long <- tbls_pct_summary(.variable = f, .cln = d11fcln)
+dcontrol_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln = d11fcln)
 
 # DATABOOK prep
 dcontrol_f <- tbls_list_split(

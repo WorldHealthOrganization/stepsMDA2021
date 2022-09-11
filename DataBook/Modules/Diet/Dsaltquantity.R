@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Think they consume far too much or too much salt
-dsaltquantity_c_list_long <- tbls_pct_summary(.variable = c)
+dsaltquantity_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dsaltquantity_c <- tbls_list_split(
@@ -49,7 +49,7 @@ dsaltquantity_c <- tbls_list_split(
 ################################################################################
 
 # Self-reported quantity of salt consumed
-dsaltquantity_d_list_long <- tbls_pct_summary(.variable = d)
+dsaltquantity_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 dsaltquantity_d <- 

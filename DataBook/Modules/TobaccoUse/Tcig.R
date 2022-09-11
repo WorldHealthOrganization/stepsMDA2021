@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of daily smokers smoking given quantities of manufactured or hand-rolled cigarettes per day
-tcig_c_list_long <- tbls_pct_summary(.variable = c)
+tcig_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tcig_c <- tbls_list_split(.data = tcig_c_list_long, .select_var = c, .vars_amount_number = 5)

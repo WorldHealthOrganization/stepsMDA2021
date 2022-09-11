@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Think consuming too much salt could cause serious health problem
-dhealth_c_list_long <- tbls_pct_summary(.variable = c)
+dhealth_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dhealth_c <- tbls_list_split(

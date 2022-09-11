@@ -28,19 +28,25 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # list function doesn't produce proper numbers for urban/rural
-# cagesex_list_long <- tbls_pct_summary(
-#   .data = STEPSClean, .variable = NULL, .cln = FALSE, .cln_val = FALSE, .fun = summary_pct_unwt)
-# 
-# STEPSClean %>% group_by(agerange, sex) %>% summary_pct_unwt()
-# 
-# cagesex_list_long <- list(
-#   STEPSClean %>% group_by(agerange, sex) %>% summary_pct_unwt(),
-#   STEPSClean %>% group_by(sex) %>% summary_pct_unwt() %>% 
-#     mutate(agerange = factor("18–69"), .before = 1)
-# )
-  
+# cagesex_list_long <- tbls_summary(.wt_unwt = unwt,
+#   .mn_pct_md = pct, .variable = NULL, 
+#   .cln = FALSE, .cln_val = FALSE)
+
+# Therefore, a separate function was written:
 
 cagesex_summary <- function() {
+  
+  ##############################################################################
+  # UNWEIGHTED PCT
+  summary_pct_unwt <- function(.data) {
+    dplyr::summarise(
+      .data, 
+      n = n()) %>%
+      mutate(m = (n / sum(n))*100) %>% 
+      # Calculating a sum of all n answer choices
+      mutate(n_sum = sum(n), .after = n)
+  }
+  ##############################################################################
   
   if(.u_r_reg == FALSE) {
     # without urban/rural and regional disaggregation

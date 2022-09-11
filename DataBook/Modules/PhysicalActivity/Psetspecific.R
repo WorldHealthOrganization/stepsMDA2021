@@ -47,19 +47,19 @@ source("functions.R", encoding="UTF-8")
 # MEAN
 
 # 1 - Mean minutes of work-related physical activity on average per day
-psetspecific_pworkday_mn_list_long <- tbls_mn_summary(.variable = pworkday)
+psetspecific_pworkday_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = pworkday)
 # DATABOOK prep
 psetspecific_pworkday_mn <- tbls_list_split(
   .data = psetspecific_pworkday_mn_list_long, .vars_amount_number = 0)
 
 # 2 - Mean minutes of transport-related physical activity on average per day
-psetspecific_ptravelday_mn_list_long <- tbls_mn_summary(.variable = ptravelday)
+psetspecific_ptravelday_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = ptravelday)
 # DATABOOK prep
 psetspecific_ptravelday_mn <- tbls_list_split(
   .data = psetspecific_ptravelday_mn_list_long, .vars_amount_number = 0)
 
 # 3 - Mean minutes of recreation-related physical activity on average per day
-psetspecific_precday_mn_list_long <- tbls_mn_summary(.variable = precday)
+psetspecific_precday_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = precday)
 # DATABOOK prep
 psetspecific_precday_mn <- tbls_list_split(
   .data = psetspecific_precday_mn_list_long, .vars_amount_number = 0)
@@ -69,19 +69,19 @@ psetspecific_precday_mn <- tbls_list_split(
 # MEDIAN
 
 # 1 - Median minutes of work-related physical activity on average per day
-psetspecific_pworkday_md_list_long <- tbls_mn_summary(.variable = pworkday, .fun = pa_summary_md)
+psetspecific_pworkday_md_list_long <- tbls_summary(.mn_pct_md = md, .variable = pworkday)
 # DATABOOK prep
 psetspecific_pworkday_md <- tbls_list_split(
   .data = psetspecific_pworkday_md_list_long, .vars_amount_number = 0)
 
 # 2 - Median minutes of transport-related physical activity on average per day
-psetspecific_ptravelday_md_list_long <- tbls_mn_summary(.variable = ptravelday, .fun = pa_summary_md)
+psetspecific_ptravelday_md_list_long <- tbls_summary(.mn_pct_md = md, .variable = ptravelday)
 # DATABOOK prep
 psetspecific_ptravelday_md <- tbls_list_split(
   .data = psetspecific_ptravelday_md_list_long, .vars_amount_number = 0)
 
 # 3 - Median minutes of recreation-related physical activity on average per day
-psetspecific_precday_md_list_long <- tbls_mn_summary(.variable = precday, .fun = pa_summary_md)
+psetspecific_precday_md_list_long <- tbls_summary(.mn_pct_md = md, .variable = precday)
 # DATABOOK prep
 psetspecific_precday_md <- tbls_list_split(
   .data = psetspecific_precday_md_list_long, .vars_amount_number = 0)

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of current users of e-cigarettes
-etstatus_d_list_long <- tbls_pct_summary(.variable = d)
+etstatus_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 etstatus_d <- tbls_list_split(
@@ -48,7 +48,7 @@ etstatus_d <- tbls_list_split(
 ################################################################################
 
 # E-cigarettes using status
-etstatus_c_list_long <- tbls_pct_summary(.variable = c)
+etstatus_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 etstatus_c <- 

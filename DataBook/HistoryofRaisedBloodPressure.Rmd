@@ -1,48 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-bp_data_dir <- here::here("DataBook", "Modules", "HistoryofRaisedBloodPressure")
-
-# list all files in the directory
-# fs::dir_ls(bp_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(bp_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "HistoryofRaisedBloodPressure") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # History of Raised Blood Pressure
 
@@ -69,50 +53,50 @@ hbloodpressure_c_reg_col_names <-
     "% Diagnosed, but not within past 12 months", "95% CI", "% Diagnosed within past 12 months", "95% CI")
 
 # men, women, both sexes
-hbloodpressure_c_m_w_b <- join_m_w_b(hbloodpressure_c, 4, hbloodpressure_c_col_names)
+hbloodpressure_c_m_w_b <- join_tbls(hbloodpressure_c, m_w_b, 4, hbloodpressure_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-hbloodpressure_c_u_r <- join_u_r(hbloodpressure_c, 4, hbloodpressure_c_col_names)
+hbloodpressure_c_u_r <- join_tbls(hbloodpressure_c, u_r, 4, hbloodpressure_c_col_names)
 ```
 
 <br>
 
 ```{r}
-hbloodpressure_c_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Blood pressure measurement and diagnosis", 10)
+hbloodpressure_c_m_w_b$m %>% final_tbl(m_w_b, 1, "Men", "Blood pressure measurement and diagnosis", 10)
 ```
 
 <br>
 
 ```{r}
-hbloodpressure_c_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Blood pressure measurement and diagnosis", 10)
+hbloodpressure_c_m_w_b$w %>% final_tbl(m_w_b, 1, "Women", "Blood pressure measurement and diagnosis", 10)
 ```
 
 <br>
 
 ```{r}
-hbloodpressure_c_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Blood pressure measurement and diagnosis", 10)
+hbloodpressure_c_m_w_b$b %>% final_tbl(m_w_b, 1, "Both sexes", "Blood pressure measurement and diagnosis", 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(hbloodpressure_c_u_r$m_u, hbloodpressure_c_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Blood pressure measurement and diagnosis by type of settlement", 10)
+  final_tbl(u_r, 1, "Men", "Blood pressure measurement and diagnosis by type of settlement", 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(hbloodpressure_c_u_r$w_u, hbloodpressure_c_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Blood pressure measurement and diagnosis by type of settlement", 10)
+  final_tbl(u_r, 1, "Women", "Blood pressure measurement and diagnosis by type of settlement", 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(hbloodpressure_c_u_r$b_u, hbloodpressure_c_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Blood pressure measurement and diagnosis by type of settlement", 10)
+  final_tbl(u_r, 1, "Both sexes", "Blood pressure measurement and diagnosis by type of settlement", 10)
 ```
 
 <br>
@@ -120,7 +104,7 @@ rbind(hbloodpressure_c_u_r$b_u, hbloodpressure_c_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 hbloodpressure_c$b_reg %>% unite_ci(.ci_amount = 4) %>% apply_hux(.col_names = hbloodpressure_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Blood pressure measurement and diagnosis by region", 10) 
+  final_tbl(reg, 1, "Both sexes", "Blood pressure measurement and diagnosis by region", 10) 
 ```
 
 <br>
@@ -149,18 +133,18 @@ hbloodpressure_d_col_names <- c("Age Group (years)", "n", "% Taking meds", "95% 
 hbloodpressure_d_reg_col_names <- c("Region", "n", "% Taking meds", "95% CI")
 
 # men, women, both sexes
-hbloodpressure_d_m_w_b <- join_m_w_b(hbloodpressure_d, 1, hbloodpressure_d_col_names)
+hbloodpressure_d_m_w_b <- join_tbls(hbloodpressure_d, m_w_b, 1, hbloodpressure_d_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-hbloodpressure_d_u_r <- join_u_r(hbloodpressure_d, 1, hbloodpressure_d_col_names)
+hbloodpressure_d_u_r <- join_tbls(hbloodpressure_d, u_r, 1, hbloodpressure_d_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(hbloodpressure_d_m_w_b$m, select(hbloodpressure_d_m_w_b$w, -agerange), select(hbloodpressure_d_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed", .colspan_val = 10)
 ```
 
 <br>
@@ -171,14 +155,14 @@ tbl_w_u_r <- rbind(hbloodpressure_d_u_r$w_u, hbloodpressure_d_u_r$w_r)
 tbl_b_u_r <- rbind(hbloodpressure_d_u_r$b_u, hbloodpressure_d_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 hbloodpressure_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hbloodpressure_d_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed by region", 4)
+  final_tbl(reg, 1, "Both sexes", "Currently taking drugs (medication) for raised blood pressure prescribed by doctor or health worker among those diagnosed by region", 4)
 ```
 
 <br>
@@ -211,32 +195,32 @@ hraisedbptrad_d_reg_col_names <- c("Region", "n", "% Taking trad. meds ", "95% C
 
 # 1 - Seen a traditional healer among those previously diagnosed
 # men, women, both sexes
-hraisedbptrad_c_m_w_b <- join_m_w_b(hraisedbptrad_c, 1, hraisedbptrad_c_col_names)
+hraisedbptrad_c_m_w_b <- join_tbls(hraisedbptrad_c, m_w_b, 1, hraisedbptrad_c_col_names)
 
 # 2 - Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed
 # men, women, both sexes
-hraisedbptrad_d_m_w_b <- join_m_w_b(hraisedbptrad_d, 1, hraisedbptrad_d_col_names)
+hraisedbptrad_d_m_w_b <- join_tbls(hraisedbptrad_d, m_w_b, 1, hraisedbptrad_d_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
 # 1 - Seen a traditional healer among those previously diagnosed
-hraisedbptrad_c_u_r <- join_u_r(hraisedbptrad_c, 1, hraisedbptrad_c_col_names)
+hraisedbptrad_c_u_r <- join_tbls(hraisedbptrad_c, u_r, 1, hraisedbptrad_c_col_names)
 # 2 - Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed
-hraisedbptrad_d_u_r <- join_u_r(hraisedbptrad_d, 1, hraisedbptrad_d_col_names)
+hraisedbptrad_d_u_r <- join_tbls(hraisedbptrad_d, u_r, 1, hraisedbptrad_d_col_names)
 ```
 
 <br>
 
 ```{r}
 # 1
-cbind(hraisedbptrad_c_m_w_b$m, select(hraisedbptrad_c_m_w_b$w, -agerange), select(hraisedbptrad_c_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Seen a traditional healer among those previously diagnosed", .colspan_val = 10)
+cbind(hraisedbptrad_c_m_w_b$m, select(hraisedbptrad_c_m_w_b$w, -agerange), select(hraisedbptrad_c_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Seen a traditional healer among those previously diagnosed", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r}
 # 2
-cbind(hraisedbptrad_d_m_w_b$m, select(hraisedbptrad_d_m_w_b$w, -agerange), select(hraisedbptrad_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed", .colspan_val = 10)
+cbind(hraisedbptrad_d_m_w_b$m, select(hraisedbptrad_d_m_w_b$w, -agerange), select(hraisedbptrad_d_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed", .colspan_val = 10)
 ```
 
 <br>
@@ -248,7 +232,7 @@ tbl_w_u_r <- rbind(hraisedbptrad_c_u_r$w_u, hraisedbptrad_c_u_r$w_r)
 tbl_b_u_r <- rbind(hraisedbptrad_c_u_r$b_u, hraisedbptrad_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Seen a traditional healer among those previously diagnosed by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Seen a traditional healer among those previously diagnosed by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -260,21 +244,21 @@ tbl_w_u_r <- rbind(hraisedbptrad_d_u_r$w_u, hraisedbptrad_d_u_r$w_r)
 tbl_b_u_r <- rbind(hraisedbptrad_d_u_r$b_u, hraisedbptrad_d_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 1
-hraisedbptrad_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hraisedbptrad_c_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Seen a traditional healer among those previously diagnosed by region", 4)
+hraisedbptrad_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hraisedbptrad_c_reg_col_names) %>% final_tbl(reg, 1, "Both sexes", "Seen a traditional healer among those previously diagnosed by region", 4)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 2
-hraisedbptrad_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hraisedbptrad_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed by region", 4)
+hraisedbptrad_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hraisedbptrad_d_reg_col_names) %>% final_tbl(reg, 1, "Both sexes", "Currently taking herbal or traditional remedy for raised blood pressure among those previously diagnosed by region", 4)
 ```
 
 <br>

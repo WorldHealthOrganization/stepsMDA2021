@@ -37,8 +37,8 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Summary of Combined Risk Factors
-raisedrisk_list_long <- tbls_pct_summary(
-  .variable = raisedrisk, .cln = rrcln, 
+raisedrisk_list_long <- tbls_summary(
+  .mn_pct_md = pct, .variable = raisedrisk, .cln = rrcln, 
   .agerange_var = agerangerr, .agerange_u_r_var = agerangerr)
 
 # DATABOOK prep
@@ -59,7 +59,6 @@ fs_36_raisedrisk_joint <- cbind(fs_36_raisedrisk_b,
                                 fs_36_raisedrisk_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with none of the above risk factors", .before = 1)
-fs_36_raisedrisk_joint
 
 readr::write_excel_csv(fs_36_raisedrisk_joint, here("FactSheet", "36_fs_raisedrisk.csv"))
 
@@ -74,7 +73,6 @@ fs_37_raisedrisk_joint <- cbind(fs_37_raisedrisk_b,
                                 fs_37_raisedrisk_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with three or more of the above risk factors, aged 18 to 44 years", .before = 1)
-fs_37_raisedrisk_joint
 
 readr::write_excel_csv(fs_37_raisedrisk_joint, here("FactSheet", "37_fs_raisedrisk.csv"))
 
@@ -89,7 +87,6 @@ fs_38_raisedrisk_joint <- cbind(fs_38_raisedrisk_b,
                                 fs_38_raisedrisk_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with three or more of the above risk factors, aged 45 to 69 years", .before = 1)
-fs_38_raisedrisk_joint
 
 readr::write_excel_csv(fs_38_raisedrisk_joint, here("FactSheet", "38_fs_raisedrisk.csv"))
 
@@ -104,16 +101,10 @@ fs_39_raisedrisk_joint <- cbind(fs_39_raisedrisk_b,
                                 fs_39_raisedrisk_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with three or more of the above risk factors, aged 18 to 69 years", .before = 1)
-fs_39_raisedrisk_joint
 
 readr::write_excel_csv(fs_39_raisedrisk_joint, here("FactSheet", "39_fs_raisedrisk.csv"))
 
 
 ################################################################################
-
-
-
-
-
 
 

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Having ever had a heart attack or chest pain from heart disease or a stroke
-hcvd_c_list_long <- tbls_pct_summary(.variable = c, .cln = h17cln)
+hcvd_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = h17cln)
 
 # DATABOOK prep
 hcvd_c <- tbls_list_split(

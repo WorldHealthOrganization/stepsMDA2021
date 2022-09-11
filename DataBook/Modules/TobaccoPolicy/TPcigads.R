@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Noticed advertisements or signs promoting cigarettes in stores
-tpcigads_c_list_long <- tbls_pct_summary(.variable = c)
+tpcigads_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tpcigads_c <- tbls_list_split(

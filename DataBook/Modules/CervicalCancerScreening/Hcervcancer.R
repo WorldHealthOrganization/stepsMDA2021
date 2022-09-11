@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 # Percentage of female respondents who have ever had a screening test for 
 # cervical cancer among all female respondents
-hcervcancer_c_w_list_long <- tbls_pct_summary(.variable = c)
+hcervcancer_c_w_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 hcervcancer_c_w <- tbls_list_split(
@@ -46,7 +46,8 @@ hcervcancer_c_w <- tbls_list_split(
 ################################################################################
 
 # Women aged 30-49 (use TOTAL line - "18–69", which is filtered to a specific range)
-hcervcancer_c2_w_list_long <- STEPSClean %>% filter(age>=30, age<50) %>% tbls_pct_summary(., .variable = c)
+hcervcancer_c2_w_list_long <- STEPSClean %>% filter(age>=30, age<50) %>% 
+  tbls_summary(., .mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 hcervcancer_c2_w <- tbls_list_split(
@@ -65,7 +66,6 @@ fs_20_hcervcancer_c2_w <- fs_summary(hcervcancer_c2_w_t, c(3,4,5), Females, .pct
 fs_20_hcervcancer_c2_joint <- cbind(fs_20_hcervcancer_c2_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage of women aged 30–49 years who have ever had a screening test for cervical cancer", .before = 1)
-fs_20_hcervcancer_c2_joint
 
 readr::write_excel_csv(fs_20_hcervcancer_c2_joint, here("FactSheet", "20_fs_hcervcancer_c2_c.csv"))
 

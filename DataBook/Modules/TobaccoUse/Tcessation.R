@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current smokers who have tried to stop smoking
-tcessation_c_list_long <- tbls_pct_summary(.variable = c, .cln = stopcln)
+tcessation_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = stopcln)
 
 # DATABOOK prep
 tcessation_c <- tbls_list_split(
@@ -48,7 +48,7 @@ tcessation_c <- tbls_list_split(
 ################################################################################
 
 # Current smokers who have been advised by doctor to stop smoking
-tcessation_d_list_long <- tbls_pct_summary(.variable = d, .cln = mdcln)
+tcessation_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = mdcln)
 
 # DATABOOK prep
 tcessation_d <- tbls_list_split(

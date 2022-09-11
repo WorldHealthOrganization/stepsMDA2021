@@ -40,37 +40,37 @@ source("functions.R", encoding="UTF-8")
 # Men, women, both sexes, urban, rural, region (both sexes)
 
 # 1 - Mean # of manufactured cig.
-tsmoketype_t5a_list_long <- tbls_mn_summary(.variable = t5a, .cln2 = t5acln, .cln2_val = 1)
+tsmoketype_t5a_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5a, .cln2 = t5acln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5a <- tbls_list_split(.data = tsmoketype_t5a_list_long, .vars_amount_number = 0)
 
 # 2 - Mean # of hand-rolled cig.
-tsmoketype_t5b_list_long <- tbls_mn_summary(.variable = t5b, .cln2 = t5bcln, .cln2_val = 1)
+tsmoketype_t5b_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5b, .cln2 = t5bcln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5b <- tbls_list_split(.data = tsmoketype_t5b_list_long, .vars_amount_number = 0)
 
 # 3 - Mean # of pipes of tobacco
-tsmoketype_t5c_list_long <- tbls_mn_summary(.variable = t5c, .cln2 = t5ccln, .cln2_val = 1)
+tsmoketype_t5c_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5c, .cln2 = t5ccln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5c <- tbls_list_split(.data = tsmoketype_t5c_list_long, .vars_amount_number = 0)
 
 # 4 - Mean # of cigars, cheerots, cigarillos
-tsmoketype_t5d_list_long <- tbls_mn_summary(.variable = t5d, .cln2 = t5dcln, .cln2_val = 1)
+tsmoketype_t5d_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5d, .cln2 = t5dcln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5d <- tbls_list_split(.data = tsmoketype_t5d_list_long, .vars_amount_number = 0)
 
 # 5 - Mean # of shisha sessions
-tsmoketype_t5e_list_long <- tbls_mn_summary(.variable = t5e, .cln2 = t5ecln, .cln2_val = 1)
+tsmoketype_t5e_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5e, .cln2 = t5ecln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5e <- tbls_list_split(.data = tsmoketype_t5e_list_long, .vars_amount_number = 0)
 
 # 6 - Mean # of heated tobacco products
-tsmoketype_t5f_list_long <- tbls_mn_summary(.variable = t5f, .cln2 = t5fcln, .cln2_val = 1)
+tsmoketype_t5f_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5f, .cln2 = t5fcln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5f <- tbls_list_split(.data = tsmoketype_t5f_list_long, .vars_amount_number = 0)
 
 # 7 - Mean # of other type of tobacco
-tsmoketype_t5g_list_long <- tbls_mn_summary(.variable = t5g, .cln2 = t5gcln, .cln2_val = 1)
+tsmoketype_t5g_list_long <- tbls_summary(.mn_pct_md = mn, .variable = t5g, .cln2 = t5gcln, .cln2_val = 1)
 # DATABOOK prep
 tsmoketype_t5g <- tbls_list_split(.data = tsmoketype_t5g_list_long, .vars_amount_number = 0)
 
@@ -113,10 +113,8 @@ fs_tsmoketype_t5a_daily_joint <- cbind(fs_tsmoketype_t5a_daily_b,
                                        fs_tsmoketype_t5a_daily_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean number of manufactured cigarettes smoked per day (by smokers of manufactured cigarettes)", .before = 1)
-fs_tsmoketype_t5a_daily_joint
 
-library(readr)
-write_excel_csv(fs_tsmoketype_t5a_daily_joint, here("FactSheet", "05_fs_tsmoketype_t5a_daily.csv"))
+readr::write_excel_csv(fs_tsmoketype_t5a_daily_joint, here("FactSheet", "05_fs_tsmoketype_t5a_daily.csv"))
 
 ################################################################################
 ################################################################################

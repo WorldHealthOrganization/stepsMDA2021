@@ -39,7 +39,7 @@ source("functions.R", encoding="UTF-8")
 # MEN
 # Percentage of respondents with HDL <1.03mmol/L or <40 mg/dl
 # NOTE: only values for men are used for reporting in Data Book
-bhdlipids_c_list_long <- tbls_pct_summary(.variable = c)
+bhdlipids_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 bhdlipids_c <- 
@@ -52,7 +52,7 @@ bhdlipids_c <-
 # WOMEN
 # Percentage of respondents with HDL <1.29mmol/L or <50 mg/dl
 # NOTE: only values for women are used for reporting in Data Book
-bhdlipids_d_list_long <- tbls_pct_summary(.variable = d)
+bhdlipids_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 bhdlipids_d <- 
@@ -64,7 +64,7 @@ bhdlipids_d <-
 
 # MEN, WOMEN, BOTH SEXES
 # Mean HDL (mmol/L)
-bhdlipids_b17_list_long <- tbls_mn_summary(.variable = b17)
+bhdlipids_b17_list_long <- tbls_summary(.mn_pct_md = mn, .variable = b17)
 
 # DATABOOK prep
 bhdlipids_b17 <- 
@@ -74,7 +74,7 @@ bhdlipids_b17 <-
 
 # MEN, WOMEN, BOTH SEXES
 # Mean HDL (mg/dl)
-bhdlipids_b17mg_list_long <- tbls_mn_summary(.variable = b17mg)
+bhdlipids_b17mg_list_long <- tbls_summary(.mn_pct_md = mn, .variable = b17mg)
 
 # DATABOOK prep
 bhdlipids_b17mg <- 

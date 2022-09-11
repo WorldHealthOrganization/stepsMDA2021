@@ -1,6 +1,7 @@
 # R files & folders
 .Rproj.user
 .Rhistory
+.Rapp.history
 .RData
 .Ruserdata
 *.rds

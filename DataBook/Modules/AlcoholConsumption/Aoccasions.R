@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean number of drinking occasions in the past 30 days among current (past 30 days) drinkers
-aoccasions_a6_list_long <- tbls_mn_summary(.variable = a6)
+aoccasions_a6_list_long <- tbls_summary(.mn_pct_md = mn, .variable = a6)
 
 # DATABOOK prep
 aoccasions_a6 <- tbls_list_split(.data = aoccasions_a6_list_long, .vars_amount_number = 0)

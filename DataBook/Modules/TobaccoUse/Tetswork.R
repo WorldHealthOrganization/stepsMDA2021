@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Exposed to second-hand smoke in the workplace during the past 30 days
-tetswork_c_list_long <- tbls_pct_summary(.variable = c)
+tetswork_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tetswork_c <- tbls_list_split(

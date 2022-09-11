@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Unpaid work and unemployed
-cworknotpaid_c_list_long <- tbls_pct_summary(.variable = c, .fun = summary_pct_unwt)
+cworknotpaid_c_list_long <- tbls_summary(.wt_unwt = unwt, .mn_pct_md = pct, .variable = c)
 
 cworknotpaid_c <- tbls_list_split(
   .data = cworknotpaid_c_list_long, .select_var = c, .vars_amount_number = 6)

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Seen a traditional healer for diabetes among those previously diagnosed
-hdiabetestrad_c_list_long <- tbls_pct_summary(.variable = c, .cln = h10cln)
+hdiabetestrad_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = h10cln)
 
 # DATABOOK prep
 hdiabetestrad_c <- tbls_list_split(
@@ -47,7 +47,7 @@ hdiabetestrad_c <- tbls_list_split(
 ################################################################################
 
 # Currently taking herbal or traditional treatment for diabetes among those previously diagnosed
-hdiabetestrad_d_list_long <- tbls_pct_summary(.variable = d, .cln = h11cln)
+hdiabetestrad_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h11cln)
 
 # DATABOOK prep
 hdiabetestrad_d <- tbls_list_split(

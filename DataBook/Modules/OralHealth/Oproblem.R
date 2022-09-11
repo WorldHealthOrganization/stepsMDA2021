@@ -40,7 +40,7 @@ source("functions.R", encoding="UTF-8")
 # the past 12 months because of the state of their teeth, gums and mouth
 
 # 1 - Percentage of respondents having difficulty in chewing foods during the past 12 months
-oproblem_a_list_long <- tbls_pct_summary(.variable = a, .cln = o14acln)
+oproblem_a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = a, .cln = o14acln)
 
 # DATABOOK prep
 oproblem_a <- tbls_list_split(
@@ -50,7 +50,7 @@ oproblem_a <- tbls_list_split(
 ################################################################################
 
 # 2 - Percentage of respondents having difficulty with speech/trouble pronouncing words during the past 12 months
-oproblem_b_list_long <- tbls_pct_summary(.variable = b, .cln = o14bcln)
+oproblem_b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = b, .cln = o14bcln)
 
 # DATABOOK prep
 oproblem_b <- tbls_list_split(
@@ -60,7 +60,7 @@ oproblem_b <- tbls_list_split(
 ################################################################################
 
 # 3 - Percentage of respondents feeling tense because of problems with teeth or mouth during the past 12 months
-oproblem_c_list_long <- tbls_pct_summary(.variable = c, .cln = o14ccln)
+oproblem_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = o14ccln)
 
 # DATABOOK prep
 oproblem_c <- tbls_list_split(
@@ -70,7 +70,7 @@ oproblem_c <- tbls_list_split(
 ################################################################################
 
 # 4 - Percentage of respondents being embarrassed because of appearance of teeth during the past 12 months
-oproblem_d_list_long <- tbls_pct_summary(.variable = d, .cln = o14dcln)
+oproblem_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = o14dcln)
 
 # DATABOOK prep
 oproblem_d <- tbls_list_split(
@@ -80,7 +80,7 @@ oproblem_d <- tbls_list_split(
 ################################################################################
 
 # 5 - Percentage of respondents avoiding smiling because of teeth during the past 12 months
-oproblem_e_list_long <- tbls_pct_summary(.variable = e, .cln = o14ecln)
+oproblem_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = o14ecln)
 
 # DATABOOK prep
 oproblem_e <- tbls_list_split(
@@ -90,7 +90,7 @@ oproblem_e <- tbls_list_split(
 ################################################################################
 
 # 6 - Percentage of respondents with interruptions in sleep during the past 12 months
-oproblem_f_list_long <- tbls_pct_summary(.variable = f, .cln = o14fcln)
+oproblem_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln = o14fcln)
 
 # DATABOOK prep
 oproblem_f <- tbls_list_split(
@@ -100,7 +100,7 @@ oproblem_f <- tbls_list_split(
 ################################################################################
 
 # 7 - Percentage of respondents with days not at work because of teeth or mouth during the past 12 months
-oproblem_g_list_long <- tbls_pct_summary(.variable = g, .cln = o14gcln)
+oproblem_g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = g, .cln = o14gcln)
 
 # DATABOOK prep
 oproblem_g <- tbls_list_split(
@@ -110,7 +110,7 @@ oproblem_g <- tbls_list_split(
 ################################################################################
 
 # 8 - Percentage of respondents having difficulty doing usual activities during the past 12 months
-oproblem_h_list_long <- tbls_pct_summary(.variable = h, .cln = o14hcln)
+oproblem_h_list_long <- tbls_summary(.mn_pct_md = pct, .variable = h, .cln = o14hcln)
 
 # DATABOOK prep
 oproblem_h <- tbls_list_split(
@@ -120,7 +120,7 @@ oproblem_h <- tbls_list_split(
 ################################################################################
 
 # 9 - Percentage of respondents having been less tolerant of spouse or people close to them during the past 12 months
-oproblem_i_list_long <- tbls_pct_summary(.variable = i, .cln = o14icln)
+oproblem_i_list_long <- tbls_summary(.mn_pct_md = pct, .variable = i, .cln = o14icln)
 
 # DATABOOK prep
 oproblem_i <- tbls_list_split(
@@ -130,7 +130,7 @@ oproblem_i <- tbls_list_split(
 ################################################################################
 
 # 10 - Percentage of respondents having reduced participation in social activities during the past 12 months
-oproblem_j_list_long <- tbls_pct_summary(.variable = j, .cln = o14jcln)
+oproblem_j_list_long <- tbls_summary(.mn_pct_md = pct, .variable = j, .cln = o14jcln)
 
 # DATABOOK prep
 oproblem_j <- tbls_list_split(

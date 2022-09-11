@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean number of years of education
-ceduyears_list_long <- tbls_mn_summary(.variable = c4, .fun = summary_mn_unwt)
+ceduyears_list_long <- tbls_summary(.wt_unwt = unwt, .mn_pct_md = mn, .variable = c4)
 
 # DATABOOK prep
 ceduyears <- 

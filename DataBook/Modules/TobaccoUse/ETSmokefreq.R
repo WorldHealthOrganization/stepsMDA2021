@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current daily users among e-cigarettes users
-etsmokefreq_c_list_long <- tbls_pct_summary(.variable = c)
+etsmokefreq_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 etsmokefreq_c <- tbls_list_split(

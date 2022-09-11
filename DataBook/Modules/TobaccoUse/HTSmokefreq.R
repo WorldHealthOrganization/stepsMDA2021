@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current daily users among heated tobacco products users
-htsmokefreq_c_list_long <- tbls_pct_summary(.variable = c)
+htsmokefreq_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 htsmokefreq_c <- tbls_list_split(

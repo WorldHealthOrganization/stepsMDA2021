@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of current smokers
-tsmokestatus_d_list_long <- tbls_pct_summary(.variable = d)
+tsmokestatus_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 tsmokestatus_d <- tbls_list_split(
@@ -48,7 +48,7 @@ tsmokestatus_d <- tbls_list_split(
 ################################################################################
 
 # Smoking status
-tsmokestatus_c_list_long <- tbls_pct_summary(.variable = c)
+tsmokestatus_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tsmokestatus_c <- 
@@ -68,7 +68,6 @@ fs_tsmokestatus_d_b <- fs_summary(filter(tsmokestatus_d$b, agerange == "18–69"
 fs_tsmokestatus_d_joint <- cbind(fs_tsmokestatus_d_b, fs_tsmokestatus_d_m, fs_tsmokestatus_d_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who currently smoke tobacco", .before = 1)
-fs_tsmokestatus_d_joint
 
 # 2. Percentage who currently smoke tobacco daily
 
@@ -79,12 +78,10 @@ fs_tsmokestatus_c_b <- fs_summary(filter(tsmokestatus_c$b, agerange == "18–69"
 fs_tsmokestatus_c_joint <- cbind(fs_tsmokestatus_c_b, fs_tsmokestatus_c_m, fs_tsmokestatus_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who currently smoke tobacco daily", .before = 1)
-fs_tsmokestatus_c_joint
 
 # save the tables into CSV
-library(readr)
-write_excel_csv(fs_tsmokestatus_d_joint, here("FactSheet", "01_fs_tsmokestatus_d.csv"))
-write_excel_csv(fs_tsmokestatus_c_joint, here("FactSheet", "02_fs_tsmokestatus_c.csv"))
+readr::write_excel_csv(fs_tsmokestatus_d_joint, here("FactSheet", "01_fs_tsmokestatus_d.csv"))
+readr::write_excel_csv(fs_tsmokestatus_c_joint, here("FactSheet", "02_fs_tsmokestatus_c.csv"))
 
 
 ################################################################################

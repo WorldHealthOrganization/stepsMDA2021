@@ -42,7 +42,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Average price paid for 20 manufactured cigarettes
-tpcost_priceper20cigs_list_long <- tbls_mn_summary(.variable = priceper20cigs)
+tpcost_priceper20cigs_list_long <- tbls_summary(.mn_pct_md = mn, .variable = priceper20cigs)
 
 # DATABOOK prep
 tpcost_priceper20cigs <- 
@@ -52,7 +52,7 @@ tpcost_priceper20cigs <-
 
 # Monthly expenditure (NOT INCLUDED IN DATABOOK)
 tpcost_monthlyexp_list_long <-  
-  tbls_mn_summary(.variable = monthlyexp, .cln = cigcln)
+  tbls_summary(.mn_pct_md = mn, .variable = monthlyexp, .cln = cigcln)
 
 # DATABOOK prep
 tpcost_monthlyexp <- 

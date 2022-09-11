@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Seen a traditional healer among those previously diagnosed
-hraisedbptrad_c_list_long <- tbls_pct_summary(.variable = c, .cln = h4cln)
+hraisedbptrad_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = h4cln)
 
 # DATABOOK prep
 hraisedbptrad_c <- tbls_list_split(
@@ -48,7 +48,7 @@ hraisedbptrad_c <- tbls_list_split(
 
 # Currently taking drugs (medication) for raised blood pressure 
 # prescribed by doctor or health worker among those diagnosed
-hraisedbptrad_d_list_long <- tbls_pct_summary(.variable = d, .cln = h5cln)
+hraisedbptrad_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h5cln)
 
 # DATABOOK prep
 hraisedbptrad_d <- tbls_list_split(

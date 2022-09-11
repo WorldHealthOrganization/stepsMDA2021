@@ -1,48 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-cvd_data_dir <- here::here("DataBook", "Modules", "HistoryofCardiovascularDiseases")
-
-# list all files in the directory
-# fs::dir_ls(cvd_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(cvd_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "HistoryofCardiovascularDiseases") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # History of Cardiovascular Diseases
 
@@ -61,18 +45,18 @@ hcvd_c_col_names <- c("Age Group (years)", "n", "% CVD history", "95% CI")
 hcvd_c_reg_col_names <- c("Region", "n", "% CVD history", "95% CI")
 
 # men, women, both sexes
-hcvd_c_m_w_b <- join_m_w_b(hcvd_c, 1, hcvd_c_col_names)
+hcvd_c_m_w_b <- join_tbls(hcvd_c, m_w_b, 1, hcvd_c_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-hcvd_c_u_r <- join_u_r(hcvd_c, 1, hcvd_c_col_names)
+hcvd_c_u_r <- join_tbls(hcvd_c, u_r, 1, hcvd_c_col_names)
 ```
 
 <br>
 
 ```{r}
 cbind(hcvd_c_m_w_b$m, select(hcvd_c_m_w_b$w, -agerange), select(hcvd_c_m_w_b$b, -agerange)) %>% 
-  final_m_w_b_tbl(.s_amount = 3, .title = "Having ever had a heart attack or chest pain from heart disease or a stroke", .colspan_val = 10)
+  final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Having ever had a heart attack or chest pain from heart disease or a stroke", .colspan_val = 10)
 ```
 
 <br>
@@ -83,14 +67,14 @@ tbl_w_u_r <- rbind(hcvd_c_u_r$w_u, hcvd_c_u_r$w_r)
 tbl_b_u_r <- rbind(hcvd_c_u_r$b_u, hcvd_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Having ever had a heart attack or chest pain from heart disease or a stroke by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Having ever had a heart attack or chest pain from heart disease or a stroke by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 hcvd_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvd_c_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Having ever had a heart attack or chest pain from heart disease or a stroke by region", 4)
+  final_tbl(.disaggregation = reg, 1, "Both sexes", "Having ever had a heart attack or chest pain from heart disease or a stroke by region", 4)
 ```
 
 <br>
@@ -121,32 +105,32 @@ hcvdmeds_d_reg_col_names <- c("Region", "n", "% Taking statins", "95% CI")
 
 # 1 - Currently taking aspirin regularly to prevent or treat heart disease
 # men, women, both sexes
-hcvdmeds_c_m_w_b <- join_m_w_b(hcvdmeds_c, 1, hcvdmeds_c_col_names)
+hcvdmeds_c_m_w_b <- join_tbls(hcvdmeds_c, m_w_b, 1, hcvdmeds_c_col_names)
 
 # 2 - Currently taking statins regularly to prevent or treat heart disease
 # men, women, both sexes
-hcvdmeds_d_m_w_b <- join_m_w_b(hcvdmeds_d, 1, hcvdmeds_d_col_names)
+hcvdmeds_d_m_w_b <- join_tbls(hcvdmeds_d, m_w_b, 1, hcvdmeds_d_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
 # 1 - Currently taking aspirin regularly to prevent or treat heart disease
-hcvdmeds_c_u_r <- join_u_r(hcvdmeds_c, 1, hcvdmeds_c_col_names)
+hcvdmeds_c_u_r <- join_tbls(hcvdmeds_c, u_r, 1, hcvdmeds_c_col_names)
 # 2 - Currently taking statins regularly to prevent or treat heart disease
-hcvdmeds_d_u_r <- join_u_r(hcvdmeds_d, 1, hcvdmeds_d_col_names)
+hcvdmeds_d_u_r <- join_tbls(hcvdmeds_d, u_r, 1, hcvdmeds_d_col_names)
 ```
 
 <br>
 
 ```{r}
 # 1
-cbind(hcvdmeds_c_m_w_b$m, select(hcvdmeds_c_m_w_b$w, -agerange), select(hcvdmeds_c_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking aspirin regularly to prevent or treat heart disease", .colspan_val = 10)
+cbind(hcvdmeds_c_m_w_b$m, select(hcvdmeds_c_m_w_b$w, -agerange), select(hcvdmeds_c_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Currently taking aspirin regularly to prevent or treat heart disease", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r}
 # 2
-cbind(hcvdmeds_d_m_w_b$m, select(hcvdmeds_d_m_w_b$w, -agerange), select(hcvdmeds_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Currently taking statins regularly to prevent or treat heart disease", .colspan_val = 10)
+cbind(hcvdmeds_d_m_w_b$m, select(hcvdmeds_d_m_w_b$w, -agerange), select(hcvdmeds_d_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Currently taking statins regularly to prevent or treat heart disease", .colspan_val = 10)
 ```
 
 <br>
@@ -158,7 +142,7 @@ tbl_w_u_r <- rbind(hcvdmeds_c_u_r$w_u, hcvdmeds_c_u_r$w_r)
 tbl_b_u_r <- rbind(hcvdmeds_c_u_r$b_u, hcvdmeds_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Currently taking aspirin regularly to prevent or treat heart disease by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Currently taking aspirin regularly to prevent or treat heart disease by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -170,21 +154,21 @@ tbl_w_u_r <- rbind(hcvdmeds_d_u_r$w_u, hcvdmeds_d_u_r$w_r)
 tbl_b_u_r <- rbind(hcvdmeds_d_u_r$b_u, hcvdmeds_d_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Currently taking statins regularly to prevent or treat heart disease by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Currently taking statins regularly to prevent or treat heart disease by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 1
-hcvdmeds_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_c_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Currently taking aspirin regularly to prevent or treat heart disease by region", 4)
+hcvdmeds_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_c_reg_col_names) %>% final_tbl(.disaggregation = reg, 1, "Both sexes", "Currently taking aspirin regularly to prevent or treat heart disease by region", 4)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 2
-hcvdmeds_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Currently taking statins regularly to prevent or treat heart disease by region", 4)
+hcvdmeds_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_d_reg_col_names) %>% final_tbl(.disaggregation = reg, 1, "Both sexes", "Currently taking statins regularly to prevent or treat heart disease by region", 4)
 ```
 
 <br>
@@ -216,32 +200,32 @@ hcvdmeds_h17_d_reg_col_names <- c("Region", "n", "% Taking statins", "95% CI")
 
 # 1 - Respondents with CVD currently taking aspirin
 # men, women, both sexes
-hcvdmeds_h17_c_m_w_b <- join_m_w_b(hcvdmeds_h17_c, 1, hcvdmeds_h17_c_col_names)
+hcvdmeds_h17_c_m_w_b <- join_tbls(hcvdmeds_h17_c, m_w_b, 1, hcvdmeds_h17_c_col_names)
 
 # 2 - Respondents with CVD currently taking statins
 # men, women, both sexes
-hcvdmeds_h17_d_m_w_b <- join_m_w_b(hcvdmeds_h17_d, 1, hcvdmeds_h17_d_col_names)
+hcvdmeds_h17_d_m_w_b <- join_tbls(hcvdmeds_h17_d, m_w_b, 1, hcvdmeds_h17_d_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
 # 1 - Respondents with CVD currently taking aspirin
-hcvdmeds_h17_c_u_r <- join_u_r(hcvdmeds_h17_c, 1, hcvdmeds_h17_c_col_names)
+hcvdmeds_h17_c_u_r <- join_tbls(hcvdmeds_h17_c, u_r, 1, hcvdmeds_h17_c_col_names)
 # 2 - Respondents with CVD currently taking statins
-hcvdmeds_h17_d_u_r <- join_u_r(hcvdmeds_h17_d, 1, hcvdmeds_h17_d_col_names)
+hcvdmeds_h17_d_u_r <- join_tbls(hcvdmeds_h17_d, u_r, 1, hcvdmeds_h17_d_col_names)
 ```
 
 <br>
 
 ```{r}
 # 1
-cbind(hcvdmeds_h17_c_m_w_b$m, select(hcvdmeds_h17_c_m_w_b$w, -agerange), select(hcvdmeds_h17_c_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Respondents with CVD currently taking aspirin", .colspan_val = 10)
+cbind(hcvdmeds_h17_c_m_w_b$m, select(hcvdmeds_h17_c_m_w_b$w, -agerange), select(hcvdmeds_h17_c_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Respondents with CVD currently taking aspirin", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r}
 # 2
-cbind(hcvdmeds_h17_d_m_w_b$m, select(hcvdmeds_h17_d_m_w_b$w, -agerange), select(hcvdmeds_h17_d_m_w_b$b, -agerange)) %>% final_m_w_b_tbl(.s_amount = 3, .title = "Respondents with CVD currently taking statins", .colspan_val = 10)
+cbind(hcvdmeds_h17_d_m_w_b$m, select(hcvdmeds_h17_d_m_w_b$w, -agerange), select(hcvdmeds_h17_d_m_w_b$b, -agerange)) %>% final_tbl(.disaggregation = m_w_b, .s_amount = 3, .title = "Respondents with CVD currently taking statins", .colspan_val = 10)
 ```
 
 <br>
@@ -253,7 +237,7 @@ tbl_w_u_r <- rbind(hcvdmeds_h17_c_u_r$w_u, hcvdmeds_h17_c_u_r$w_r)
 tbl_b_u_r <- rbind(hcvdmeds_h17_c_u_r$b_u, hcvdmeds_h17_c_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Respondents with CVD currently taking aspirin by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Respondents with CVD currently taking aspirin by type of settlement", .colspan_val = 10)
 ```
 
 <br>
@@ -265,21 +249,21 @@ tbl_w_u_r <- rbind(hcvdmeds_h17_d_u_r$w_u, hcvdmeds_h17_d_u_r$w_r)
 tbl_b_u_r <- rbind(hcvdmeds_h17_d_u_r$b_u, hcvdmeds_h17_d_u_r$b_r)
 
 cbind(tbl_m_u_r, select(tbl_w_u_r, -agerange2), select(tbl_b_u_r, -agerange2)) %>% 
-  final_u_r_tbl(.s_amount = 3, .title = "Respondents with CVD currently taking statins by type of settlement", .colspan_val = 10)
+  final_tbl(.disaggregation = u_r, .s_amount = 3, .title = "Respondents with CVD currently taking statins by type of settlement", .colspan_val = 10)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 1
-hcvdmeds_h17_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_h17_c_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Respondents with CVD currently taking aspirin by region", 4)
+hcvdmeds_h17_c$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_h17_c_reg_col_names) %>% final_tbl(.disaggregation = reg, 1, "Both sexes", "Respondents with CVD currently taking aspirin by region", 4)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # 2
-hcvdmeds_h17_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_h17_d_reg_col_names) %>% final_m_w_b_tbl(1, "Both sexes", "Respondents with CVD currently taking statins by region", 4)
+hcvdmeds_h17_d$b_reg %>% unite_ci(.ci_amount = 1) %>% apply_hux(.col_names = hcvdmeds_h17_d_reg_col_names) %>% final_tbl(.disaggregation = reg, 1, "Both sexes", "Respondents with CVD currently taking statins by region", 4)
 ```
 
 <br>

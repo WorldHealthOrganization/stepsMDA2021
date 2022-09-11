@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Seen a traditional healer for raised cholesterol among those previously diagnosed
-hcholtrad_c_list_long <- tbls_pct_summary(.variable = c, .cln = h15cln)
+hcholtrad_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = h15cln)
 
 # DATABOOK prep
 hcholtrad_c <- tbls_list_split(
@@ -47,7 +47,7 @@ hcholtrad_c <- tbls_list_split(
 ################################################################################
 
 # Currently taking herbal or traditional treatment for raised cholesterol among those previously diagnosed
-hcholtrad_d_list_long <- tbls_pct_summary(.variable = d, .cln = h16cln)
+hcholtrad_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h16cln)
 
 # DATABOOK prep
 hcholtrad_d <- tbls_list_split(

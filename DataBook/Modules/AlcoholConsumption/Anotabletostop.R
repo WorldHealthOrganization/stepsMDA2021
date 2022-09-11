@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 # Frequency of not being able to stop drinking once started 
 # during the past 12 months among past 12 month drinkers
-anotabletostop_c_list_long <- tbls_pct_summary(.variable = c)
+anotabletostop_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 anotabletostop_c <- 

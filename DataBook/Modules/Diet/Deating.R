@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Add salt always or often before eating or when eating 
-deating_c_list_long <- tbls_pct_summary(.variable = c)
+deating_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 deating_c <- tbls_list_split(
@@ -60,7 +60,6 @@ fs_15_deating_c_joint <- cbind(fs_15_deating_c_b,
                                fs_15_deating_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who always or often add salt or salty sauce to their food before eating or as they are eating", .before = 1)
-fs_15_deating_c_joint
 
 readr::write_excel_csv(fs_15_deating_c_joint, here("FactSheet", "15_fs_deating_c.csv"))
 

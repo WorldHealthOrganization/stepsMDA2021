@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current users of smokeless tobacco
-tsmokelessstatus_d_list_long <- tbls_pct_summary(.variable = d)
+tsmokelessstatus_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 tsmokelessstatus_d <- tbls_list_split(
@@ -48,7 +48,7 @@ tsmokelessstatus_d <- tbls_list_split(
 ################################################################################
 
 # Smokeless tobacco use
-tsmokelessstatus_c_list_long <- tbls_pct_summary(.variable = c)
+tsmokelessstatus_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tsmokelessstatus_c <- 

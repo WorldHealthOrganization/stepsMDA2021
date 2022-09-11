@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Employment status
-cworkpaid_c_list_long <- tbls_pct_summary(.variable = c, .fun = summary_pct_unwt)
+cworkpaid_c_list_long <- tbls_summary(.wt_unwt = unwt, .mn_pct_md = pct, .variable = c)
 
 cworkpaid_c <- tbls_list_split(
   .data = cworkpaid_c_list_long, .select_var = c, .vars_amount_number = 4)

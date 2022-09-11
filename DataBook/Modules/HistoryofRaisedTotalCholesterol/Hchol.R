@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Total cholesterol measurement and diagnosis
-hchol_c_list_long <- tbls_pct_summary(.variable = c)
+hchol_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 hchol_c <- tbls_list_split(
@@ -47,7 +47,7 @@ hchol_c <- tbls_list_split(
 
 # Currently taking oral treatment (medication) prescribed for 
 # raised total cholesterol among those previously diagnosed
-hchol_d_list_long <- tbls_pct_summary(.variable = d, .cln = h14cln)
+hchol_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h14cln)
 
 # DATABOOK prep
 hchol_d <- tbls_list_split(

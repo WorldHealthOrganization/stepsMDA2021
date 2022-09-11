@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 # Mean number of standard drinks of unrecorded alcohol consumed on average 
 # per day in the past 7 days among current drinkers
-ameanunrecorded_list_long <- tbls_mn_summary(.variable = avgperday, .cln2 = onecln, .cln2_val = 1)
+ameanunrecorded_list_long <- tbls_summary(.mn_pct_md = mn, .variable = avgperday, .cln2 = onecln, .cln2_val = 1)
 
 # DATABOOK prep
 ameanunrecorded <- tbls_list_split(.data = ameanunrecorded_list_long, .vars_amount_number = 0)

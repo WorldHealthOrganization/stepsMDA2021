@@ -48,7 +48,7 @@ source("functions.R", encoding="UTF-8")
 # Median minutes of total physical activity on average per day
 # Median with Interquartile range (P25-P75)
 ptotalmedian_md_list_long <- 
-  tbls_mn_summary(.variable = ptotalday, .fun = pa_summary_md)
+  tbls_summary(.mn_pct_md = md, .variable = ptotalday)
 
 # DATABOOK prep
 ptotalmedian_md <- tbls_list_split(.data = ptotalmedian_md_list_long, .vars_amount_number = 0)
@@ -67,7 +67,6 @@ fs_18_ptotalmedian_md_joint <- cbind(fs_18_ptotalmedian_md_b,
                                      fs_18_ptotalmedian_md_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Median time spent in physical activity on average per day (minutes) (presented with inter-quartile range)", .before = 1)
-fs_18_ptotalmedian_md_joint
 
 readr::write_excel_csv(fs_18_ptotalmedian_md_joint, here("FactSheet", "18_fs_ptotalmedian_md.csv"))
 

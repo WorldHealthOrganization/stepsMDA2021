@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # Frequency of failing to do what was normally expected from you during 
 # the past 12 months among past 12 month drinkers
-afailexpected_c_list_long <- tbls_pct_summary(.variable = c)
+afailexpected_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 afailexpected_c <- 

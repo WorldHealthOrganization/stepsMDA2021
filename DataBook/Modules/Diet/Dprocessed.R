@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Always or often consume processed food high in salt
-dprocessed_c_list_long <- tbls_pct_summary(.variable = c)
+dprocessed_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dprocessed_c <- tbls_list_split(
@@ -60,7 +60,6 @@ fs_16_dprocessed_c_joint <- cbind(fs_16_dprocessed_c_b,
                                   fs_16_dprocessed_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage who always or often eat processed foods high in salt", .before = 1)
-fs_16_dprocessed_c_joint
 
 readr::write_excel_csv(fs_16_dprocessed_c_joint, here("FactSheet", "16_fs_dprocessed_c.csv"))
 

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - Percentage of respondents cleaning their teeth at least once a day
-ofreqclean_c_list_long <- tbls_pct_summary(.variable = c)
+ofreqclean_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 ofreqclean_c <- tbls_list_split(
@@ -47,7 +47,7 @@ ofreqclean_c <- tbls_list_split(
 ################################################################################
 
 # 2 - Percentage of respondents cleaning their teeth at least twice a day
-ofreqclean_d_list_long <- tbls_pct_summary(.variable = d)
+ofreqclean_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 ofreqclean_d <- tbls_list_split(

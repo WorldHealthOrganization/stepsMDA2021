@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # Description: How often people drink sugared beverages, excluding light, diet and non-sugar beverages.   
 # Drinking sugared soft drinks
-dx1_c_list_long <- tbls_pct_summary(.variable = c)
+dx1_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 dx1_c <- tbls_list_split(

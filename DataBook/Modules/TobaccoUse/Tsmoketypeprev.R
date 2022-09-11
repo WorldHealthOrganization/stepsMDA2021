@@ -39,7 +39,8 @@ source("functions.R", encoding="UTF-8")
 # 1 - Percentage of current smokers smoking each of the following products
 
 # 1.1 manuf_cigs 
-tsmoketypeprev_nondaily_t5a_list_long <- tbls_pct_summary(.variable = c, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5a <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5a_list_long, 
@@ -47,7 +48,8 @@ tsmoketypeprev_nondaily_t5a <- tbls_list_split(
   .select_var_val = "1) smokes manuf cigs")
 
 # 1.2 handrolled_cigs
-tsmoketypeprev_nondaily_t5b_list_long <- tbls_pct_summary(.variable = d, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5b <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5b_list_long, 
@@ -55,7 +57,8 @@ tsmoketypeprev_nondaily_t5b <- tbls_list_split(
   .select_var_val = "1) smokes hand-rolled cigs")
 
 # 1.3 pipes 
-tsmoketypeprev_nondaily_t5c_list_long <- tbls_pct_summary(.variable = e, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5c <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5c_list_long, 
@@ -63,7 +66,8 @@ tsmoketypeprev_nondaily_t5c <- tbls_list_split(
   .select_var_val = "1) smokes pipes")
 
 # 1.4 cigars 
-tsmoketypeprev_nondaily_t5d_list_long <- tbls_pct_summary(.variable = f, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5d <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5d_list_long, 
@@ -71,7 +75,8 @@ tsmoketypeprev_nondaily_t5d <- tbls_list_split(
   .select_var_val = "1) smokes cigars")
 
 # 1.5 shisha 
-tsmoketypeprev_nondaily_t5e_list_long <- tbls_pct_summary(.variable = g, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = g, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5e <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5e_list_long, 
@@ -79,7 +84,8 @@ tsmoketypeprev_nondaily_t5e <- tbls_list_split(
   .select_var_val = "1) smokes shisha")
 
 # 1.6 heated_tobacco 
-tsmoketypeprev_nondaily_t5f_list_long <- tbls_pct_summary(.variable = h, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = h, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5f <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5f_list_long, 
@@ -95,7 +101,8 @@ tsmoketypeprev_nondaily_t5f <- lapply(tsmoketypeprev_nondaily_t5f, function(x){
 
 
 # 1.7 other_tobacco 
-tsmoketypeprev_nondaily_t5g_list_long <- tbls_pct_summary(.variable = i, .cln2 = t1, .cln2_val = 1)
+tsmoketypeprev_nondaily_t5g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = i, 
+                                                      .cln2 = t1, .cln2_val = 1)
 # DATABOOK prep
 tsmoketypeprev_nondaily_t5g <- tbls_list_split(
   .data = tsmoketypeprev_nondaily_t5g_list_long, 
@@ -138,7 +145,7 @@ tsmoketypeprev_nondaily_list_long <- nondaily_t5a_b_c_d_e_f_g
 # 2 - Proportion of population who smoke each of the following products daily
 
 # 2.1 manuf_cigs_daily
-tsmoketypeprev_daily_t5a_list_long <- tbls_pct_summary(.variable = cd)
+tsmoketypeprev_daily_t5a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = cd)
 # DATABOOK prep
 tsmoketypeprev_daily_t5a <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5a_list_long, 
@@ -146,7 +153,7 @@ tsmoketypeprev_daily_t5a <- tbls_list_split(
   .select_var_val = "1) smokes manuf cigs daily")
 
 # 2.2 handrolled_cigs_daily
-tsmoketypeprev_daily_t5b_list_long <- tbls_pct_summary(.variable = dd)
+tsmoketypeprev_daily_t5b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = dd)
 # DATABOOK prep
 tsmoketypeprev_daily_t5b <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5b_list_long, 
@@ -154,7 +161,7 @@ tsmoketypeprev_daily_t5b <- tbls_list_split(
   .select_var_val = "1) smokes hand-rolled cigs daily")
 
 # 2.3 pipes_daily
-tsmoketypeprev_daily_t5c_list_long <- tbls_pct_summary(.variable = ed)
+tsmoketypeprev_daily_t5c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = ed)
 # DATABOOK prep
 tsmoketypeprev_daily_t5c <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5c_list_long, 
@@ -162,7 +169,7 @@ tsmoketypeprev_daily_t5c <- tbls_list_split(
   .select_var_val = "1) smokes pipes daily")
 
 # 2.4 cigars_daily
-tsmoketypeprev_daily_t5d_list_long <- tbls_pct_summary(.variable = fd)
+tsmoketypeprev_daily_t5d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = fd)
 # DATABOOK prep
 tsmoketypeprev_daily_t5d <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5d_list_long, 
@@ -177,7 +184,7 @@ tsmoketypeprev_daily_t5d <- lapply(tsmoketypeprev_daily_t5d, function(x){
 })
 
 # 2.5 shisha_daily
-tsmoketypeprev_daily_t5e_list_long <- tbls_pct_summary(.variable = gd)
+tsmoketypeprev_daily_t5e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = gd)
 # DATABOOK prep
 tsmoketypeprev_daily_t5e <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5e_list_long, 
@@ -185,7 +192,7 @@ tsmoketypeprev_daily_t5e <- tbls_list_split(
   .select_var_val = "1) smokes shisha daily")
 
 # 2.6 heated_tobacco_daily
-tsmoketypeprev_daily_t5f_list_long <- tbls_pct_summary(.variable = hd)
+tsmoketypeprev_daily_t5f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = hd)
 # DATABOOK prep
 tsmoketypeprev_daily_t5f <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5f_list_long, 
@@ -201,7 +208,7 @@ tsmoketypeprev_daily_t5f <- lapply(tsmoketypeprev_daily_t5f, function(x){
 
 
 # 2.7 other_tobacco_daily
-tsmoketypeprev_daily_t5g_list_long <- tbls_pct_summary(.variable = id)
+tsmoketypeprev_daily_t5g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = id)
 # DATABOOK prep
 tsmoketypeprev_daily_t5g <- tbls_list_split(
   .data = tsmoketypeprev_daily_t5g_list_long, 

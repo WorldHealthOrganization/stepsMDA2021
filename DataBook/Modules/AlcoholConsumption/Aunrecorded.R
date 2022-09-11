@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Consumption of unrecorded alcohol
-aunrecorded_c_list_long <- tbls_pct_summary(.variable = c)
+aunrecorded_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 aunrecorded_c <- tbls_list_split(

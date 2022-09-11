@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - Noticed free samples of cigarettes
-tpcigpromos_a_list_long <- tbls_pct_summary(.variable = a, .cln = tp3acln)
+tpcigpromos_a_list_long <- tbls_summary(.mn_pct_md = pct, .variable = a, .cln = tp3acln)
 
 # DATABOOK prep
 tpcigpromos_a <- tbls_list_split(
@@ -48,7 +48,7 @@ tpcigpromos_a <- tbls_list_split(
 ################################################################################
 
 # 2 - Noticed sale prices on cigarettes
-tpcigpromos_b_list_long <- tbls_pct_summary(.variable = b, .cln = tp3bcln)
+tpcigpromos_b_list_long <- tbls_summary(.mn_pct_md = pct, .variable = b, .cln = tp3bcln)
 
 # DATABOOK prep
 tpcigpromos_b <- tbls_list_split(
@@ -59,7 +59,7 @@ tpcigpromos_b <- tbls_list_split(
 ################################################################################
 
 # 3 - Noticed coupons for cigarettes
-tpcigpromos_c_list_long <- tbls_pct_summary(.variable = c, .cln = tp3ccln)
+tpcigpromos_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = tp3ccln)
 
 # DATABOOK prep
 tpcigpromos_c <- tbls_list_split(
@@ -70,7 +70,7 @@ tpcigpromos_c <- tbls_list_split(
 ################################################################################
 
 # 4 - Noticed free gifts or special discount offers on other products when buying cigarettes
-tpcigpromos_d_list_long <- tbls_pct_summary(.variable = d, .cln = tp3dcln)
+tpcigpromos_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = tp3dcln)
 
 # DATABOOK prep
 tpcigpromos_d <- tbls_list_split(
@@ -81,7 +81,7 @@ tpcigpromos_d <- tbls_list_split(
 ################################################################################
 
 # 5 - Noticed clothing or other items with a cigarette brand name or logo
-tpcigpromos_e_list_long <- tbls_pct_summary(.variable = e, .cln = tp3ecln)
+tpcigpromos_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = tp3ecln)
 
 # DATABOOK prep
 tpcigpromos_e <- tbls_list_split(
@@ -92,7 +92,7 @@ tpcigpromos_e <- tbls_list_split(
 ################################################################################
 
 # 6 - Noticed cigarette promotions in the mail
-tpcigpromos_f_list_long <- tbls_pct_summary(.variable = f, .cln = tp3fcln)
+tpcigpromos_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln = tp3fcln)
 
 # DATABOOK prep
 tpcigpromos_f <- tbls_list_split(
@@ -103,7 +103,7 @@ tpcigpromos_f <- tbls_list_split(
 ################################################################################
 
 # 7 - Noticed any promotions (NOT INCLUDED IN DATABOOK)
-tpcigpromos_g_list_long <- tbls_pct_summary(.variable = g, .cln = allcln)
+tpcigpromos_g_list_long <- tbls_summary(.mn_pct_md = pct, .variable = g, .cln = allcln)
 
 # DATABOOK prep
 tpcigpromos_g <- tbls_list_split(

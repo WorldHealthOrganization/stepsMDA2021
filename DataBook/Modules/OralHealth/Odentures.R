@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of respondents having removable dentures
-odentures_c_list_long <- tbls_pct_summary(.variable = c)
+odentures_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 odentures_c <- tbls_list_split(
@@ -48,7 +48,7 @@ odentures_c <- tbls_list_split(
 ################################################################################
 
 # Percentage of respondents having an upper jaw denture among those having removable dentures
-odentures_d_list_long <- tbls_pct_summary(.variable = d, .cln = o6acln, .cln_val = 1)
+odentures_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = o6acln, .cln_val = 1)
 
 # DATABOOK prep
 odentures_d <- tbls_list_split(
@@ -60,7 +60,7 @@ odentures_d <- tbls_list_split(
 ################################################################################
 
 # Percentage of respondents having a lower jaw denture among those having removable dentures
-odentures_e_list_long <- tbls_pct_summary(.variable = e, .cln = o6bcln, .cln_val = 1)
+odentures_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = o6bcln, .cln_val = 1)
 
 # DATABOOK prep
 odentures_e <- tbls_list_split(
@@ -71,8 +71,8 @@ odentures_e <- tbls_list_split(
 ################################################################################
 
 # Percentage of respondents having an upper and a lower jaw denture among those having removable dentures
-odentures_f_list_long <- tbls_pct_summary(.variable = f, .cln2 = o6acln, .cln2_val = 1, 
-                                          .cln3 = o6bcln, .cln3_val = 1)
+odentures_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, .cln2 = o6acln, 
+                                      .cln2_val = 1, .cln3 = o6bcln, .cln3_val = 1)
 
 # DATABOOK prep
 odentures_f <- tbls_list_split(

@@ -51,13 +51,13 @@ source("functions.R", encoding="UTF-8")
 
 # Minutes spent in sedentary activities on average per day
 # MEAN MINUTES
-psedentary_mn_list_long <- tbls_mn_summary(.variable = p16)
+psedentary_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = p16)
 # DATABOOK prep
 psedentary_mn <- tbls_list_split(
   .data = psedentary_mn_list_long, .vars_amount_number = 0)
 
 # MEDIAN MINUTES
-psedentary_md_list_long <- tbls_mn_summary(.variable = p16, .fun = pa_summary_md)
+psedentary_md_list_long <- tbls_summary(.mn_pct_md = md, .variable = p16)
 # DATABOOK prep
 psedentary_md <- tbls_list_split(
   .data = psedentary_md_list_long, .vars_amount_number = 0)

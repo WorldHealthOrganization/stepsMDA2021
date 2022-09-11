@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Highest level of education
-ceduhigh_c_list_long <- tbls_pct_summary(.variable = c, .fun = summary_pct_unwt)
+ceduhigh_c_list_long <- tbls_summary(.wt_unwt = unwt, .mn_pct_md = pct, .variable = c)
 
 ceduhigh_c <- tbls_list_split(.data = ceduhigh_c_list_long, .select_var = c, .vars_amount_number = 7)
 

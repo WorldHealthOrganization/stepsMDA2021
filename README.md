@@ -8,17 +8,13 @@ R Project for analysis of the STEPS survey data conducted in the Republic of Mol
 
 -   `STEPS.mdb` data file for MDA is needed for the project and should be placed in the root folder
 
--   `LoadData.R` script (located in the root folder) is used for manually adjusting the inclusion of disaggregations (by urban/rural and region)
+-   `LoadData.R` script (located in the root folder) is used for manually adjusting the inclusion of disaggregations (by urban/rural and region), project title and authors
 
 -   Code in the project contains comments and functions have descriptions of arguments
 
 -   Some scripts in modules are tailored to the country-specific settings
 
 -   It is suggested to use RStudio software and `stepsMDA2021.Rproj` file to load the project
-
--   Setup RStudio:
-
-    -   Use the project's directory for RMarkdown (Tools ➔ Global Options ➔ R Markdown ➔ Evaluate chunks in directory ➔ Project)
 
 -   Project has been tested on MacOS 12.3 and Windows 10/11, using R version 4.1.3
 
@@ -70,15 +66,15 @@ The WHO STEPS in MDA includes the following modules:
 
 ### Data book
 
-Individual Rmd files are used to create Word documents for each module (located in DataBook folder).
+Individual Rmd files are used to create Word documents for each module (located in `DataBook/` folder).
 
 ### Fact sheet
 
-The `factsheet.R` script is used for creating a Word document out of CSV files that are written to FactSheet folder when Rmd files are run.
+The `factsheet.R` script (located in `FactSheet/` folder) is used for creating a Word document out of CSV files that are written to the folder when Rmd files are run.
 
 ### Forest plots
 
-There are two parts for creating plots in PDF, SVG and EMF formats: `01_load_save_scripts.R` and `02_make_plots.R` (located in Plots folder). The first script is used to create an Rds data file, containing all modules, and the second one is used for loading the Rds, manually adjusting which indicators are included, and plotting. The XLSX mapping spreadsheet (located in Plots folder) is used for manually adjusting which indicators are included for plotting, using `include_in_analysis` variable (TRUE or FALSE).
+The `make_plots.R` script (located in `Plots/` folder) is used for creating forest plots in PDF, SVG and EMF formats. The script creates an Rds data file with a function, containing all modules, loads the mapping XLSX of included indicators, and generates subsequent plots with a function. The XLSX mapping spreadsheet (located in `Plots/` folder) is used to manually adjust which indicators are included for plotting, using `include_in_analysis` variable (TRUE or FALSE).
 
 ## Getting help
 

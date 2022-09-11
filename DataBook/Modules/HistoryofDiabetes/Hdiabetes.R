@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Blood sugar measurement and diagnosis
-hdiabetes_c_list_long <- tbls_pct_summary(.variable = c)
+hdiabetes_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 hdiabetes_c <- tbls_list_split(
@@ -46,7 +46,7 @@ hdiabetes_c <- tbls_list_split(
 ################################################################################
 
 # Currently taking drugs (medication) prescribed for diabetes among those previously diagnosed
-hdiabetes_d_list_long <- tbls_pct_summary(.variable = d, .cln = h8cln)
+hdiabetes_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h8cln)
 
 # DATABOOK prep
 hdiabetes_d <- tbls_list_split(
@@ -56,7 +56,7 @@ hdiabetes_d <- tbls_list_split(
 ################################################################################
 
 # Currently taking insulin prescribed for diabetes among those previously diagnosed
-hdiabetes_e_list_long <- tbls_pct_summary(.variable = e, .cln = h9cln)
+hdiabetes_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = h9cln)
 
 # DATABOOK prep
 hdiabetes_e <- tbls_list_split(

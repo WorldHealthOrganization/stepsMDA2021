@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current smokers who saw health warnings on cigarette packages that thought of quitting
-tpquitting_c_list_long <- tbls_pct_summary(.variable = c)
+tpquitting_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tpquitting_c <- tbls_list_split(

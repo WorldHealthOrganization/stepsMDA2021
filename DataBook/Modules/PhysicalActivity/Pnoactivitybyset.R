@@ -45,7 +45,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - No work-related physical activity
-pnoactivitybyset_work_list_long <- tbls_pct_summary(.variable = work)
+pnoactivitybyset_work_list_long <- tbls_summary(.mn_pct_md = pct, .variable = work)
 
 # DATABOOK prep
 pnoactivitybyset_work <- tbls_list_split(
@@ -55,7 +55,7 @@ pnoactivitybyset_work <- tbls_list_split(
 
 
 # 2 - No transport-related physical activity
-pnoactivitybyset_trans_list_long <- tbls_pct_summary(.variable = trans)
+pnoactivitybyset_trans_list_long <- tbls_summary(.mn_pct_md = pct, .variable = trans)
 
 # DATABOOK prep
 pnoactivitybyset_trans <- tbls_list_split(
@@ -65,7 +65,7 @@ pnoactivitybyset_trans <- tbls_list_split(
 
 
 # 3 - No recreation-related physical activity
-pnoactivitybyset_rec_list_long <- tbls_pct_summary(.variable = rec)
+pnoactivitybyset_rec_list_long <- tbls_summary(.mn_pct_md = pct, .variable = rec)
 
 # DATABOOK prep
 pnoactivitybyset_rec <- tbls_list_split(

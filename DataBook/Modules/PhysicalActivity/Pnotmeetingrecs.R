@@ -45,7 +45,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Not meeting WHO recommendations on physical activity for health
-pnotmeetingrecs_c_list_long <- tbls_pct_summary(.variable = c)
+pnotmeetingrecs_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 pnotmeetingrecs_c <- tbls_list_split(
@@ -59,7 +59,7 @@ pnotmeetingrecs_c <- tbls_list_split(
 # Not meeting WHO recommendations on physical activity for health
 # Proportion of the population engaged in physical activity with additional health benefits 
 # (physical activity ≥ 1200 MET-minutes/week). Total and data by gender and/or age group.
-pnotmeetingrecs_mets1200_list_long <- tbls_pct_summary(.variable = mets1200)
+pnotmeetingrecs_mets1200_list_long <- tbls_summary(.mn_pct_md = pct, .variable = mets1200)
 
 # DATABOOK prep
 pnotmeetingrecs_mets1200 <- tbls_list_split(
@@ -88,7 +88,6 @@ fs_17_pnotmeetingrecs_c_joint <- cbind(fs_17_pnotmeetingrecs_c_b,
                                        fs_17_pnotmeetingrecs_c_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with insufficient physical activity (defined as < 150 minutes of moderate-intensity activity per week, or equivalent)*", .before = 1)
-fs_17_pnotmeetingrecs_c_joint
 
 readr::write_excel_csv(fs_17_pnotmeetingrecs_c_joint, here("FactSheet", "17_fs_pnotmeetingrecs_c.csv"))
 

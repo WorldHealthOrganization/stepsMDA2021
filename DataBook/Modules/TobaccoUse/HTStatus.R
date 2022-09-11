@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of current users of heated tobacco products
-htstatus_d_list_long <- tbls_pct_summary(.variable = d)
+htstatus_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 htstatus_d <- tbls_list_split(
@@ -48,7 +48,7 @@ htstatus_d <- tbls_list_split(
 ################################################################################
 
 # Heated tobacco products using status
-htstatus_c_list_long <- tbls_pct_summary(.variable = c)
+htstatus_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 htstatus_c <- 

@@ -36,7 +36,7 @@ source("functions.R", encoding="UTF-8")
 
 ################################################################################
 
-mhip_list_long <- tbls_mn_summary(.variable = m15, .cln = m15cln)
+mhip_list_long <- tbls_summary(.mn_pct_md = mn, .variable = m15, .cln = m15cln)
 
 # DATABOOK prep
 mhip <- tbls_list_split(.data = mhip_list_long, .vars_amount_number = 0)

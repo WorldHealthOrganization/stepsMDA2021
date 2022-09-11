@@ -3,16 +3,15 @@
 # Copyright: WHO NCD Office
 ################################################################################
 
-# This script creates an Rds data file for making forest plots.
-# Load individual R scripts from modules for mapping the forest plot function.
-
 # load packages
 library(here)
 library(tidyverse)
 library(fs) # for using dir_ls function
-library(purrr)
 library(magrittr)
 
+################################################################################
+# PART 1 - load individual R scripts from modules for mapping the forest plot 
+# function and create an Rds data file for making forest plots
 ################################################################################
 
 # load all scripts into global environment by using a function
@@ -120,16 +119,11 @@ run_all_scripts <- function() {
   
 }
 
+# NOTE: the function below will require some time to run
+# For reference, on a MacBook with the M1 processor and 8Gb RAM, it runs for 10 mins
 run_all_scripts()
 
 ################################################################################
-
-# the commented out code below is superseded
-# # pull "list_long" objects from the global environment 
-# # names_all <- ls(pattern = "_list_long")
-# 
-# # set names (if needed), typically leave it commented out
-# # names_all <- purrr::set_names(names_all)
 
 # create a list of all lists... 
 # ^ to match the start of the string.
@@ -179,9 +173,89 @@ tidy_df_all <-
 
 View(tidy_df_all)
 
-# export to a Rds file for loading later in the second script 02_make_plots.R
+# save to a Rds file for reference and loading later if needed
 saveRDS(tidy_df_all, here("Plots", "tidy_df_all.rds"))
 
 ################################################################################
+
+# if the above part of script was run before, 
+# load the Rds, containing all previously saved lists
+tidy_df_all <- readRDS(here("Plots", "tidy_df_all.rds"))
+
+################################################################################
+
+# load the mapping spreadsheet
+data_book_mapping <- 
+  readxl::read_excel(here("Plots", "MDA_DataBook_mapping.xlsx"))
+
+# View(data_book_mapping)
+
+################################################################################
+
+# Load functions
+
+source("functions.R", encoding="UTF-8")
+
+################################################################################
+# PART 2 - create forest plots in vector graphics (PDF, SVG, EMF)
+# EXAMPLES OF USAGE
+################################################################################
+
+# PERCENTAGES
+
+# MEN, WOMEN, BOTH SEXES ONLY # without urban/rural and regional disaggregation
+forestplot_steps(.multi_vals = TRUE, .pct_mn_md_val = pct, .ylab = "%", 
+                 .agerange = agerange, .folder = "Age_range_Sex")
+forestplot_steps(.pct_mn_md_val = pct, .ylab = "%",
+                 .agerange = agerange, .folder = "Age_range_Sex")
+
+# URBAN, RURAL
+forestplot_steps(.multi_vals = TRUE, .pct_mn_md_val = pct, .ylab = "%", 
+                 .agerange = agerange2, .folder = "Urban_Rural", .ur = TRUE)
+forestplot_steps(.pct_mn_md_val = pct, .ylab = "%", 
+                 .agerange = agerange2, .folder = "Urban_Rural", .ur = TRUE)
+
+# REGION
+forestplot_steps(.multi_vals = TRUE, .pct_mn_md_val = pct, .ylab = "%",
+                 .agerange = region, .folder = "Region")
+forestplot_steps(.pct_mn_md_val = pct, .ylab = "%",
+                 .agerange = region, .folder = "Region")
+
+
+################################################################################
+
+# MEANS
+
+# MEN, WOMEN, BOTH SEXES ONLY # without urban/rural and regional disaggregation
+forestplot_steps(.pct_mn_md_val = mn, .ylab = "Mean", 
+                 .agerange = agerange, .folder = "Age_range_Sex")
+
+# URBAN, RURAL
+forestplot_steps(.pct_mn_md_val = mn, .ylab = "Mean", 
+                 .agerange = agerange2, .folder = "Urban_Rural", .ur = TRUE)
+
+# REGION
+forestplot_steps(.pct_mn_md_val = mn, .ylab = "Mean", 
+                 .agerange = region, .folder = "Region")
+
+################################################################################
+
+# MEDIANS
+
+# MEN, WOMEN, BOTH SEXES ONLY # without urban/rural and regional disaggregation
+forestplot_steps(.pct_mn_md_val = md, .ylab = "Median", 
+                 .agerange = agerange, .folder = "Age_range_Sex")
+
+# URBAN, RURAL
+forestplot_steps(.pct_mn_md_val = md, .ylab = "Median", 
+                 .agerange = agerange2, .folder = "Urban_Rural", .ur = TRUE)
+
+# REGION
+forestplot_steps(.pct_mn_md_val = md, .ylab = "Median",
+                 .agerange = region, .folder = "Region")
+
+
+################################################################################
+
 
 

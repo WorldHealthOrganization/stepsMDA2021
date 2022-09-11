@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of respondents having poor or very poor state of teeth among those having natural teeth
-ohealthteeth_c_list_long <- tbls_pct_summary(.variable = c)
+ohealthteeth_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 ohealthteeth_c <- tbls_list_split(

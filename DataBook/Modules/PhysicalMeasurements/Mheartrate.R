@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # % of those with heart rate over 100 ("beats per minute over 100") # NOT INCLUDED IN DATA BOOK
-# mheartrate_c_list_long <- tbls_pct_summary(.variable = c)
+# mheartrate_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 # # DATABOOK prep
 # mheartrate_c <- tbls_list_split(
 #   .data = mheartrate_c_list_long, .select_var = c, 
@@ -46,7 +46,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean heart rate (beats per minute)  # INCLUDED IN DATA BOOK
-mheartrate_mn_list_long <- tbls_mn_summary(.variable = rate)
+mheartrate_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = rate)
 
 # DATABOOK prep
 mheartrate_mn <- 

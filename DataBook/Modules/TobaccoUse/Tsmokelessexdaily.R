@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Former daily smokeless tobacco users (who don't use tobacco currently) among all respondents
-tsmokelessexdaily_c_list_long <- tbls_pct_summary(.variable = c)
+tsmokelessexdaily_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tsmokelessexdaily_c <- tbls_list_split(
@@ -48,7 +48,8 @@ tsmokelessexdaily_c <- tbls_list_split(
 ################################################################################
 
 # Former daily smokeless tobacco users (who don’t use tobacco currently) among ever daily users
-tsmokelessexdaily_everdaily_c_list_long <- tbls_pct_summary(.variable = c, .cln2 = everdaily, .cln2_val = 1)
+tsmokelessexdaily_everdaily_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, 
+                                                        .cln2 = everdaily, .cln2_val = 1)
 
 # DATABOOK prep
 tsmokelessexdaily_everdaily_c <- tbls_list_split(

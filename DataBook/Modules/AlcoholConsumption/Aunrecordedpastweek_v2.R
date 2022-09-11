@@ -168,6 +168,6 @@ aunrecordedpastweek <-
 ##################################
 # WHAT IS PRODUCED WITH SRVYR
 
-# aunrecordedpastweek_list_long <- tbls_mn_summary(.variable = percentunrec * 100)
+# aunrecordedpastweek_list_long <- tbls_summary(.mn_pct_md = mn, .variable = percentunrec * 100)
 
 

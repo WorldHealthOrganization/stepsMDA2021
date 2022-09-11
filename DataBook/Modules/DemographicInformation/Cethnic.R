@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Ethnic group of respondents
-cethnic_c_list_long <- tbls_pct_summary(.variable = c, .fun = summary_pct_unwt)
+cethnic_c_list_long <- tbls_summary(.wt_unwt = unwt, .mn_pct_md = pct, .variable = c)
 
 cethnic_c <- tbls_list_split(
   .data = cethnic_c_list_long, .select_var = c, .vars_amount_number = 6)

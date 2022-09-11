@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # 1 - Percentage of respondents having seen a dentist during the past 12 months
-odentalvisit_c_list_long <- tbls_pct_summary(.variable = c)
+odentalvisit_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 odentalvisit_c <- tbls_list_split(
@@ -48,7 +48,7 @@ odentalvisit_c <- tbls_list_split(
 ################################################################################
 
 # 2 - Percentage of respondents who have never received dental care
-odentalvisit_d_list_long <- tbls_pct_summary(.variable = d)
+odentalvisit_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 odentalvisit_d <- tbls_list_split(

@@ -45,7 +45,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Level of total physical activity according to former recommendations
-ptotallevels_c_list_long <- tbls_pct_summary(.variable = c)
+ptotallevels_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 ptotallevels_c <- tbls_list_split(

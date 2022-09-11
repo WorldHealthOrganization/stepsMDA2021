@@ -1,48 +1,32 @@
 ---
-title: "STEPS MDA Data Book"
-author: "WHO NCD Office Moscow"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   word_document: default
-  html_document:
-    css: style.css
-    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 library(here)
 library(huxtable)
 library(tidyverse)
 library(fs)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+# Set a root directory for all chunks to be evaluated relative to rather than the document location
+knitr::opts_knit$set(root.dir = here())
 ```
 
 ```{r source, include=FALSE}
-combined_risk_factors_data_dir <- here::here("DataBook", "Modules", "SummaryofCombinedRiskFactors")
-
-# list all files in the directory
-# fs::dir_ls(combined_risk_factors_data_dir)
-
-# only R files
-r_files <- fs::dir_ls(combined_risk_factors_data_dir, regexp = "\\.R$") 
-# r_files
-
-# read in just one R file for testing
-# source(r_files[1])
-
-# scale up to all R files with a map function from purrr
-r_files %>% 
+here("DataBook", "Modules", "SummaryofCombinedRiskFactors") %>% 
+  # list all R files in the directory
+  fs::dir_ls(regexp = "\\.R$") %>% 
+  # scale up to all R files with a map function from purrr
   map(source, encoding = "UTF-8", local = knitr::knit_global())
 ```
 
-```{r databook_functions, echo=FALSE}
-source(here("DataBook", "databook_functions.R"), encoding = "UTF-8", local = knitr::knit_global())
-```
+---
+title: "`r set_title`"
+author: "`r set_author`"
+---
 
-```{r}
-m_w_b <- c("m","w","b")
-u_r <- c("m_u","w_u","b_u","m_r","w_r","b_r")
-```
 
 # Summary of Combined Risk Factors
 
@@ -70,50 +54,50 @@ raisedrisk_reg_col_names <-
     "% with 3-5 risk factors", "95% CI")
 
 # men, women, both sexes
-raisedrisk_m_w_b <- join_m_w_b(raisedrisk, 3, raisedrisk_col_names)
+raisedrisk_m_w_b <- join_tbls(raisedrisk, m_w_b, 3, raisedrisk_col_names)
 ```
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # urban, rural
-raisedrisk_u_r <- join_u_r(raisedrisk, 3, raisedrisk_col_names)
+raisedrisk_u_r <- join_tbls(raisedrisk, u_r, 3, raisedrisk_col_names)
 ```
 
 <br>
 
 ```{r}
-raisedrisk_m_w_b$m %>% final_m_w_b_tbl(1, "Men", "Summary of Combined Risk Factors", 8)
+raisedrisk_m_w_b$m %>% final_tbl(m_w_b, 1, "Men", "Summary of Combined Risk Factors", 8)
 ```
 
 <br>
 
 ```{r}
-raisedrisk_m_w_b$w %>% final_m_w_b_tbl(1, "Women", "Summary of Combined Risk Factors", 8)
+raisedrisk_m_w_b$w %>% final_tbl(m_w_b, 1, "Women", "Summary of Combined Risk Factors", 8)
 ```
 
 <br>
 
 ```{r}
-raisedrisk_m_w_b$b %>% final_m_w_b_tbl(1, "Both sexes", "Summary of Combined Risk Factors", 8)
+raisedrisk_m_w_b$b %>% final_tbl(m_w_b, 1, "Both sexes", "Summary of Combined Risk Factors", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(raisedrisk_u_r$m_u, raisedrisk_u_r$m_r) %>% 
-  final_u_r_tbl(1, "Men", "Summary of Combined Risk Factors by type of settlement", 8)
+  final_tbl(u_r, 1, "Men", "Summary of Combined Risk Factors by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(raisedrisk_u_r$w_u, raisedrisk_u_r$w_r) %>% 
-  final_u_r_tbl(1, "Women", "Summary of Combined Risk Factors by type of settlement", 8)
+  final_tbl(u_r, 1, "Women", "Summary of Combined Risk Factors by type of settlement", 8)
 ```
 
 <br>
 
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 rbind(raisedrisk_u_r$b_u, raisedrisk_u_r$b_r) %>% 
-  final_u_r_tbl(1, "Both sexes", "Summary of Combined Risk Factors by type of settlement", 8)
+  final_tbl(u_r, 1, "Both sexes", "Summary of Combined Risk Factors by type of settlement", 8)
 ```
 
 <br>
@@ -121,7 +105,7 @@ rbind(raisedrisk_u_r$b_u, raisedrisk_u_r$b_r) %>%
 ```{r, eval=.GlobalEnv$.u_r_reg==TRUE}
 # region
 raisedrisk$b_reg %>% unite_ci(.ci_amount = 3) %>% apply_hux(.col_names = raisedrisk_reg_col_names) %>% 
-  final_m_w_b_tbl(1, "Both sexes", "Summary of Combined Risk Factors by region", 8) 
+  final_tbl(reg, 1, "Both sexes", "Summary of Combined Risk Factors by region", 8) 
 ```
 
 <br>

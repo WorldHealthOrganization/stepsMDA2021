@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Blood pressure measurement and diagnosis
-hbloodpressure_c_list_long <- tbls_pct_summary(.variable = c)
+hbloodpressure_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 hbloodpressure_c <- tbls_list_split(
@@ -47,7 +47,7 @@ hbloodpressure_c <- tbls_list_split(
 
 # Currently taking drugs (medication) for raised blood pressure 
 # prescribed by doctor or health worker among those diagnosed
-hbloodpressure_d_list_long <- tbls_pct_summary(.variable = d, .cln = h3cln)
+hbloodpressure_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = h3cln)
 
 # DATABOOK prep
 hbloodpressure_d <- tbls_list_split(

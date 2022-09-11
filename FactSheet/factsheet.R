@@ -3,28 +3,17 @@
 # Copyright: WHO NCD Office
 ################################################################################
 
-# load CSV data files for joining into one df for the FactSheet
+# load CSV data files for joining into one df for the fact sheet
 
 # load packages
 library(here)
 library(tidyverse)
 library(fs) # for using dir_ls function
 
-# set the directory
-data_dir <- here("FactSheet")
-
-# list all files in the directory
-dir_ls(data_dir)
-
-# only CSV files
-csv_files <- dir_ls(data_dir, regexp = "\\.csv$")
-csv_files
-
-# read in just one file
-# readr::read_csv(csv_files[1])
-
-# scale up to all CSV files with a map functions from purrr
-fs_df <- csv_files %>% 
+fs_df <- here("FactSheet") %>% 
+  # read in only CSV files
+  dir_ls(regexp = "\\.csv$") %>% 
+  # scale up to all CSV files with a map functions from purrr
   map_dfr(read_csv)
 
 fs_df

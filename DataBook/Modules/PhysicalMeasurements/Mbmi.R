@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # 1 - Mean height (cm)
 # ONLY MEN & WOMEN are included in data book
-mbmi_m11_list_long <- tbls_mn_summary(.variable = m11, .cln = m11cln)
+mbmi_m11_list_long <- tbls_summary(.mn_pct_md = mn, .variable = m11, .cln = m11cln)
 
 # DATABOOK prep
 mbmi_m11 <- 
@@ -48,7 +48,7 @@ mbmi_m11 <-
 
 # 2 - Mean weight (kg)
 # ONLY MEN & WOMEN are included in data book
-mbmi_m12_list_long <- tbls_mn_summary(.variable = m12, .cln = m12cln)
+mbmi_m12_list_long <- tbls_summary(.mn_pct_md = mn, .variable = m12, .cln = m12cln)
 
 # DATABOOK prep
 mbmi_m12 <- 
@@ -57,7 +57,7 @@ mbmi_m12 <-
 ################################################################################
 
 # 3 - Mean BMI (kg/m2)
-mbmi_list_long <- tbls_mn_summary(.variable = bmi, .cln = bmicln)
+mbmi_list_long <- tbls_summary(.mn_pct_md = mn, .variable = bmi, .cln = bmicln)
 
 # DATABOOK prep
 mbmi <- tbls_list_split(.data = mbmi_list_long, .vars_amount_number = 0)
@@ -77,7 +77,6 @@ fs_21_mbmi_joint <- cbind(fs_21_mbmi_b,
                           fs_21_mbmi_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean body mass index – BMI (kg/m2)", .before = 1)
-fs_21_mbmi_joint
 
 readr::write_excel_csv(fs_21_mbmi_joint, here("FactSheet", "21_fs_mbmi.csv"))
 

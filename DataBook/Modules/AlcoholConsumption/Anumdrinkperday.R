@@ -35,7 +35,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean number of standard drinks per drinking occasion among current (past 30 days) drinkers
-anumdrinkperday_a7_list_long <- tbls_mn_summary(.variable = a7)
+anumdrinkperday_a7_list_long <- tbls_summary(.mn_pct_md = mn, .variable = a7)
 
 # DATABOOK prep
 anumdrinkperday_a7 <- tbls_list_split(.data = anumdrinkperday_a7_list_long, .vars_amount_number = 0)

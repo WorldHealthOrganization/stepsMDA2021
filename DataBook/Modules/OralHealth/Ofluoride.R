@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Percentage of respondents using toothpaste with fluoride
-ofluoride_c_list_long <- tbls_pct_summary(.variable = c)
+ofluoride_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 ofluoride_c <- tbls_list_split(

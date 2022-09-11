@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Current tobacco users
-tdailyuser_c_list_long <- tbls_pct_summary(.variable = c)
+tdailyuser_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 tdailyuser_c <- tbls_list_split(
@@ -48,7 +48,7 @@ tdailyuser_c <- tbls_list_split(
 ################################################################################
 
 # Daily tobacco users
-tdailyuser_d_list_long <- tbls_pct_summary(.variable = d)
+tdailyuser_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
 tdailyuser_d <- tbls_list_split(

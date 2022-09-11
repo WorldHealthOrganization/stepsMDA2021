@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean number of days fruit consumed in a typical week
-ddays_d1_list_long <- tbls_mn_summary(.variable = d1, .cln = d1cln)
+ddays_d1_list_long <- tbls_summary(.mn_pct_md = mn, .variable = d1, .cln = d1cln)
 
 # DATABOOK prep
 ddays_d1 <- 
@@ -46,7 +46,7 @@ ddays_d1 <-
 ################################################################################
 
 # Mean number of days vegetables consumed in a typical week
-ddays_d3_list_long <- tbls_mn_summary(.variable = d3, .cln = d3cln)
+ddays_d3_list_long <- tbls_summary(.mn_pct_md = mn, .variable = d3, .cln = d3cln)
 
 # DATABOOK prep
 ddays_d3 <- 
@@ -67,7 +67,6 @@ fs_10_ddays_d1_joint <- cbind(fs_10_ddays_d1_b,
                               fs_10_ddays_d1_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean number of days fruit consumed in a typical week", .before = 1)
-fs_10_ddays_d1_joint
 
 readr::write_excel_csv(fs_10_ddays_d1_joint, here("FactSheet", "10_fs_ddays_d1.csv"))
 
@@ -82,7 +81,6 @@ fs_12_ddays_d3_joint <- cbind(fs_12_ddays_d3_b,
                               fs_12_ddays_d3_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean number of days vegetables consumed in a typical week", .before = 1)
-fs_12_ddays_d3_joint
 
 readr::write_excel_csv(fs_12_ddays_d3_joint, here("FactSheet", "12_fs_ddays_d3.csv"))
 

@@ -37,7 +37,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Main reason for last visit to the dentist among those who ever visited a dentist
-oreasonvisit_c_list_long <- tbls_pct_summary(.variable = c)
+oreasonvisit_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c)
 
 # DATABOOK prep
 oreasonvisit_c <- tbls_list_split(
@@ -46,7 +46,7 @@ oreasonvisit_c <- tbls_list_split(
 ################################################################################
 
 # Main reason not to visit a dentist during last 12 months
-oreasonvisit_d_list_long <- tbls_pct_summary(.variable = d, .cln = clnox2)
+oreasonvisit_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = clnox2)
 
 # DATABOOK prep
 oreasonvisit_d <- tbls_list_split(

@@ -45,7 +45,7 @@ source("functions.R", encoding="UTF-8")
 ################################################################################
 
 # Mean minutes of total physical activity on average per day
-ptotal_mn_list_long <- tbls_mn_summary(.variable = ptotalday)
+ptotal_mn_list_long <- tbls_summary(.mn_pct_md = mn, .variable = ptotalday)
 
 # DATABOOK prep
 ptotal_mn <- tbls_list_split(.data = ptotal_mn_list_long, .vars_amount_number = 0)
@@ -53,7 +53,7 @@ ptotal_mn <- tbls_list_split(.data = ptotal_mn_list_long, .vars_amount_number = 
 ################################################################################
 
 # Median minutes of total physical activity on average per day
-ptotal_md_list_long <- tbls_mn_summary(.variable = ptotalday, .fun = pa_summary_md)
+ptotal_md_list_long <- tbls_summary(.mn_pct_md = md, .variable = ptotalday)
 
 # DATABOOK prep
 ptotal_md <- tbls_list_split(.data = ptotal_md_list_long, .vars_amount_number = 0)

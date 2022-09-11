@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # 1
 # Mean number of servings of fruit on average per day
-fservings_list_long <- tbls_mn_summary(.variable = fservings, .cln = fruitcln)
+fservings_list_long <- tbls_summary(.mn_pct_md = mn, .variable = fservings, .cln = fruitcln)
 
 # DATABOOK prep
 fservings_tbls <- tbls_list_split(.data = fservings_list_long, .vars_amount_number = 0)
@@ -47,7 +47,7 @@ fservings_tbls <- tbls_list_split(.data = fservings_list_long, .vars_amount_numb
 
 # 2
 # Mean number of servings of vegetables on average per day
-vservings_list_long <- tbls_mn_summary(.variable = vservings, .cln = vegcln)
+vservings_list_long <- tbls_summary(.mn_pct_md = mn, .variable = vservings, .cln = vegcln)
 
 # DATABOOK prep
 vservings_tbls <- tbls_list_split(.data = vservings_list_long, .vars_amount_number = 0)
@@ -56,7 +56,7 @@ vservings_tbls <- tbls_list_split(.data = vservings_list_long, .vars_amount_numb
 
 # 3
 # Mean number of servings of fruit and/or vegetables on average per day
-fvservings_list_long <- tbls_mn_summary(.variable = fvservings, .cln = fvcln)
+fvservings_list_long <- tbls_summary(.mn_pct_md = mn, .variable = fvservings, .cln = fvcln)
 
 # DATABOOK prep
 fvservings_tbls <- tbls_list_split(.data = fvservings_list_long, .vars_amount_number = 0)
@@ -75,7 +75,6 @@ fs_11_fservings_joint <- cbind(fs_11_fservings_b,
                               fs_11_fservings_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean number of servings of fruit consumed on average per day", .before = 1)
-fs_11_fservings_joint
 
 readr::write_excel_csv(fs_11_fservings_joint, here("FactSheet", "11_fs_fservings.csv"))
 
@@ -89,7 +88,6 @@ fs_13_vservings_joint <- cbind(fs_13_vservings_b,
                                fs_13_vservings_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Mean number of servings of vegetables consumed on average per day", .before = 1)
-fs_13_vservings_joint
 
 readr::write_excel_csv(fs_13_vservings_joint, here("FactSheet", "13_fs_vservings.csv"))
 

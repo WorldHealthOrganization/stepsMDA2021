@@ -38,14 +38,14 @@ source("functions.R", encoding="UTF-8")
 
 # 1 - RAISED BP
 # 1.1 - SBP ≥140 and/or DBP ≥ 90 mmHg
-raisedbp_140_90_list_long <- tbls_pct_summary(.variable = raisedbp_140_90)
+raisedbp_140_90_list_long <- tbls_summary(.mn_pct_md = pct, .variable = raisedbp_140_90)
 # DATABOOK prep
 raisedbp_140_90 <- tbls_list_split(
   .data = raisedbp_140_90_list_long, .select_var = raisedbp_140_90, 
   .vars_amount_number = 2, .select_var_val = "1)SBP>=140 and/or DBP>=90")
 
 # 1.2 - SBP ≥160 and/or DBP ≥ 100 mmHg
-raisedbp_160_100_list_long <- tbls_pct_summary(.variable = raisedbp_160_100)
+raisedbp_160_100_list_long <- tbls_summary(.mn_pct_md = pct, .variable = raisedbp_160_100)
 # DATABOOK prep
 raisedbp_160_100 <- tbls_list_split(
   .data = raisedbp_160_100_list_long, .select_var = raisedbp_160_100, 
@@ -53,7 +53,7 @@ raisedbp_160_100 <- tbls_list_split(
 
 ################################################################################
 # 2 - Raised BP, excluding those on medication # NOT INCLUDED IN DATA BOOK
-# raisedbp_140_90_excl_ppl_on_meds_list_long <- tbls_pct_summary(.variable = raisedbp_140_90, .cln = clnnomeds)
+# raisedbp_140_90_excl_ppl_on_meds_list_long <- tbls_summary(.mn_pct_md = pct, .variable = raisedbp_140_90, .cln = clnnomeds)
 # # DATABOOK prep
 # raisedbp_140_90_excl_ppl_on_meds <- tbls_list_split(
 #   .data = raisedbp_140_90_excl_ppl_on_meds_list_long, .select_var = raisedbp_140_90, 
@@ -63,7 +63,7 @@ raisedbp_160_100 <- tbls_list_split(
 
 # 3 - Raised BP or on medication
 # 3.1 - SBP ≥140 and/or DBP ≥ 90 mmHg or currently on medication for raised blood pressure
-raisedbp_140_90_or_meds_list_long <- tbls_pct_summary(.variable = raisedbp_140_90_or_meds)
+raisedbp_140_90_or_meds_list_long <- tbls_summary(.mn_pct_md = pct, .variable = raisedbp_140_90_or_meds)
 # DATABOOK prep
 raisedbp_140_90_or_meds <- tbls_list_split(
   .data = raisedbp_140_90_or_meds_list_long, .select_var = raisedbp_140_90_or_meds, 
@@ -71,7 +71,7 @@ raisedbp_140_90_or_meds <- tbls_list_split(
 
 
 # 3.2 - SBP ≥160 and/or DBP ≥ 100 mmHg or currently on medication for raised blood pressure
-raisedbp_160_100_or_meds_list_long <- tbls_pct_summary(.variable = raisedbp_160_100_or_meds)
+raisedbp_160_100_or_meds_list_long <- tbls_summary(.mn_pct_md = pct, .variable = raisedbp_160_100_or_meds)
 # DATABOOK prep
 raisedbp_160_100_or_meds <- tbls_list_split(
   .data = raisedbp_160_100_or_meds_list_long, .select_var = raisedbp_160_100_or_meds, 
@@ -83,7 +83,7 @@ raisedbp_160_100_or_meds <- tbls_list_split(
 # Raised blood pressure diagnosis, treatment and control among those with raised 
 # blood pressure (SBP ≥ 140 and/or DBP ≥ 90 mmHg) or on medication for raised blood pressure
 # NOTE: new/current version of tables split by 4 columns
-htn_control_list_long <- tbls_pct_summary(.variable = htn_control, .cln = htn_control_cln)
+htn_control_list_long <- tbls_summary(.mn_pct_md = pct, .variable = htn_control, .cln = htn_control_cln)
 
 # DATABOOK prep
 htn_control <- tbls_list_split(
@@ -99,7 +99,7 @@ htn_control <- tbls_list_split(
 # at the beginning of the table (new column names: 
 # "% with raised blood pressure, not previously diagnosed", 
 # "% with previously diagnosed raised blood pressure, not on medication")
-bp_control_old_list_long <- tbls_pct_summary(.variable = bp_control_old, .cln = htn_control_cln)
+bp_control_old_list_long <- tbls_summary(.mn_pct_md = pct, .variable = bp_control_old, .cln = htn_control_cln)
 
 # DATABOOK prep
 bp_control_old <- tbls_list_split(
@@ -120,7 +120,6 @@ fs_27_raisedbp_140_90_or_meds_joint <- cbind(fs_27_raisedbp_140_90_or_meds_b,
                                              fs_27_raisedbp_140_90_or_meds_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with raised BP (SBP ≥ 140 and/or DBP ≥ 90 mmHg or currently on medication for raised BP)", .before = 1)
-fs_27_raisedbp_140_90_or_meds_joint
 
 readr::write_excel_csv(fs_27_raisedbp_140_90_or_meds_joint, here("FactSheet", "27_fs_raisedbp_140_90_or_meds.csv"))
 
@@ -136,7 +135,6 @@ fs_28_bp_control_old_joint <- cbind(fs_28_bp_control_old_b,
                                     fs_28_bp_control_old_w) %>%
   mutate("Results for adults aged 18–69 years (incl. 95% CI)" =
            "Percentage with raised BP (SBP ≥ 140 and/or DBP ≥ 90 mmHg or currently on medication for raised BP) who are not currently on medication for raised BP", .before = 1)
-fs_28_bp_control_old_joint
 
 readr::write_excel_csv(fs_28_bp_control_old_joint, here("FactSheet", "28_fs_bp_control_old.csv"))
 

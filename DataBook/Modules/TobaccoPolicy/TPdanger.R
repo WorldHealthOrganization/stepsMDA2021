@@ -38,7 +38,7 @@ source("functions.R", encoding="UTF-8")
 
 # 1 #
 # Noticed information in newspapers or magazines about dangers of smoking or that encourages quitting
-tpdanger_c_list_long <- tbls_pct_summary(.variable = c, .cln = tp1acln)
+tpdanger_c_list_long <- tbls_summary(.mn_pct_md = pct, .variable = c, .cln = tp1acln)
 
 # DATABOOK prep
 tpdanger_c <- tbls_list_split(
@@ -50,7 +50,7 @@ tpdanger_c <- tbls_list_split(
 
 # 2 #
 # Noticed information on television about dangers of smoking or that encourages quitting
-tpdanger_d_list_long <- tbls_pct_summary(.variable = d, .cln = tp1bcln)
+tpdanger_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d, .cln = tp1bcln)
 
 # DATABOOK prep
 tpdanger_d <- tbls_list_split(
@@ -62,7 +62,7 @@ tpdanger_d <- tbls_list_split(
 
 # 3 #
 # Noticed information on the radio about dangers of smoking or that encourages quitting
-tpdanger_e_list_long <- tbls_pct_summary(.variable = e, .cln = tp1ccln)
+tpdanger_e_list_long <- tbls_summary(.mn_pct_md = pct, .variable = e, .cln = tp1ccln)
 
 # DATABOOK prep
 tpdanger_e <- tbls_list_split(
@@ -74,8 +74,9 @@ tpdanger_e <- tbls_list_split(
 
 # 4 # NOT INCLUDED IN DATABOOK
 # Noticed information on the TV or radio about dangers of smoking or that encourages quitting
-tpdanger_f_list_long <- tbls_pct_summary(.variable = f, .cln = tp1bcln, .cln_val = 1, 
-                                         .cln2 = tp1ccln, .cln2_val = 1)
+tpdanger_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f, 
+                                     .cln = tp1bcln, .cln_val = 1, 
+                                     .cln2 = tp1ccln, .cln2_val = 1)
 
 # DATABOOK prep
 tpdanger_f <- tbls_list_split(
