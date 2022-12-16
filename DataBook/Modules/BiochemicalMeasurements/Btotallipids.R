@@ -67,7 +67,6 @@ btotallipids_e <- tbls_list_split(
 ################################################################################
 
 # 2.2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl
-# NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
 btotallipids_f_list_long <- tbls_summary(.mn_pct_md = pct, .variable = f)
 
 # DATABOOK prep
@@ -90,7 +89,6 @@ btotallipids_c <- tbls_list_split(
 ################################################################################
 
 # 3.2 - Total cholesterol ≥ 6.2 mmol/L or ≥ 240 mg/dl or currently on medication for raised cholesterol
-# NOTE: PRODUCES SLIGHTLY DIFFERENT NUMBERS
 btotallipids_d_list_long <- tbls_summary(.mn_pct_md = pct, .variable = d)
 
 # DATABOOK prep
