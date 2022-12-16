@@ -30,7 +30,7 @@ list_of_packages <- c("here", "tidyverse", "RODBC", "odbc", "Hmisc", "rlang", "s
                       "rmarkdown", "knitr", "magrittr", "plyr", "readxl", "svglite")
 
 # Checking if already installed packages contain the required packages
-install.packages(setdiff(list_of_packages, rownames(installed.packages()))) 
+install.packages(setdiff(list_of_packages, rownames(installed.packages())), type = "binary") 
 
 ################################################################################
 
