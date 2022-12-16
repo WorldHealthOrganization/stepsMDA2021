@@ -19,16 +19,17 @@ cleanrecodep1p15 <- function(.data) {
   } else {
     .data %>%
       ### Clean Recode P1-P3
-      mutate(p3a = replace(p3a, p3a==15 & (is.na(p3b) | p3b==0 | p3b==15 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
-      mutate(p3b = replace(p3b, p3a==15 & (is.na(p3b) | p3b==0 | p3b==15 | p3b==77 | p3b==88 | p3b==99), 15)) %>% 
-      mutate(p3a = replace(p3a, p3a==30 & (is.na(p3b) | p3b==0 | p3b==30 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
-      mutate(p3b = replace(p3b, p3a==30 & (is.na(p3b) | p3b==0 | p3b==30 | p3b==77 | p3b==88 | p3b==99), 15)) %>% 
-      mutate(p3a = replace(p3a, p3a==45 & (is.na(p3b) | p3b==0 | p3b==45 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
-      mutate(p3b = replace(p3b, p3a==45 & (is.na(p3b) | p3b==0 | p3b==45 | p3b==77 | p3b==88 | p3b==99), 45)) %>% 
-      mutate(p3a = replace(p3a, p3a==60 & (is.na(p3b) | p3b==0 | p3b==60 | p3b==77 | p3b==88 | p3b==99), 1)) %>% 
-      mutate(p3b = replace(p3b, p3a==60 & (is.na(p3b) | p3b==0 | p3b==60 | p3b==77 | p3b==88 | p3b==99), 0)) %>%
-      mutate(p3a = replace(p3a, (p3a==7 & p3b==77) | (p3a==8 & p3b==88) | (p3a==9 & p3b==99), 0)) %>% 
-      mutate(p3b = replace(p3b, (p3a==7 & p3b==77) | (p3a==8 & p3b==88) | (p3a==9 & p3b==99), 0)) %>% 
+      # Mutate "a" (hr) and "b" (mins) at the same time
+      mutate(p3b = replace(p3b, p3a==15 & (is.na(p3b) | p3b==0 | p3b==15 | p3b==77 | p3b==88 | p3b==99), 15),
+             p3a = replace(p3a, p3a==15 & (is.na(p3b) | p3b==0 | p3b==15 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
+      mutate(p3b = replace(p3b, p3a==30 & (is.na(p3b) | p3b==0 | p3b==30 | p3b==77 | p3b==88 | p3b==99), 30),
+             p3a = replace(p3a, p3a==30 & (is.na(p3b) | p3b==0 | p3b==30 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
+      mutate(p3b = replace(p3b, p3a==45 & (is.na(p3b) | p3b==0 | p3b==45 | p3b==77 | p3b==88 | p3b==99), 45),
+             p3a = replace(p3a, p3a==45 & (is.na(p3b) | p3b==0 | p3b==45 | p3b==77 | p3b==88 | p3b==99), 0)) %>% 
+      mutate(p3b = replace(p3b, p3a==60 & (is.na(p3b) | p3b==0 | p3b==60 | p3b==77 | p3b==88 | p3b==99), 0),
+             p3a = replace(p3a, p3a==60 & (is.na(p3b) | p3b==0 | p3b==60 | p3b==77 | p3b==88 | p3b==99), 1)) %>% 
+      mutate(p3b = replace(p3b, (p3a==7 & p3b==77) | (p3a==8 & p3b==88) | (p3a==9 & p3b==99), 0),
+             p3a = replace(p3a, (p3a==7 & p3b==77) | (p3a==8 & p3b==88) | (p3a==9 & p3b==99), 0)) %>% 
       mutate(p3b = replace(p3b, p3b==77 | p3b==88 | p3b==99, 0)) %>% 
       mutate(p3a = replace(p3a, p3a==77 | p3a==88 | p3a==99, 0)) %>% 
       # Recode variables into minutes only
